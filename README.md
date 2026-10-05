@@ -10,5 +10,6 @@ docker compose up -d
 ./mvnw spring-boot:run
 
 # Terminal ouvert depuis dossier front/
-gn serve
+npm install # juste la 1e fois
+ng serve
 ```
