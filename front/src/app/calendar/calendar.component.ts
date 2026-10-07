@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { CalendarService } from './calendar.service';
@@ -12,7 +12,15 @@ type CalendarView = 'month' | 'week';
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
-export class CalendarComponent {
+export class CalendarComponent implements OnInit {
+
+  /*
+   * TEMPORAIRE
+   * En attendant que l'authentification soit terminée,
+   * on utilise la colocation 1 et le colocataire 1.
+   */
+  readonly sharedHouseId = 1;
+  readonly currentUserId = 1;
 
   currentDate = new Date();
 
@@ -62,6 +70,37 @@ export class CalendarComponent {
   constructor(
     public calendarService: CalendarService
   ) {}
+
+  /*
+   * Chargement des événements depuis le backend
+   * lorsque le composant est affiché.
+   */
+  ngOnInit(): void {
+    this.loadEvents();
+  }
+
+  /*
+   * Récupère les événements de la colocation depuis Spring Boot.
+   */
+  private loadEvents(): void {
+    this.calendarService
+      .getEvents(this.sharedHouseId)
+      .subscribe({
+        next: events => {
+          console.log('Événements récupérés depuis le backend :', events);
+        },
+        error: error => {
+          console.error(
+            'Erreur lors du chargement des événements :',
+            error
+          );
+
+          alert(
+            'Impossible de charger les événements du calendrier.'
+          );
+        }
+      });
+  }
 
   get currentMonthLabel(): string {
     return `${this.monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
@@ -130,11 +169,23 @@ export class CalendarComponent {
   get selectedDayEvents(): CalendarEvent[] {
     return this.getEventsForDate(this.selectedDate)
       .sort((a, b) => {
+
         if (a.allDay && !b.allDay) {
           return -1;
         }
 
         if (!a.allDay && b.allDay) {
+          return 1;
+        }
+
+        /*
+         * Les événements "all day" ont startTime = null.
+         */
+        if (a.startTime === null) {
+          return -1;
+        }
+
+        if (b.startTime === null) {
           return 1;
         }
 
@@ -240,9 +291,15 @@ export class CalendarComponent {
       startDate: event.startDate,
       endDate: event.endDate,
       allDay: event.allDay,
-      startTime: event.startTime,
-      endTime: event.endTime,
-      description: event.description
+
+      /*
+       * Le backend renvoie null pour les événements all-day.
+       * Le formulaire utilise cependant des strings.
+       */
+      startTime: event.startTime ?? '18:00',
+      endTime: event.endTime ?? '19:00',
+
+      description: event.description ?? ''
     };
 
     this.showEventForm = true;
@@ -268,7 +325,9 @@ export class CalendarComponent {
     }
 
     if (this.newEvent.endDate < this.newEvent.startDate) {
-      alert('La date de fin doit être après ou égale à la date de début.');
+      alert(
+        'La date de fin doit être après ou égale à la date de début.'
+      );
       return;
     }
 
@@ -277,70 +336,160 @@ export class CalendarComponent {
       && this.newEvent.endDate === this.newEvent.startDate
       && this.newEvent.endTime <= this.newEvent.startTime
     ) {
-      alert('L’heure de fin doit être après l’heure de début.');
+      alert(
+        'L’heure de fin doit être après l’heure de début.'
+      );
       return;
     }
 
+    /*
+     * Données envoyées à Spring Boot.
+     */
+    const eventRequest = {
+      title: this.newEvent.title.trim(),
+
+      description: this.newEvent.description.trim(),
+
+      startDate: this.newEvent.startDate,
+
+      endDate: this.newEvent.endDate,
+
+      allDay: this.newEvent.allDay,
+
+      startTime: this.newEvent.allDay
+        ? null
+        : this.newEvent.startTime,
+
+      endTime: this.newEvent.allDay
+        ? null
+        : this.newEvent.endTime,
+
+      /*
+       * TEMPORAIRE :
+       * l'utilisateur connecté sera utilisé plus tard.
+       */
+      creatorId: this.currentUserId,
+
+      sharedHouseId: this.sharedHouseId
+    };
+
+    /*
+     * =========================
+     * CRÉATION
+     * =========================
+     */
     if (this.editingEventId === null) {
 
-      this.calendarService.addEvent({
-        title: this.newEvent.title.trim(),
-        description: this.newEvent.description.trim(),
-        startDate: this.newEvent.startDate,
-        endDate: this.newEvent.endDate,
-        allDay: this.newEvent.allDay,
-        startTime: this.newEvent.allDay
-          ? ''
-          : this.newEvent.startTime,
-        endTime: this.newEvent.allDay
-          ? ''
-          : this.newEvent.endTime,
-        creatorName: 'Mila A',
-        creatorInitials: 'MA'
-      });
+      this.calendarService
+        .addEvent(eventRequest)
+        .subscribe({
+          next: createdEvent => {
 
-    } else {
+            console.log(
+              'Événement créé :',
+              createdEvent
+            );
 
-      const existingEvent = this.calendarService
-        .events()
-        .find(event => event.id === this.editingEventId);
+            this.selectedDate =
+              this.parseDate(createdEvent.startDate);
 
-      if (!existingEvent) {
-        return;
-      }
+            this.currentDate =
+              new Date(this.selectedDate);
 
-      const updatedEvent: CalendarEvent = {
-        ...existingEvent,
-        title: this.newEvent.title.trim(),
-        description: this.newEvent.description.trim(),
-        startDate: this.newEvent.startDate,
-        endDate: this.newEvent.endDate,
-        allDay: this.newEvent.allDay,
-        startTime: this.newEvent.allDay
-          ? ''
-          : this.newEvent.startTime,
-        endTime: this.newEvent.allDay
-          ? ''
-          : this.newEvent.endTime
-      };
+            this.closeEventForm();
+          },
 
-      this.calendarService.updateEvent(updatedEvent);
+          error: error => {
+
+            console.error(
+              'Erreur lors de la création :',
+              error
+            );
+
+            alert(
+              'Impossible de créer l’événement.'
+            );
+          }
+        });
+
+      return;
     }
 
-    this.selectedDate = this.parseDate(this.newEvent.startDate);
-    this.currentDate = new Date(this.selectedDate);
+    /*
+     * =========================
+     * MODIFICATION
+     * =========================
+     */
 
-    this.closeEventForm();
+    this.calendarService
+      .updateEvent(
+        this.editingEventId,
+        eventRequest
+      )
+      .subscribe({
+        next: updatedEvent => {
+
+          console.log(
+            'Événement modifié :',
+            updatedEvent
+          );
+
+          this.selectedDate =
+            this.parseDate(updatedEvent.startDate);
+
+          this.currentDate =
+            new Date(this.selectedDate);
+
+          this.closeEventForm();
+        },
+
+        error: error => {
+
+          console.error(
+            'Erreur lors de la modification :',
+            error
+          );
+
+          alert(
+            'Impossible de modifier l’événement.'
+          );
+        }
+      });
   }
 
   deleteEvent(event: CalendarEvent): void {
+
     const confirmation = confirm(
       `Voulez-vous supprimer l’événement "${event.title}" ?`
     );
 
-    if (confirmation) {
-      this.calendarService.deleteEvent(event.id);
+    if (!confirmation) {
+      return;
     }
+
+    this.calendarService
+      .deleteEvent(event.id)
+      .subscribe({
+        next: () => {
+
+          console.log(
+            'Événement supprimé :',
+            event.id
+          );
+        },
+
+        error: error => {
+
+          console.error(
+            'Erreur lors de la suppression :',
+            error
+          );
+
+          alert(
+            'Impossible de supprimer l’événement.'
+          );
+        }
+      });
   }
 
   isToday(date: Date): boolean {
@@ -392,15 +541,22 @@ export class CalendarComponent {
   }
 
   private parseDate(date: string): Date {
-    const [year, month, day] = date.split('-').map(Number);
+    const [year, month, day] = date
+      .split('-')
+      .map(Number);
 
-    return new Date(year, month - 1, day);
+    return new Date(
+      year,
+      month - 1,
+      day
+    );
   }
 
   private isSameDate(
     first: Date,
     second: Date
   ): boolean {
+
     return first.getFullYear() === second.getFullYear()
       && first.getMonth() === second.getMonth()
       && first.getDate() === second.getDate();
