@@ -17,3 +17,10 @@
   height: 28px;
   font-size: 0.7rem;
 }
+
+:host(.large) {
+  width: 64px;
+  height: 64px;
+  font-size: 1.6rem;
+  font-weight: 400;
+}

@@ -1,0 +1,30 @@
+<main class="home">
+  <p class="date">{{ today | date: 'EEE d MMM' }}</p>
+  <h1>Bon retour dans {{ house()?.name }} {{ user()?.name }} !</h1>
+
+  <div class="grid">
+    @if (house(); as h) {
+      <section class="house-card" aria-label="Ma colocation">
+        <h2>{{ h.name }}</h2>
+        <p class="description">{{ h.description }}</p>
+        <ul class="members">
+          @for (m of members(); track m.id) {
+            <li>
+              <span class="member-name">{{ m.name }} {{ m.surname }}</span>
+              <span class="member-title">-- {{ m.title }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @for (tile of tiles(); track tile.title) {
+      <a class="tile" [class.salmon]="tile.color === 'salmon'" [class.purple]="tile.color === 'purple'" [routerLink]="tile.route">
+        <h2>{{ tile.title }}</h2>
+        @for (line of tile.lines; track $index) {
+          <p>{{ line }}</p>
+        }
+      </a>
+    }
+  </div>
+</main>

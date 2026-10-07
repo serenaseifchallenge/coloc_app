@@ -1,0 +1,58 @@
+.home { max-width: 1100px; padding: 40px 5% 56px; }
+.date { margin: 0 0 18px; font-size: 24px; font-weight: 700; }
+h1 { margin: 0 0 30px; font-size: 24px; font-weight: 700; }
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.75fr) 1fr 1fr;
+  gap: 26px;
+}
+
+/* Carte de la coloc, sur toute la hauteur */
+.house-card {
+  grid-row: 1 / span 3;
+  padding: 22px 20px;
+  border-radius: 10px;
+  background: var(--primary);
+  box-shadow: var(--shadow);
+  color: #fff;
+}
+.house-card h2 { margin: 0 0 22px; font-size: 19px; font-weight: 500; text-align: center; }
+.description { margin: 0 0 34px; font-size: 14px; font-weight: 700; line-height: 1.6; }
+.members { margin: 0; padding: 0; list-style: none; }
+.members li { padding: 12px 0 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.35); }
+.members li:last-child { border-bottom: none; }
+.member-name { position: relative; display: block; font-weight: 700; font-size: 14px; }
+.member-name::before { content: ''; position: absolute; left: -12px; top: 7px; width: 4px; height: 4px; border-radius: 50%; background: #fff; }
+.member-title { font-size: 12px; color: #dcdaff; }
+
+/* Tuiles des fonctionnalités */
+.tile {
+  display: block;
+  padding: 22px 22px 18px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  color: #fff;
+  text-decoration: none;
+  transition: transform 0.15s;
+}
+.tile:hover { transform: translateY(-2px); }
+.tile h2 {
+  width: fit-content;
+  min-width: 130px;
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid;
+  font-size: 15px;
+  font-weight: 500;
+}
+.tile p { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.6; }
+.tile.salmon { background: var(--salmon); }
+.tile.salmon h2 { border-color: var(--coral); }
+.tile.purple { background: var(--primary); }
+.tile.purple h2 { border-color: var(--indigo); }
+
+@media (max-width: 860px) {
+  .grid { grid-template-columns: 1fr; }
+  .house-card { grid-row: auto; }
+}

@@ -1,0 +1,20 @@
+<header class="header">
+  <app-logo />
+
+  @if (auth.isLoggedIn()) {
+    @if (hasHouse()) {
+      <nav class="nav" aria-label="Navigation principale">
+        @for (link of links; track link.path) {
+          <a [routerLink]="link.path" routerLinkActive="active" ariaCurrentWhenActive="page">{{ link.label }}</a>
+        }
+      </nav>
+    }
+    @if (auth.user(); as user) {
+      <a routerLink="/settings" class="avatar-link" aria-label="Paramètres du compte">
+        <app-roommate-avatar [roommate]="user" size="small" />
+      </a>
+    }
+  } @else {
+    <a routerLink="/login" class="btn btn-primary header-btn">Connexion</a>
+  }
+</header>

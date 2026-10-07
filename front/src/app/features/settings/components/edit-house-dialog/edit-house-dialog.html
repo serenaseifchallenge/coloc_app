@@ -1,0 +1,31 @@
+<app-modal heading="Editer colocation" (closed)="closed.emit()">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (error()) {
+      <p class="form-alert" role="alert">{{ error() }}</p>
+    }
+    <div class="form-field">
+      <label for="edit-name">Nom de la colocation</label>
+      <input id="edit-name" type="text" formControlName="name" />
+      @if (form.controls.name.touched && form.controls.name.invalid) {
+        <span class="form-field-error">Donnez un nom à votre coloc.</span>
+      }
+    </div>
+    <div class="form-field">
+      <label for="edit-address">Adresse</label>
+      <input id="edit-address" type="text" formControlName="address" />
+      @if (form.controls.address.touched && form.controls.address.invalid) {
+        <span class="form-field-error">Indiquez l'adresse de la coloc.</span>
+      }
+    </div>
+    <div class="form-field">
+      <label for="edit-description">Description</label>
+      <textarea id="edit-description" formControlName="description" rows="3"></textarea>
+      @if (form.controls.description.touched && form.controls.description.invalid) {
+        <span class="form-field-error">Ajoutez une courte description.</span>
+      }
+    </div>
+    <div class="dialog-actions">
+      <button type="submit" class="btn btn-salmon" [disabled]="saving()">Valider</button>
+    </div>
+  </form>
+</app-modal>
