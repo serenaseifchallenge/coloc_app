@@ -1,0 +1,45 @@
+<main class="auth-page">
+  <app-auth-waves />
+
+  <section class="auth-form">
+    <h1 class="auth-title">Connexion à un compte existant</h1>
+    <p class="auth-subtitle">Content de vous revoir ! Connectez-vous pour retrouver votre coloc</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      @if (error()) {
+        <p class="form-alert" role="alert">{{ error() }}</p>
+      }
+
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="alice.martin@example.fr" autocomplete="email" />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="form-field-error">Entrez une adresse email valide.</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="password">Mot de passe</label>
+        <input id="password" type="password" formControlName="password" placeholder="exemple" autocomplete="current-password" />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <span class="form-field-error">Entrez votre mot de passe.</span>
+        }
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" [disabled]="loading()">Valider</button>
+        <span class="forgot" title="Bientôt disponible">Mot de passe oublié ?</span>
+      </div>
+    </form>
+
+    <div class="signup">
+      <p>Vous n'avez pas de compte ?<br />Cliquez ci-dessous pour vous inscrire.</p>
+      <a routerLink="/register" class="btn btn-salmon">Inscription</a>
+    </div>
+  </section>
+
+  <aside class="auth-aside">
+    <app-house-illustration [size]="260" />
+    <p class="aside-text">Tâches, dépenses, courses, décisions : Coloc réunit toute la vie de votre colocation au même endroit.</p>
+  </aside>
+</main>

@@ -1,0 +1,60 @@
+<main class="auth-page">
+  <app-auth-waves />
+
+  <section class="auth-form">
+    <h1 class="auth-title">Inscription</h1>
+    <p class="auth-subtitle">Créez votre compte, puis rejoignez ou créez votre coloc !</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      @if (error()) {
+        <p class="form-alert" role="alert">{{ error() }}</p>
+      }
+
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="alice.martin@example.fr" autocomplete="email" />
+        @if (invalid('email')) { <span class="form-field-error">Entrez une adresse email valide.</span> }
+      </div>
+
+      <div class="form-field">
+        <label for="name">Prénom</label>
+        <input id="name" type="text" formControlName="name" placeholder="Alice" autocomplete="given-name" />
+        @if (invalid('name')) { <span class="form-field-error">Entrez votre prénom.</span> }
+      </div>
+
+      <div class="form-field">
+        <label for="surname">Nom</label>
+        <input id="surname" type="text" formControlName="surname" placeholder="Martin" autocomplete="family-name" />
+        @if (invalid('surname')) { <span class="form-field-error">Entrez votre nom.</span> }
+      </div>
+
+      <div class="form-field">
+        <label for="birthday">Date de naissance</label>
+        <input id="birthday" type="date" formControlName="birthday" autocomplete="bday" />
+        @if (invalid('birthday')) { <span class="form-field-error">Entrez votre date de naissance.</span> }
+      </div>
+
+      <div class="form-field">
+        <label for="password">Mot de passe</label>
+        <input id="password" type="password" formControlName="password" placeholder="exemple2mdp" autocomplete="new-password" />
+        @if (invalid('password')) { <span class="form-field-error">8 caractères minimum.</span> }
+      </div>
+
+      <div class="form-field">
+        <label for="confirm">Confirmer le mot de passe</label>
+        <input id="confirm" type="password" formControlName="confirm" placeholder="exemple2mdp" autocomplete="new-password" />
+        @if (form.controls.confirm.touched && form.hasError('passwordsMismatch')) {
+          <span class="form-field-error">Les deux mots de passe sont différents.</span>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="loading()">Valider</button>
+    </form>
+  </section>
+
+  <aside class="auth-aside">
+    <app-house-illustration [size]="260" />
+    <p class="login-text">Vous avez déjà un compte ? Cliquez ci-dessous pour continuer sur Coloc</p>
+    <a routerLink="/login" class="btn btn-salmon login-btn">Connexion</a>
+  </aside>
+</main>

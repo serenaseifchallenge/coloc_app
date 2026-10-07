@@ -1,0 +1,57 @@
+.settings { max-width: 1000px; padding: 48px 5% 48px; }
+h1 { margin: 0 0 16px; font-size: 26px; font-weight: 700; }
+.card { margin-bottom: 26px; }
+
+/* Boutons communs */
+.edit-btn {
+  display: grid; place-items: center; flex-shrink: 0;
+  width: 32px; height: 32px; border: none; border-radius: 50%;
+  background: var(--salmon); fill: var(--text);
+}
+.edit-btn:hover { background: var(--salmon-hover); }
+.danger-link { border: none; background: none; padding: 0; color: var(--danger); font-size: 13px; }
+.danger-link:hover { text-decoration: underline; }
+
+/* Profil */
+.profile { display: flex; align-items: center; gap: 24px; padding: 14px 14px 20px; }
+.profile-info { flex: 1; }
+.profile-info h2 { margin: 0 0 4px; font-size: 16px; font-weight: 700; }
+.email { margin: 0 0 14px; color: var(--muted); font-size: 13px; font-weight: 500; }
+.meta { margin: 0; display: flex; flex-wrap: wrap; gap: 0 22px; font-size: 13px; }
+.profile-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; align-self: stretch; }
+.profile-actions .edit-btn { margin-bottom: auto; }
+
+/* Coloc */
+.house { display: grid; grid-template-columns: 1.6fr 1fr; padding: 20px 0; }
+.house-main { display: flex; gap: 18px; padding: 0 24px 0 18px; border-right: 1px solid var(--border); }
+.house-icon { display: grid; place-items: center; flex-shrink: 0; width: 56px; height: 56px; border-radius: 50%; background: var(--coral); }
+.house-info { flex: 1; }
+.house-info h2 { margin: 0 0 6px; font-size: 16px; font-weight: 700; }
+.sub { margin: 0; color: var(--muted); font-size: 13px; font-weight: 500; line-height: 1.6; }
+.house-description { margin: 10px 0 0; font-size: 13px; line-height: 1.6; }
+
+.members { padding: 0 20px; text-align: center; }
+.members h3 { margin: 0 0 18px; font-size: 13px; font-weight: 500; }
+.members ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 0; padding: 0; list-style: none; }
+
+/* Code d'invitation */
+.invite { display: flex; align-items: center; gap: 20px; padding: 6px 12px 6px 20px; }
+.invite h2 { margin: 0; font-size: 16px; font-weight: 700; white-space: nowrap; }
+.code {
+  flex: 1; padding: 8px 12px; border-radius: 8px; background: #d9d9de;
+  font-weight: 700; font-size: 15px; letter-spacing: 0.55em; text-align: center;
+}
+.copy-btn { display: grid; place-items: center; width: 34px; height: 34px; border: none; border-radius: 6px; background: #d9d9de; fill: var(--text); }
+.copy-btn:hover { background: #c9c9cf; }
+.copied { color: var(--primary); font-size: 13px; }
+
+.leave { display: flex; justify-content: flex-end; }
+.leave-btn { background: var(--indigo); color: #fff; padding: 10px 26px; }
+.leave-btn:hover { background: #4038c9; }
+
+@media (max-width: 760px) {
+  .profile { flex-wrap: wrap; }
+  .house { grid-template-columns: 1fr; gap: 20px; }
+  .house-main { border-right: none; }
+  .invite { flex-wrap: wrap; }
+}

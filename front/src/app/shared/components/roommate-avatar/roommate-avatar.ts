@@ -10,12 +10,13 @@ const AVATAR_COLORS = ['#6c63ff', '#c400e8', '#1e6b12', '#e8261e', '#e07a00', '#
   host: {
     '[style.background-color]': 'color()',
     '[class.small]': "size() === 'small'",
+    '[class.large]': "size() === 'large'",
     '[attr.title]': 'fullName()',
   },
 })
 export class RoommateAvatar {
   readonly roommate = input.required<RoommateSummary>();
-  readonly size = input<'small' | 'medium'>('medium');
+  readonly size = input<'small' | 'medium' | 'large'>('medium');
 
   readonly initials = computed(() => `${this.roommate().name[0]}${this.roommate().surname[0]}`.toUpperCase());
   readonly fullName = computed(() => `${this.roommate().name} ${this.roommate().surname}`);
