@@ -1,10 +1,12 @@
 package com.coloc.back.controller;
 
 import com.coloc.back.dto.RoommateResponse;
+import com.coloc.back.dto.UpdateCredentialsRequest;
 import com.coloc.back.dto.UpdateProfileRequest;
 import com.coloc.back.service.RoommateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,5 +24,16 @@ public class RoommateController {
     @PutMapping
     public RoommateResponse updateMe(@Valid @RequestBody UpdateProfileRequest request) {
         return roommateService.updateMe(request);
+    }
+
+    @PatchMapping("/credentials")
+    public RoommateResponse updateCredentials(@Valid @RequestBody UpdateCredentialsRequest request) {
+        return roommateService.updateCredentials(request);
+    }
+
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMe() {
+        roommateService.deleteMe();
     }
 }
