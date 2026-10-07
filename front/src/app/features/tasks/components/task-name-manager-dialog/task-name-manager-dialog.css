@@ -25,6 +25,15 @@
   border-top: none;
 }
 
+.name-button {
+  flex: 1;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
 .delete-button {
   display: grid;
   place-items: center;

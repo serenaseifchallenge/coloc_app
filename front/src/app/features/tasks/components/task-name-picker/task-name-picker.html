@@ -1,0 +1,22 @@
+<h3 id="task-name-picker-heading">Tâches récurrentes</h3>
+<p class="intro">Clique sur un nom pour remplir le champ.</p>
+
+@if (names().length === 0) {
+  <p class="info">Aucune suggestion : tape le nom de ta tâche.</p>
+} @else {
+  <ul class="names" aria-labelledby="task-name-picker-heading">
+    @for (name of names(); track name) {
+      <li>
+        <button
+          type="button"
+          class="name-button"
+          [class.selected]="name === selectedName()"
+          [attr.aria-pressed]="name === selectedName()"
+          (click)="nameSelected.emit(name)"
+        >
+          {{ name }}
+        </button>
+      </li>
+    }
+  </ul>
+}

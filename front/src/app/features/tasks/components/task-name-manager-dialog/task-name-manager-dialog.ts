@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, output, signal } from '@angular/core';
+import { Component, DestroyRef, inject, output, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Modal } from '../../../../shared/components/modal/modal';
 import { TaskService } from '../../services/task.service';
@@ -12,8 +12,10 @@ import { TaskService } from '../../services/task.service';
 export class TaskNameManagerDialog {
   private readonly taskService = inject(TaskService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly modal = viewChild.required(Modal);
 
   readonly closed = output<void>();
+  readonly taskNameSelected = output<string>();
 
   readonly taskNames = signal<string[]>([]);
   readonly loading = signal(true);
@@ -34,6 +36,11 @@ export class TaskNameManagerDialog {
           this.loading.set(false);
         },
       });
+  }
+
+  selectTaskName(name: string): void {
+    this.taskNameSelected.emit(name);
+    this.modal().close();
   }
 
   deleteTaskName(name: string): void {

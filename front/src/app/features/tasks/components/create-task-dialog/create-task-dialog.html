@@ -4,16 +4,10 @@
       <label for="task-name">Nom</label>
       <input
         id="task-name"
-        list="task-name-options"
         formControlName="name"
         placeholder="Sélectionne ou tape le nom de ta tâche…"
         autocomplete="off"
       />
-      <datalist id="task-name-options">
-        @for (taskName of taskNames(); track taskName) {
-          <option [value]="taskName"></option>
-        }
-      </datalist>
       @if (hasError('name')) {
         <span class="field-error">Le nom est obligatoire (150 caractères maximum).</span>
       }
@@ -51,4 +45,11 @@
       </button>
     </footer>
   </form>
+
+  <app-task-name-picker
+    modalAside
+    [names]="filteredTaskNames()"
+    [selectedName]="nameValue()"
+    (nameSelected)="selectTaskName($event)"
+  />
 </app-modal>
