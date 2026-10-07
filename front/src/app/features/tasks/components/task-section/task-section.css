@@ -1,0 +1,20 @@
+section {
+  margin-bottom: 24px;
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.late { color: var(--color-late); }
+.upcoming { color: var(--color-upcoming); }
+.no-date { color: var(--color-no-date); }
+.done { color: var(--color-text); }
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

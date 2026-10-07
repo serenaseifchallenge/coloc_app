@@ -1,0 +1,60 @@
+:host {
+  --status-color: var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: #fff;
+  border: 1px solid var(--status-color);
+  border-radius: 12px;
+}
+
+:host(.late) { --status-color: var(--color-late); }
+:host(.upcoming) { --status-color: var(--color-upcoming); }
+:host(.no-date) { --status-color: var(--color-no-date); }
+:host(.done) { padding: 8px 16px; }
+
+.check {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--status-color);
+  flex-shrink: 0;
+}
+
+.done-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: var(--color-text);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-weight: 600;
+  color: var(--status-color);
+}
+
+:host(.done) .name {
+  color: var(--color-text);
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: var(--color-muted);
+}
+
+.points {
+  color: var(--color-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}

@@ -1,0 +1,21 @@
+@if (isDone()) {
+  <svg class="done-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M7.5 12.5l3 3 6-6.5" />
+  </svg>
+} @else {
+  <span class="check"></span>
+}
+
+<div class="content">
+  <p class="name">{{ task().name }}</p>
+  @if (subtitle(); as text) {
+    <p class="subtitle">{{ text }}</p>
+  }
+</div>
+
+<span class="points">+ {{ task().points }} points</span>
+
+@if (showAssignee() && task().assignee; as assignee) {
+  <app-roommate-avatar [roommate]="assignee" [size]="avatarSize()" />
+}
