@@ -1,0 +1,13 @@
+package com.coloc.back.repository;
+
+import com.coloc.back.entity.Task;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface TaskRepository extends JpaRepository<Task, Long> {
+
+    @EntityGraph(attributePaths = "assigned")
+    List<Task> findBySharedHouseIdAndDoneOrderByDeadlineAsc(Long sharedHouseId, boolean done);
+}
