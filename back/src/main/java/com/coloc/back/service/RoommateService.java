@@ -1,6 +1,7 @@
 package com.coloc.back.service;
 
 import com.coloc.back.dto.RoommateResponse;
+import com.coloc.back.dto.RoommateSummaryResponse;
 import com.coloc.back.dto.UpdateCredentialsRequest;
 import com.coloc.back.dto.UpdateProfileRequest;
 import com.coloc.back.entity.Roommate;
@@ -12,6 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Comparator;
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -68,5 +73,16 @@ public class RoommateService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Impossible de supprimer ce compte : il est encore lié à des dépenses, notes ou événements de la coloc.");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<RoommateSummaryResponse> getRoommatesOfCurrentSharedHouse() {
+        Long sharedHouseId = currentUserService.getCurrentSharedHouse().getId();
+
+        return roommateRepository.findBySharedHouseId(sharedHouseId)
+                .stream()
+                .map(RoommateSummaryResponse::from)
+                .sorted(Comparator.comparing(RoommateSummaryResponse::name))
+                .toList();
     }
 }

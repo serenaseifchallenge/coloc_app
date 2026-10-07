@@ -8,6 +8,6 @@ export class RoommateService {
   private readonly http = inject(HttpClient);
 
   getRoommates(): Observable<RoommateSummary[]> {
-    return this.http.get<RoommateSummary[]>('/api/me');
+    return this.http.get<RoommateSummary[]>('/api/me/roommates');
   }
 }
