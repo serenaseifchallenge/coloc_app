@@ -1,10 +1,12 @@
 package com.coloc.back.service;
 
+import com.coloc.back.dto.AuthResponse;
 import com.coloc.back.dto.LoginRequest;
 import com.coloc.back.dto.RegisterRequest;
 import com.coloc.back.dto.RoommateResponse;
 import com.coloc.back.entity.Roommate;
 import com.coloc.back.repository.RoommateRepository;
+import com.coloc.back.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,8 +19,9 @@ public class AuthService {
 
     private final RoommateRepository roommateRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public RoommateResponse register(RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request) {
         String email = request.email().trim().toLowerCase();
 
         if (roommateRepository.existsByEmail(email)) {
@@ -33,10 +36,12 @@ public class AuthService {
         roommate.setBirthday(request.birthday().atStartOfDay());
         roommate.setPoints(0);
 
-        return RoommateResponse.from(roommateRepository.save(roommate));
+        Roommate saved = roommateRepository.save(roommate);
+
+        return new AuthResponse(jwtService.generateToken(saved.getId()), RoommateResponse.from(saved));
     }
 
-    public RoommateResponse login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request) {
         String email = request.email().trim().toLowerCase();
 
         Roommate roommate = roommateRepository.findByEmail(email)
@@ -44,6 +49,6 @@ public class AuthService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED, "Email ou mot de passe incorrect"));
 
-        return RoommateResponse.from(roommate);
+        return new AuthResponse(jwtService.generateToken(roommate.getId()), RoommateResponse.from(roommate));
     }
 }

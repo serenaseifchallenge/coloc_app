@@ -1,8 +1,8 @@
 package com.coloc.back.controller;
 
+import com.coloc.back.dto.AuthResponse;
 import com.coloc.back.dto.LoginRequest;
 import com.coloc.back.dto.RegisterRequest;
-import com.coloc.back.dto.RoommateResponse;
 import com.coloc.back.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +18,12 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public RoommateResponse register(@Valid @RequestBody RegisterRequest request) {
+    public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
         return authService.register(request);
     }
 
     @PostMapping("/login")
-    public RoommateResponse login(@Valid @RequestBody LoginRequest request) {
+    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
 }
