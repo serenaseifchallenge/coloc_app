@@ -1,6 +1,5 @@
 package com.coloc.back.dto;
 
-import com.coloc.back.entity.Roommate;
 import com.coloc.back.entity.Task;
 
 import java.time.LocalDate;
@@ -13,17 +12,8 @@ public record TaskResponse(
         LocalDate completionDate,
         boolean done,
         Integer points,
-        Assignee assignee) {
-
-    public record Assignee(Long id, String name, String surname) {
-
-        static Assignee from(Roommate roommate) {
-            if (roommate == null) {
-                return null;
-            }
-            return new Assignee(roommate.getId(), roommate.getName(), roommate.getSurname());
-        }
-    }
+        RoommateSummaryResponse assignee
+) {
 
     public static TaskResponse from(Task task) {
         return new TaskResponse(
@@ -34,6 +24,7 @@ public record TaskResponse(
                 task.getCompletionDate(),
                 task.isDone(),
                 task.getPoints(),
-                Assignee.from(task.getAssigned()));
+                task.getAssigned() == null ? null : RoommateSummaryResponse.from(task.getAssigned())
+        );
     }
 }

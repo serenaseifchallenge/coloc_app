@@ -1,0 +1,10 @@
+@if (tasks().length > 0) {
+  <section>
+    <h2 [class]="status()">{{ heading() }}</h2>
+    <div class="list">
+      @for (task of tasks(); track task.id) {
+        <app-task-card [task]="task" [showAssignee]="showAssignee()" />
+      }
+    </div>
+  </section>
+}

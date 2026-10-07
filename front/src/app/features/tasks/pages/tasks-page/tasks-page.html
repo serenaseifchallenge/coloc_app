@@ -1,0 +1,21 @@
+<main class="page">
+  <h1>Tâches</h1>
+
+  <div class="toolbar">
+    <app-tab-group [options]="tabs" [selected]="activeTab()" (selectedChange)="selectTab($event)" />
+  </div>
+
+  @if (errorMessage(); as message) {
+    <p class="error">{{ message }}</p>
+  } @else if (loading()) {
+    <p class="info">Chargement…</p>
+  } @else if (tasks().length === 0) {
+    <p class="info">{{ activeTab().emptyMessage }}</p>
+  } @else if (activeTab().value === 'done') {
+    <app-task-section heading="Faites" status="done" [tasks]="tasks()" />
+  } @else {
+    <app-task-section heading="En retard" status="late" [tasks]="lateTasks()" [showAssignee]="showAssignee()" />
+    <app-task-section heading="À venir" status="upcoming" [tasks]="upcomingTasks()" [showAssignee]="showAssignee()" />
+    <app-task-section heading="Sans date" status="no-date" [tasks]="noDateTasks()" [showAssignee]="showAssignee()" />
+  }
+</main>
