@@ -4,7 +4,17 @@
     <path d="M7.5 12.5l3 3 6-6.5" />
   </svg>
 } @else {
-  <span class="check"></span>
+  <button
+    type="button"
+    class="check"
+    [disabled]="busy()"
+    [attr.aria-label]="'Marquer « ' + task().name + ' » comme faite'"
+    (click)="requestAction('complete')"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7.5 12.5l3 3 6-6.5" />
+    </svg>
+  </button>
 }
 
 <div class="content">
@@ -18,4 +28,33 @@
 
 @if (showAssignee() && task().assignee; as assignee) {
   <app-roommate-avatar [roommate]="assignee" [size]="avatarSize()" />
+}
+
+@if (isDone()) {
+  <button
+    type="button"
+    class="icon-button reopen"
+    title="Remettre à faire"
+    [disabled]="busy()"
+    [attr.aria-label]="'Remettre « ' + task().name + ' » à faire'"
+    (click)="requestAction('reopen')"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 14L4 9l5-5" />
+      <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+    </svg>
+  </button>
+} @else {
+  <button
+    type="button"
+    class="icon-button delete"
+    title="Supprimer"
+    [disabled]="busy()"
+    [attr.aria-label]="'Supprimer « ' + task().name + ' »'"
+    (click)="requestAction('delete')"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6" />
+    </svg>
+  </button>
 }

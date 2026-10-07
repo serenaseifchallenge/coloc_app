@@ -1,25 +1,43 @@
 :host {
   display: inline-flex;
-  gap: 2px;
-  padding: 3px;
+  align-items: stretch;
+  height: 44px;
+  padding: 2px;
+  border: 2px solid var(--color-primary-dark);
+  border-radius: var(--radius-sm);
   background: var(--color-primary);
-  border: 2px solid #4f46e5;
-  border-radius: 6px;
 }
 
 button {
-  padding: 10px 16px;
+  position: relative;
+  padding: 0 16px;
   border: none;
   border-radius: 4px;
   background: transparent;
   color: #fff;
-  font: inherit;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+button + button::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  bottom: 7px;
+  left: 0;
+  width: 1px;
+  background: rgba(30, 27, 75, 0.35);
+}
+
+button.active::before,
+button.active + button::before {
+  display: none;
 }
 
 button:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.14);
 }
 
 button.active {
@@ -29,5 +47,5 @@ button.active {
 
 button:focus-visible {
   outline: 2px solid #fff;
-  outline-offset: 2px;
+  outline-offset: -4px;
 }

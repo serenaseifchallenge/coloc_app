@@ -1,0 +1,33 @@
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.option {
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.option:hover {
+  transform: scale(1.06);
+}
+
+.option.selected {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--color-primary);
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+.hint {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}

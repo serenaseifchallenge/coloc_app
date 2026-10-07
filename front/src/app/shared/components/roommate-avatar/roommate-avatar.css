@@ -1,17 +1,19 @@
 :host {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
   display: inline-grid;
   place-items: center;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
+  border-radius: 50%;
   color: #fff;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
+  letter-spacing: 0.02em;
+  user-select: none;
 }
 
 :host(.small) {
-  width: 30px;
-  height: 30px;
-  font-size: 0.8rem;
+  width: 28px;
+  height: 28px;
+  font-size: 0.7rem;
 }

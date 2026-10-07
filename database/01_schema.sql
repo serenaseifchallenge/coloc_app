@@ -90,3 +90,10 @@ CREATE TABLE event (
     end_date        TIMESTAMP NOT NULL,
     CHECK (end_date >= start_date)
 );
+
+CREATE TABLE hidden_task_name (
+    id              BIGSERIAL PRIMARY KEY,
+    shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+    name            VARCHAR(150) NOT NULL,
+    UNIQUE (shared_house_id, name)
+);

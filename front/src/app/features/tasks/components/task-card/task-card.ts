@@ -1,6 +1,6 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { RoommateAvatar } from '../../../../shared/components/roommate-avatar/roommate-avatar';
-import { Task } from '../../models/task.model';
+import { Task, TaskAction, TaskActionRequest } from '../../models/task.model';
 import { daysLate, formatDate, getTaskStatus } from '../../utils/task-status';
 
 @Component({
@@ -13,9 +13,10 @@ import { daysLate, formatDate, getTaskStatus } from '../../utils/task-status';
 export class TaskCard {
   readonly task = input.required<Task>();
   readonly showAssignee = input(true);
+  readonly busy = input(false);
+  readonly actionRequested = output<TaskActionRequest>();
 
   readonly status = computed(() => getTaskStatus(this.task()));
-
   readonly isDone = computed(() => this.status() === 'done');
   readonly avatarSize = computed(() => (this.isDone() ? 'small' : 'medium'));
 
@@ -30,5 +31,8 @@ export class TaskCard {
     }
     return formatDate(deadline);
   });
-  
+
+  requestAction(action: TaskAction): void {
+    this.actionRequested.emit({ action, task: this.task() });
+  }
 }

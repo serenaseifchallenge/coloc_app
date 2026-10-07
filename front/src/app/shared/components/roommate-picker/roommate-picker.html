@@ -1,0 +1,22 @@
+<div class="options">
+  @for (roommate of roommates(); track roommate.id) {
+    <button
+      type="button"
+      class="option"
+      [class.selected]="roommate.id === selectedId()"
+      [attr.aria-pressed]="roommate.id === selectedId()"
+      [attr.aria-label]="roommate.name + ' ' + roommate.surname"
+      (click)="toggle(roommate.id)"
+    >
+      <app-roommate-avatar [roommate]="roommate" />
+    </button>
+  }
+</div>
+
+<p class="hint">
+  @if (selectedRoommate(); as roommate) {
+    Assignée à {{ roommate.name }} {{ roommate.surname }}
+  } @else {
+    Personne n'est assigné : n'importe qui pourra la prendre.
+  }
+</p>

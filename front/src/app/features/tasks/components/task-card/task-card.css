@@ -2,29 +2,69 @@
   --status-color: var(--color-border);
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 12px 20px;
-  background: #fff;
+  gap: 14px;
+  min-height: 66px;
+  padding: 10px 16px 10px 12px;
   border: 1px solid var(--status-color);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s;
+}
+
+:host(:hover) {
+  box-shadow: var(--shadow-md);
 }
 
 :host(.late) { --status-color: var(--color-late); }
 :host(.upcoming) { --status-color: var(--color-upcoming); }
 :host(.no-date) { --status-color: var(--color-no-date); }
-:host(.done) { padding: 8px 16px; }
+
+:host(.done) {
+  min-height: 46px;
+  padding: 6px 12px;
+}
 
 .check {
+  display: grid;
+  place-items: center;
   width: 26px;
   height: 26px;
-  border-radius: 50%;
-  border: 2px solid var(--status-color);
+  padding: 0;
   flex-shrink: 0;
+  border: 2px solid var(--status-color);
+  border-radius: 50%;
+  background: none;
+  color: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.check:hover:not(:disabled),
+.check:focus-visible {
+  background: color-mix(in srgb, var(--status-color) 15%, transparent);
+  color: var(--status-color);
+  outline: none;
+}
+
+.check:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.check svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .done-icon {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   fill: none;
   stroke: var(--color-text);
@@ -34,27 +74,105 @@
 }
 
 .content {
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  gap: 4px;
   min-width: 0;
 }
 
 .name {
   margin: 0;
-  font-weight: 600;
+  overflow: hidden;
   color: var(--status-color);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 :host(.done) .name {
   color: var(--color-text);
+  font-weight: 500;
 }
 
 .subtitle {
-  margin: 6px 0 0;
+  margin: 0;
   color: var(--color-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .points {
   color: var(--color-muted);
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 500;
   white-space: nowrap;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: opacity 0.15s, background-color 0.15s, color 0.15s;
+}
+
+.icon-button.delete:hover:not(:disabled) {
+  background: #fdecec;
+  color: var(--color-late);
+}
+
+.icon-button.reopen:hover:not(:disabled) {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.icon-button:disabled {
+  color: var(--color-border);
+  cursor: wait;
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.icon-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (hover: hover) {
+  .icon-button {
+    opacity: 0;
+  }
+
+  :host(:hover) .icon-button,
+  :host(:focus-within) .icon-button {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 560px) {
+  :host {
+    gap: 10px;
+    padding: 10px 10px 10px 12px;
+  }
+
+  .points {
+    font-size: 0.8rem;
+  }
 }

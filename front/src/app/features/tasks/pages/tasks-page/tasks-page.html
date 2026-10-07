@@ -3,6 +3,33 @@
 
   <div class="toolbar">
     <app-tab-group [options]="tabs" [selected]="activeTab()" (selectedChange)="selectTab($event)" />
+
+    <div class="actions">
+      <button
+        type="button"
+        class="ghost-button"
+        title="Gérer les tâches récurrentes"
+        aria-label="Gérer les tâches récurrentes"
+        (click)="isNameManagerOpen.set(true)"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01" />
+        </svg>
+      </button>
+
+      <button type="button" class="new-task-button" (click)="isCreateDialogOpen.set(true)">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Nouvelle tâche
+      </button>
+    </div>
+  </div>
+
+  <div class="feedback-area" role="status" aria-live="polite">
+    @if (feedback(); as currentFeedback) {
+      <p class="feedback" [class]="currentFeedback.type">{{ currentFeedback.message }}</p>
+    }
   </div>
 
   @if (errorMessage(); as message) {
@@ -12,10 +39,46 @@
   } @else if (tasks().length === 0) {
     <p class="info">{{ activeTab().emptyMessage }}</p>
   } @else if (activeTab().value === 'done') {
-    <app-task-section heading="Faites" status="done" [tasks]="tasks()" />
+    <p class="info retention-hint">Les tâches faites sont automatiquement supprimées après 14 jours.</p>
+    <app-task-section
+      heading="Faites"
+      status="done"
+      [tasks]="tasks()"
+      [busyTaskIds]="busyTaskIds()"
+      (taskActionRequested)="onTaskAction($event)"
+    />
   } @else {
-    <app-task-section heading="En retard" status="late" [tasks]="lateTasks()" [showAssignee]="showAssignee()" />
-    <app-task-section heading="À venir" status="upcoming" [tasks]="upcomingTasks()" [showAssignee]="showAssignee()" />
-    <app-task-section heading="Sans date" status="no-date" [tasks]="noDateTasks()" [showAssignee]="showAssignee()" />
+    <app-task-section
+      heading="En retard"
+      status="late"
+      [tasks]="lateTasks()"
+      [showAssignee]="showAssignee()"
+      [busyTaskIds]="busyTaskIds()"
+      (taskActionRequested)="onTaskAction($event)"
+    />
+    <app-task-section
+      heading="À venir"
+      status="upcoming"
+      [tasks]="upcomingTasks()"
+      [showAssignee]="showAssignee()"
+      [busyTaskIds]="busyTaskIds()"
+      (taskActionRequested)="onTaskAction($event)"
+    />
+    <app-task-section
+      heading="Sans date"
+      status="no-date"
+      [tasks]="noDateTasks()"
+      [showAssignee]="showAssignee()"
+      [busyTaskIds]="busyTaskIds()"
+      (taskActionRequested)="onTaskAction($event)"
+    />
+  }
+
+  @if (isCreateDialogOpen()) {
+    <app-create-task-dialog (created)="onTaskCreated()" (closed)="isCreateDialogOpen.set(false)" />
+  }
+
+  @if (isNameManagerOpen()) {
+    <app-task-name-manager-dialog (closed)="isNameManagerOpen.set(false)" />
   }
 </main>

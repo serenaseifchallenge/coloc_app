@@ -26,6 +26,6 @@ export const TASK_TABS: readonly TaskTabConfig[] = [
     value: 'done',
     label: 'Faites',
     query: { done: true, assignedToMe: false },
-    emptyMessage: 'Aucune tâche terminée pour le moment.',
+    emptyMessage: 'Aucune tâche terminée ces 14 derniers jours.',
   },
 ];
