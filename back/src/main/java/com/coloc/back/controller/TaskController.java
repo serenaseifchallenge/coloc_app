@@ -17,8 +17,11 @@ public class TaskController {
 
     private final TaskService taskService;
 
+
     @GetMapping
-    public List<TaskResponse> getTasks(@RequestParam(defaultValue = "false") boolean done) {
-        return taskService.getTasks(done);
+    public List<TaskResponse> getTasks(
+            @RequestParam(defaultValue = "false") boolean done,
+            @RequestParam(defaultValue = "false") boolean assignedToMe) {
+        return taskService.getTasks(done, assignedToMe);
     }
 }
