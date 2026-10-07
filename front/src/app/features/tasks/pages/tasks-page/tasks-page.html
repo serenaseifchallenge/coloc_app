@@ -17,7 +17,7 @@
         </svg>
       </button>
 
-      <button type="button" class="new-task-button" (click)="isCreateDialogOpen.set(true)">
+      <button type="button" class="new-task-button" (click)="openCreateDialog()">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 5v14M5 12h14" />
         </svg>
@@ -75,10 +75,17 @@
   }
 
   @if (isCreateDialogOpen()) {
-    <app-create-task-dialog (created)="onTaskCreated()" (closed)="isCreateDialogOpen.set(false)" />
+    <app-create-task-dialog
+      [initialName]="createDialogInitialName()"
+      (created)="onTaskCreated()"
+      (closed)="isCreateDialogOpen.set(false)"
+    />
   }
 
   @if (isNameManagerOpen()) {
-    <app-task-name-manager-dialog (closed)="isNameManagerOpen.set(false)" />
+    <app-task-name-manager-dialog
+      (taskNameSelected)="openCreateDialog($event)"
+      (closed)="isNameManagerOpen.set(false)"
+    />
   }
 </main>

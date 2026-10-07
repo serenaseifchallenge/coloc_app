@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, output, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, OnInit, output, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, of } from 'rxjs';
@@ -8,20 +8,22 @@ import { RoommateService } from '../../../../shared/services/roommate.service';
 import { Task } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
 import { todayIso } from '../../utils/task-status';
+import { TaskNamePicker } from '../task-name-picker/task-name-picker';
 
 @Component({
   selector: 'app-create-task-dialog',
-  imports: [ReactiveFormsModule, Modal, RoommatePicker],
+  imports: [ReactiveFormsModule, Modal, RoommatePicker, TaskNamePicker],
   templateUrl: './create-task-dialog.html',
   styleUrl: './create-task-dialog.css',
 })
-export class CreateTaskDialog {
+export class CreateTaskDialog implements OnInit {
   private readonly taskService = inject(TaskService);
   private readonly roommateService = inject(RoommateService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly modal = viewChild.required(Modal);
 
+  readonly initialName = input('');
   readonly created = output<Task>();
   readonly closed = output<void>();
 
@@ -42,6 +44,29 @@ export class CreateTaskDialog {
     assigneeId: this.formBuilder.control<number | null>(null),
     points: [10, [Validators.required, Validators.min(1), Validators.max(100)]],
   });
+
+  readonly nameValue = toSignal(this.form.controls.name.valueChanges, {
+    initialValue: this.form.controls.name.value,
+  });
+
+  readonly filteredTaskNames = computed(() => {
+    const query = this.nameValue().trim().toLowerCase();
+    const names = this.taskNames();
+    const isExactSuggestion = names.some((name) => name.toLowerCase() === query);
+
+    if (!query || isExactSuggestion) {
+      return names;
+    }
+    return names.filter((name) => name.toLowerCase().includes(query));
+  });
+
+  ngOnInit(): void {
+    this.form.controls.name.setValue(this.initialName());
+  }
+
+  selectTaskName(name: string): void {
+    this.form.controls.name.setValue(name);
+  }
 
   selectAssignee(roommateId: number | null): void {
     this.form.controls.assigneeId.setValue(roommateId);

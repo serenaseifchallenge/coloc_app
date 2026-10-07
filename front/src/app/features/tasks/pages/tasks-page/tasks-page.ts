@@ -33,6 +33,7 @@ export class TasksPage {
   readonly tabs = TASK_TABS;
   readonly activeTab = signal<TaskTabConfig>(TASK_TABS[0]);
   readonly isCreateDialogOpen = signal(false);
+  readonly createDialogInitialName = signal('');
   readonly isNameManagerOpen = signal(false);
 
   readonly tasks = signal<Task[]>([]);
@@ -57,6 +58,11 @@ export class TasksPage {
     }
     this.activeTab.set(tab);
     this.loadTasks();
+  }
+
+  openCreateDialog(initialName = ''): void {
+    this.createDialogInitialName.set(initialName);
+    this.isCreateDialogOpen.set(true);
   }
 
   onTaskCreated(): void {

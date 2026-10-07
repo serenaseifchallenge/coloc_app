@@ -1,6 +1,6 @@
 <app-modal heading="Tâches récurrentes" (closed)="closed.emit()">
   <p class="intro">
-    Ces noms sont proposés quand on crée une tâche. En retirer un ne supprime aucune tâche existante.
+    Clique sur un nom pour créer la tâche, ou sur la corbeille pour le retirer des suggestions.
   </p>
 
   @if (errorMessage(); as message) {
@@ -15,7 +15,14 @@
     <ul class="names">
       @for (name of taskNames(); track name) {
         <li>
-          <span>{{ name }}</span>
+          <button
+            type="button"
+            class="name-button"
+            [attr.aria-label]="'Créer la tâche « ' + name + ' »'"
+            (click)="selectTaskName(name)"
+          >
+            {{ name }}
+          </button>
           <button
             type="button"
             class="delete-button"
