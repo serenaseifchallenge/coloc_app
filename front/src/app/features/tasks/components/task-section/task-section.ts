@@ -1,5 +1,5 @@
-import { Component, input } from '@angular/core';
-import { Task } from '../../models/task.model';
+import { Component, input, output } from '@angular/core';
+import { Task, TaskActionRequest } from '../../models/task.model';
 import { TaskStatus } from '../../utils/task-status';
 import { TaskCard } from '../task-card/task-card';
 
@@ -14,4 +14,6 @@ export class TaskSection {
   readonly status = input.required<TaskStatus>();
   readonly tasks = input.required<Task[]>();
   readonly showAssignee = input(true);
+  readonly busyTaskIds = input<ReadonlySet<number>>(new Set());
+  readonly taskActionRequested = output<TaskActionRequest>();
 }

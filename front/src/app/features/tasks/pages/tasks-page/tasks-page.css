@@ -1,12 +1,12 @@
 .page {
-  max-width: 820px;
-  margin: 0 auto;
-  padding: 48px 24px;
+  padding: 56px 54px 64px;
 }
 
 h1 {
   margin: 0 0 24px;
-  font-size: 2rem;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .toolbar {
@@ -15,16 +15,133 @@ h1 {
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.new-task-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 18px 0 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+
+.new-task-button:hover {
+  background: var(--color-accent-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.new-task-button:active {
+  transform: translateY(1px);
+}
+
+.new-task-button svg,
+.ghost-button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.new-task-button svg {
+  stroke-width: 2.4;
+}
+
+.ghost-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.ghost-button svg {
+  stroke-width: 2;
+}
+
+.ghost-button:hover {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+
+.new-task-button:focus-visible,
+.ghost-button:focus-visible {
+  outline: 2px solid var(--color-primary-dark);
+  outline-offset: 2px;
+}
+
+.feedback-area:empty {
+  display: none;
+}
+
+.feedback {
+  margin: 0 0 20px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.feedback.success {
+  background: #e3f5dc;
+  color: var(--color-upcoming);
+}
+
+.feedback.error,
+.error {
+  background: #fdecec;
+  color: var(--color-late);
+}
+
+.error {
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
 }
 
 .info {
   color: var(--color-muted);
 }
 
-.error {
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: #fdecea;
-  color: var(--color-late);
+.retention-hint {
+  margin: -8px 0 16px;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 560px) {
+  .page {
+    padding: 32px 16px 48px;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions {
+    justify-content: flex-end;
+  }
 }

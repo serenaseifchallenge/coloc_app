@@ -1,0 +1,34 @@
+<app-modal heading="Tâches récurrentes" (closed)="closed.emit()">
+  <p class="intro">
+    Ces noms sont proposés quand on crée une tâche. En retirer un ne supprime aucune tâche existante.
+  </p>
+
+  @if (errorMessage(); as message) {
+    <p class="error">{{ message }}</p>
+  }
+
+  @if (loading()) {
+    <p class="info">Chargement…</p>
+  } @else if (taskNames().length === 0) {
+    <p class="info">Plus aucune suggestion : tu peux toujours taper un nom librement.</p>
+  } @else {
+    <ul class="names">
+      @for (name of taskNames(); track name) {
+        <li>
+          <span>{{ name }}</span>
+          <button
+            type="button"
+            class="delete-button"
+            [disabled]="deletingName() === name"
+            [attr.aria-label]="'Retirer ' + name"
+            (click)="deleteTaskName(name)"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6" />
+            </svg>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</app-modal>

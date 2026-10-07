@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.List;
 
@@ -26,7 +27,6 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
-
 
     @GetMapping
     public List<TaskResponse> getTasks(
@@ -44,6 +44,17 @@ public class TaskController {
     @PatchMapping("/{id}/complete")
     public TaskResponse completeTask(@PathVariable Long id) {
         return taskService.completeTask(id);
+    }
+
+    @PatchMapping("/{id}/reopen")
+    public TaskResponse reopenTask(@PathVariable Long id) {
+        return taskService.reopenTask(id);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTask(@PathVariable Long id) {
+        taskService.deleteTask(id);
     }
 
 }

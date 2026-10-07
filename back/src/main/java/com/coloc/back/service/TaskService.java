@@ -14,85 +14,114 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class TaskService {
 
-        private static final Sort TO_DO_SORT = Sort.by(Sort.Direction.ASC, "deadline");
-        private static final Sort DONE_SORT = Sort.by(Sort.Direction.DESC, "completionDate");
+    private static final Sort TO_DO_SORT = Sort.by(Sort.Direction.ASC, "deadline");
+    private static final Sort DONE_SORT = Sort.by(Sort.Direction.DESC, "completionDate");
 
-        private final TaskRepository taskRepository;
-        private final RoommateRepository roommateRepository;
-        private final CurrentUserService currentUserService;
+    private final TaskRepository taskRepository;
+    private final RoommateRepository roommateRepository;
+    private final CurrentUserService currentUserService;
 
-        @Transactional(readOnly = true)
-        public List<TaskResponse> getTasks(boolean done, boolean assignedToMe) {
-                Long sharedHouseId = currentUserService.getCurrentSharedHouse().getId();
-                Sort sort = done ? DONE_SORT : TO_DO_SORT;
+    @Transactional(readOnly = true)
+    public List<TaskResponse> getTasks(boolean done, boolean assignedToMe) {
+        Long sharedHouseId = currentUserService.getCurrentSharedHouse().getId();
+        Sort sort = done ? DONE_SORT : TO_DO_SORT;
 
-                List<Task> tasks = assignedToMe
-                                ? taskRepository.findBySharedHouseIdAndAssignedIdAndDone(
-                                                sharedHouseId, currentUserService.getCurrentRoommateId(), done, sort)
-                                : taskRepository.findBySharedHouseIdAndDone(sharedHouseId, done, sort);
+        List<Task> tasks = assignedToMe
+                ? taskRepository.findBySharedHouseIdAndAssignedIdAndDone(
+                        sharedHouseId, currentUserService.getCurrentRoommateId(), done, sort)
+                : taskRepository.findBySharedHouseIdAndDone(sharedHouseId, done, sort);
 
-                return tasks.stream()
-                                .map(TaskResponse::from)
-                                .toList();
+        return tasks.stream()
+                .map(TaskResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    public TaskResponse createTask(CreateTaskRequest request) {
+        SharedHouse sharedHouse = currentUserService.getCurrentSharedHouse();
+
+        Task task = new Task();
+        task.setSharedHouse(sharedHouse);
+        task.setName(request.name().trim());
+        task.setDeadline(request.deadline());
+        task.setPoints(request.points());
+        task.setDone(false);
+        task.setAssigned(findAssignee(request.assigneeId(), sharedHouse.getId()));
+
+        return TaskResponse.from(taskRepository.save(task));
+    }
+
+    @Transactional
+    public TaskResponse completeTask(Long taskId) {
+        Task task = findTaskForUpdate(taskId);
+        if (task.isDone()) {
+            throw conflict("Cette tâche est déjà faite");
+        }
+        if (task.getAssigned() == null) {
+            task.setAssigned(currentUserService.getCurrentRoommate());
         }
 
-        @Transactional
-        public TaskResponse createTask(CreateTaskRequest request) {
-                SharedHouse sharedHouse = currentUserService.getCurrentSharedHouse();
+        task.setDone(true);
+        task.setCompletionDate(LocalDate.now());
+        roommateRepository.addPoints(task.getAssigned().getId(), task.getPoints());
 
-                Task task = new Task();
-                task.setSharedHouse(sharedHouse);
-                task.setName(request.name().trim());
-                task.setDeadline(request.deadline());
-                task.setPoints(request.points());
-                task.setDone(false);
-                task.setAssigned(findAssignee(request.assigneeId(), sharedHouse.getId()));
+        return TaskResponse.from(task);
+    }
 
-                return TaskResponse.from(taskRepository.save(task));
+    @Transactional
+    public TaskResponse reopenTask(Long taskId) {
+        Task task = findTaskForUpdate(taskId);
+        if (!task.isDone()) {
+            throw conflict("Cette tâche n'est pas encore faite");
         }
 
-        private Roommate findAssignee(Long assigneeId, Long sharedHouseId) {
-                if (assigneeId == null) {
-                        return null;
-                }
-                return roommateRepository.findById(assigneeId)
-                                .filter(roommate -> isMemberOf(roommate, sharedHouseId))
-                                .orElseThrow(() -> new ResponseStatusException(
-                                                HttpStatus.BAD_REQUEST,
-                                                "Ce colocataire ne fait pas partie de votre colocation"));
+        task.setDone(false);
+        task.setCompletionDate(null);
+        if (task.getAssigned() != null) {
+            roommateRepository.addPoints(task.getAssigned().getId(), -task.getPoints());
         }
 
-        private boolean isMemberOf(Roommate roommate, Long sharedHouseId) {
-                return roommate.getSharedHouse() != null
-                                && sharedHouseId.equals(roommate.getSharedHouse().getId());
+        return TaskResponse.from(task);
+    }
+
+    @Transactional
+    public void deleteTask(Long taskId) {
+        Task task = findTaskForUpdate(taskId);
+        if (task.isDone()) {
+            throw conflict("Une tâche faite ne peut pas être supprimée : remets-la d'abord à faire");
         }
+        taskRepository.delete(task);
+    }
 
-        @Transactional
-        public TaskResponse completeTask(Long taskId) {
-                Long sharedHouseId = currentUserService.getCurrentSharedHouse().getId();
+    private Task findTaskForUpdate(Long taskId) {
+        Long sharedHouseId = currentUserService.getCurrentSharedHouse().getId();
+        return taskRepository.findForUpdateByIdAndSharedHouseId(taskId, sharedHouseId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tâche introuvable"));
+    }
 
-                Task task = taskRepository.findForUpdateByIdAndSharedHouseId(taskId, sharedHouseId)
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                                "Tâche introuvable"));
+    private ResponseStatusException conflict(String message) {
+        return new ResponseStatusException(HttpStatus.CONFLICT, message);
+    }
 
-                if (task.isDone()) {
-                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Cette tâche est déjà faite");
-                }
-                if (task.getAssigned() == null) {
-                        task.setAssigned(currentUserService.getCurrentRoommate());
-                }
-
-                task.setDone(true);
-                task.setCompletionDate(LocalDate.now());
-                roommateRepository.addPoints(task.getAssigned().getId(), task.getPoints());
-
-                return TaskResponse.from(task);
+    private Roommate findAssignee(Long assigneeId, Long sharedHouseId) {
+        if (assigneeId == null) {
+            return null;
         }
+        return roommateRepository.findById(assigneeId)
+                .filter(roommate -> isMemberOf(roommate, sharedHouseId))
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Ce colocataire ne fait pas partie de votre colocation"));
+    }
+
+    private boolean isMemberOf(Roommate roommate, Long sharedHouseId) {
+        return roommate.getSharedHouse() != null
+                && sharedHouseId.equals(roommate.getSharedHouse().getId());
+    }
 }

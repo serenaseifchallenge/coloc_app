@@ -3,7 +3,12 @@
     <h2 [class]="status()">{{ heading() }}</h2>
     <div class="list">
       @for (task of tasks(); track task.id) {
-        <app-task-card [task]="task" [showAssignee]="showAssignee()" />
+        <app-task-card
+          [task]="task"
+          [showAssignee]="showAssignee()"
+          [busy]="busyTaskIds().has(task.id)"
+          (actionRequested)="taskActionRequested.emit($event)"
+        />
       }
     </div>
   </section>

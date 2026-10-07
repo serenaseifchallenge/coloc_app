@@ -1,0 +1,54 @@
+<app-modal heading="Nouvelle tâche" (closed)="closed.emit()">
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="field">
+      <label for="task-name">Nom</label>
+      <input
+        id="task-name"
+        list="task-name-options"
+        formControlName="name"
+        placeholder="Sélectionne ou tape le nom de ta tâche…"
+        autocomplete="off"
+      />
+      <datalist id="task-name-options">
+        @for (taskName of taskNames(); track taskName) {
+          <option [value]="taskName"></option>
+        }
+      </datalist>
+      @if (hasError('name')) {
+        <span class="field-error">Le nom est obligatoire (150 caractères maximum).</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="task-deadline">Date limite <span class="optional">(facultatif)</span></label>
+      <input id="task-deadline" type="date" formControlName="deadline" [min]="today" />
+    </div>
+
+    <div class="field">
+      <span class="label">Personne assignée <span class="optional">(facultatif)</span></span>
+      <app-roommate-picker
+        [roommates]="roommates()"
+        [selectedId]="form.controls.assigneeId.value"
+        (selectedIdChange)="selectAssignee($event)"
+      />
+    </div>
+
+    <div class="field">
+      <label for="task-points">Points</label>
+      <input id="task-points" type="number" formControlName="points" min="1" max="100" />
+      @if (hasError('points')) {
+        <span class="field-error">Entre 1 et 100 points.</span>
+      }
+    </div>
+
+    @if (errorMessage(); as message) {
+      <p class="form-error">{{ message }}</p>
+    }
+
+    <footer>
+      <button type="submit" class="submit-button" [disabled]="submitting()">
+        {{ submitting() ? 'Création…' : 'Valider' }}
+      </button>
+    </footer>
+  </form>
+</app-modal>
