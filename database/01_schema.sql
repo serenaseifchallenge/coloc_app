@@ -104,3 +104,12 @@ CREATE TABLE custom_task_name (
     name            VARCHAR(150) NOT NULL,
     UNIQUE (shared_house_id, name)
 );
+
+CREATE TABLE monthly_score (
+    id              BIGSERIAL PRIMARY KEY,
+    shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+    roommate_id     BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,
+    month_start     DATE NOT NULL,
+    points          INTEGER NOT NULL,
+    UNIQUE (roommate_id, month_start)
+);

@@ -21,4 +21,10 @@ public interface RoommateRepository extends JpaRepository<Roommate, Long> {
     @Modifying
     @Query("UPDATE Roommate roommate SET roommate.points = COALESCE(roommate.points, 0) + :points WHERE roommate.id = :roommateId")
     void addPoints(@Param("roommateId") Long roommateId, @Param("points") int points);
+
+    List<Roommate> findBySharedHouseIsNotNull();
+
+    @Modifying
+    @Query("UPDATE Roommate roommate SET roommate.points = 0")
+    void resetAllPoints();
 }

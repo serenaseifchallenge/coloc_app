@@ -55,3 +55,12 @@ INSERT INTO event (shared_house_id, creator_id, title, start_date, end_date) VAL
   (1, 3, 'Soirée coloc',          NOW() + INTERVAL '5 days', NOW() + INTERVAL '5 days 4 hours'),
   (1, 1, 'Visite du proprio',     NOW() + INTERVAL '3 days', NOW() + INTERVAL '3 days 1 hour'),
   (1, 2, 'Grand ménage mensuel',  NOW() + INTERVAL '10 days', NOW() + INTERVAL '10 days 3 hours');
+
+
+INSERT INTO monthly_score (shared_house_id, roommate_id, month_start, points) VALUES
+  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 480),
+  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 370),
+  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 290),
+  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 410),
+  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 150),
+  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 95);
