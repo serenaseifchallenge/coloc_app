@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AutoFocus } from '../../../../shared/directives/auto-focus';
 import { Article, ShoppingListType } from '../../models/article.model';
@@ -37,6 +37,7 @@ export class ShoppingList implements OnInit {
   readonly drafts = signal<ArticleDraft[]>([]);
   readonly saving = signal(false);
   readonly buyingIds = signal<ReadonlySet<number>>(new Set());
+  readonly deletingIds = signal<ReadonlySet<number>>(new Set());
   readonly editingId = signal<number | null>(null);
   readonly renamingId = signal<number | null>(null);
 
@@ -109,7 +110,7 @@ export class ShoppingList implements OnInit {
         error: (error: HttpErrorResponse) => {
           this.renamingId.set(null);
           if (error.status === 404 || error.status === 409) {
-            this.articles.update((articles) => articles.filter((current) => current.id !== article.id));
+            this.removeArticle(article.id);
             this.cancelEditing();
             this.actionError.set(`« ${article.name} » a été acheté ou supprimé entre-temps.`);
           } else {
@@ -120,7 +121,7 @@ export class ShoppingList implements OnInit {
   }
 
   buyArticle(article: Article): void {
-    this.setBuying(article.id, true);
+    this.toggleId(this.buyingIds, article.id, true);
     this.actionError.set(null);
 
     this.articleService
@@ -128,25 +129,52 @@ export class ShoppingList implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.articles.update((articles) => articles.filter((current) => current.id !== article.id));
-          this.setBuying(article.id, false);
+          this.removeArticle(article.id);
+          this.toggleId(this.buyingIds, article.id, false);
         },
         error: () => {
-          this.setBuying(article.id, false);
+          this.toggleId(this.buyingIds, article.id, false);
           this.actionError.set(`« ${article.name} » n'a pas pu être coché. Réessaie.`);
         },
       });
   }
 
-  private setBuying(articleId: number, buying: boolean): void {
-    this.buyingIds.update((ids) => {
-      const nextIds = new Set(ids);
-      if (buying) {
-        nextIds.add(articleId);
+  deleteArticle(article: Article): void {
+    this.toggleId(this.deletingIds, article.id, true);
+    this.actionError.set(null);
+
+    this.articleService
+      .deleteArticle(article.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.removeArticle(article.id);
+          this.toggleId(this.deletingIds, article.id, false);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.toggleId(this.deletingIds, article.id, false);
+          if (error.status === 404) {
+            this.removeArticle(article.id);
+          } else {
+            this.actionError.set(`« ${article.name} » n'a pas pu être supprimé. Réessaie.`);
+          }
+        },
+      });
+  }
+
+  private removeArticle(articleId: number): void {
+    this.articles.update((articles) => articles.filter((current) => current.id !== articleId));
+  }
+
+  private toggleId(ids: WritableSignal<ReadonlySet<number>>, id: number, present: boolean): void {
+    ids.update((current) => {
+      const next = new Set(current);
+      if (present) {
+        next.add(id);
       } else {
-        nextIds.delete(articleId);
+        next.delete(id);
       }
-      return nextIds;
+      return next;
     });
   }
 

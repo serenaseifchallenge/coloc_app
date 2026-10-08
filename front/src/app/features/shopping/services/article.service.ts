@@ -25,4 +25,8 @@ export class ArticleService {
   buyArticle(articleId: number): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${articleId}/buy`, null);
   }
+
+  deleteArticle(articleId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${articleId}`);
+  }
 }

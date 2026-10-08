@@ -3,6 +3,11 @@
   align-items: center;
   gap: 16px;
   padding: 9px 4px;
+  transition: opacity 0.15s;
+}
+
+:host(.deleting) {
+  opacity: 0.45;
 }
 
 .checkbox {
@@ -68,32 +73,47 @@
   color: var(--color-muted);
 }
 
-.edit-button {
+.actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.icon-button {
   display: grid;
   place-items: center;
   width: 30px;
   height: 30px;
   padding: 0;
-  flex-shrink: 0;
   border: none;
   border-radius: 6px;
   background: none;
   color: var(--color-muted);
   cursor: pointer;
-  transition: opacity 0.15s, background-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, color 0.15s;
 }
 
-.edit-button:hover:not(:disabled) {
+.icon-button.edit:hover:not(:disabled) {
   background: var(--color-primary-soft);
   color: var(--list-color, var(--color-primary));
 }
 
-.edit-button:focus-visible {
+.icon-button.delete:hover:not(:disabled) {
+  background: #fdecec;
+  color: var(--color-late);
+}
+
+.icon-button:disabled {
+  cursor: default;
+}
+
+.icon-button:focus-visible {
   outline: 2px solid var(--list-color, var(--color-primary));
   outline-offset: 2px;
 }
 
-.edit-button svg {
+.icon-button svg {
   width: 18px;
   height: 18px;
   fill: none;
@@ -104,12 +124,12 @@
 }
 
 @media (hover: hover) {
-  .edit-button {
+  .actions {
     opacity: 0;
   }
 
-  :host(:hover) .edit-button,
-  :host(:focus-within) .edit-button {
+  :host(:hover) .actions,
+  :host(:focus-within) .actions {
     opacity: 1;
   }
 }
