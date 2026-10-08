@@ -7,6 +7,7 @@ import { CreateTaskRequest, Task, TaskQuery } from '../models/task.model';
 export class TaskService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = '/api/tasks';
+  private readonly taskNamesUrl = '/api/task-names';
 
   getTasks(query: TaskQuery): Observable<Task[]> {
     return this.http.get<Task[]>(this.apiUrl, {
@@ -31,10 +32,14 @@ export class TaskService {
   }
 
   getTaskNames(): Observable<string[]> {
-    return this.http.get<string[]>('/api/task-names');
+    return this.http.get<string[]>(this.taskNamesUrl);
+  }
+
+  addTaskName(name: string): Observable<{ name: string }> {
+    return this.http.post<{ name: string }>(this.taskNamesUrl, { name });
   }
 
   deleteTaskName(name: string): Observable<void> {
-    return this.http.delete<void>(`/api/task-names/${encodeURIComponent(name)}`);
+    return this.http.delete<void>(`${this.taskNamesUrl}/${encodeURIComponent(name)}`);
   }
 }

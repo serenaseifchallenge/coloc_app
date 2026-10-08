@@ -2,10 +2,11 @@ import { Component, DestroyRef, inject, output, signal, viewChild } from '@angul
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Modal } from '../../../../shared/components/modal/modal';
 import { TaskService } from '../../services/task.service';
+import { TaskNameAdder } from '../task-name-adder/task-name-adder';
 
 @Component({
   selector: 'app-task-name-manager-dialog',
-  imports: [Modal],
+  imports: [Modal, TaskNameAdder],
   templateUrl: './task-name-manager-dialog.html',
   styleUrl: './task-name-manager-dialog.css',
 })
@@ -23,6 +24,10 @@ export class TaskNameManagerDialog {
   readonly errorMessage = signal<string | null>(null);
 
   constructor() {
+    this.loadTaskNames();
+  }
+
+  loadTaskNames(): void {
     this.taskService
       .getTaskNames()
       .pipe(takeUntilDestroyed(this.destroyRef))

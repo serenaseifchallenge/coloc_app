@@ -38,4 +38,8 @@
       }
     </ul>
   }
+
+  @if (!loading()) {
+    <app-task-name-adder (added)="loadTaskNames()" />
+  }
 </app-modal>

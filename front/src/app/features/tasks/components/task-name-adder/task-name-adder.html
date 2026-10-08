@@ -1,0 +1,26 @@
+@if (adding()) {
+  <input
+    #nameInput
+    appAutoFocus
+    class="name-input"
+    type="text"
+    maxlength="150"
+    placeholder="Nom de la tâche récurrente…"
+    aria-label="Nouvelle tâche récurrente"
+    [disabled]="saving()"
+    (keydown.enter)="submit(nameInput.value)"
+    (keydown.escape)="cancel($event)"
+  />
+  <p class="hint">Entrée pour valider · Échap pour annuler</p>
+} @else {
+  <button type="button" class="add-button" (click)="start()">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+    Ajouter une tâche récurrente
+  </button>
+}
+
+@if (errorMessage(); as message) {
+  <p class="error">{{ message }}</p>
+}

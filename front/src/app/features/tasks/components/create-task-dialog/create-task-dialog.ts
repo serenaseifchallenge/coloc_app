@@ -27,9 +27,7 @@ export class CreateTaskDialog implements OnInit {
   readonly created = output<Task>();
   readonly closed = output<void>();
 
-  readonly taskNames = toSignal(this.taskService.getTaskNames().pipe(catchError(() => of([]))), {
-    initialValue: [],
-  });
+  readonly taskNames = signal<string[]>([]);
   readonly roommates = toSignal(this.roommateService.getRoommates().pipe(catchError(() => of([]))), {
     initialValue: [],
   });
@@ -62,10 +60,16 @@ export class CreateTaskDialog implements OnInit {
 
   ngOnInit(): void {
     this.form.controls.name.setValue(this.initialName());
+    this.loadTaskNames();
   }
 
   selectTaskName(name: string): void {
     this.form.controls.name.setValue(name);
+  }
+
+  onTaskNameAdded(name: string): void {
+    this.loadTaskNames();
+    this.selectTaskName(name);
   }
 
   selectAssignee(roommateId: number | null): void {
@@ -99,6 +103,16 @@ export class CreateTaskDialog implements OnInit {
           this.errorMessage.set("La tâche n'a pas pu être créée. Vérifie les champs et réessaie.");
           this.submitting.set(false);
         },
+      });
+  }
+
+  private loadTaskNames(): void {
+    this.taskService
+      .getTaskNames()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (names) => this.taskNames.set(names),
+        error: () => this.taskNames.set([]),
       });
   }
 }

@@ -51,5 +51,6 @@
     [names]="filteredTaskNames()"
     [selectedName]="nameValue()"
     (nameSelected)="selectTaskName($event)"
+    (nameAdded)="onTaskNameAdded($event)"
   />
 </app-modal>

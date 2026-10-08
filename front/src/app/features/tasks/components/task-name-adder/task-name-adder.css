@@ -1,0 +1,68 @@
+:host {
+  display: block;
+  margin-top: 12px;
+}
+
+.add-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 8px;
+  border: 1px var(--color-border);
+  border-radius: 8px;
+  background: var(--color-accent);
+  text-align: left; /* Aligne le texte proprement à gauche */
+  white-space: normal;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.830rem;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+
+
+.add-button:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.add-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.add-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.name-input {
+  width: 100%;
+  padding: 10px 6px;
+  border: none;
+  background: transparent;
+  box-shadow: 0 1px 0 var(--color-primary);
+  font-size: inherit;
+  outline: none;
+}
+
+.name-input:disabled {
+  color: var(--color-muted);
+}
+
+.hint {
+  margin: 6px 0 0;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+
+.error {
+  margin: 6px 0 0;
+  color: var(--color-late);
+  font-size: 0.85rem;
+}
