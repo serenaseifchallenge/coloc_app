@@ -97,3 +97,10 @@ CREATE TABLE hidden_task_name (
     name            VARCHAR(150) NOT NULL,
     UNIQUE (shared_house_id, name)
 );
+
+CREATE TABLE custom_task_name (
+    id              BIGSERIAL PRIMARY KEY,
+    shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+    name            VARCHAR(150) NOT NULL,
+    UNIQUE (shared_house_id, name)
+);
