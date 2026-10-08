@@ -91,7 +91,6 @@ select {
 .form-field input,
 .form-field textarea {
   width: 100%;
-  max-width: 340px;
   padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -115,7 +114,17 @@ select {
   min-height: calc(100vh - var(--header-h));
   overflow: hidden;
 }
-.auth-form { position: relative; z-index: 1; padding: 44px 0 48px 7%; }
+/* Partie gauche : centrée dans l'espace libre entre le bord et la vague */
+.auth-form {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  justify-self: center;
+  width: min(540px, calc(100% - 48px));
+  padding: 28px 0;
+}
+.auth-form form { max-width: 420px; }
+/* Partie droite : centrée dans la zone violette de la vague */
 .auth-aside {
   position: relative;
   z-index: 1;
@@ -123,20 +132,29 @@ select {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 32px;
-  padding: 40px 5% 40px 18%;
+  gap: 28px;
+  padding: 100px 2vw 32px 18vw;
   color: #fff;
+  text-align: center;
+  --house: 330px;
 }
-.auth-title { margin: 0 0 22px; font-size: 34px; font-weight: 700; }
+.auth-title { margin: 0 0 16px; font-size: clamp(28px, 2.2vw, 34px); font-weight: 700; line-height: 1.2; }
 .auth-subtitle {
-  max-width: 320px;
-  margin: 0 0 28px;
+  max-width: 360px;
+  margin: 0 0 24px;
   color: var(--muted);
   font-size: 15px;
   font-weight: 500;
   line-height: 1.6;
 }
-.aside-text { align-self: flex-end; max-width: 260px; margin: 0; font-weight: 500; line-height: 1.7; text-align: right; }
+.aside-text { 
+  width: var(--house); 
+  margin: 0; 
+  text-align: right; 
+  font-weight: 500; 
+  line-height: 1.7; 
+}
+.auth-aside .btn { margin: 0 calc(50% - var(--house) / 2) 0 auto; }
 
 /* ---------- Cartes ---------- */
 .card { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); }
@@ -150,7 +168,7 @@ app-modal .form-field textarea { max-width: none; }
 @media (max-width: 860px) {
   .auth-page { grid-template-columns: 1fr; }
   .auth-aside, app-auth-waves { display: none; }
-  .auth-form { padding: 32px 24px; }
+  .auth-form { width: auto; justify-self: stretch; padding: 32px 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -5,8 +5,8 @@ import { Component } from '@angular/core';
   selector: 'app-auth-waves',
   template: `
     <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-      <path class="salmon" d="M76 0C44 22 38 62 60 100H100V0Z" />
-      <path class="purple" d="M81 0C55 26 52 66 68 100H100V0Z" />
+      <path class="salmon" d="M70 0C50 40 50 85 58 100H100V0Z" />
+      <path class="purple" d="M76 0C60 40 58 80 64 100H100V0Z" />
     </svg>
   `,
   styles: `

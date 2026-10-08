@@ -4,56 +4,60 @@
   </svg>
 
   <section class="create" aria-labelledby="create-title">
-    <h1 id="create-title">Créez votre coloc</h1>
-    <p class="intro">Vous êtes le premier ? Créez votre coloc et invitez vos colocataires avec un code d'invitation.</p>
+    <div class="panel">
+      <h1 id="create-title">Créez votre coloc</h1>
+      <p class="intro">Vous êtes le premier ? Créez votre coloc et invitez vos colocataires avec un code d'invitation.</p>
 
-    <form [formGroup]="createForm" (ngSubmit)="create()" novalidate>
-      @if (createError()) {
-        <p class="form-alert light" role="alert">{{ createError() }}</p>
-      }
-      <div class="form-field">
-        <label for="name">Nom de la colocation</label>
-        <input id="name" type="text" formControlName="name" placeholder="La coloc des Lilas" />
-        @if (createForm.controls.name.touched && createForm.controls.name.invalid) {
-          <span class="form-field-error light">Donnez un nom à votre coloc.</span>
+      <form [formGroup]="createForm" (ngSubmit)="create()" novalidate>
+        @if (createError()) {
+          <p class="form-alert light" role="alert">{{ createError() }}</p>
         }
-      </div>
-      <div class="form-field">
-        <label for="address">Adresse</label>
-        <input id="address" type="text" formControlName="address" placeholder="12 rue des Lilas, Paris" />
-        @if (createForm.controls.address.touched && createForm.controls.address.invalid) {
-          <span class="form-field-error light">Indiquez l'adresse de la coloc.</span>
-        }
-      </div>
-      <div class="form-field">
-        <label for="description">Description</label>
-        <input id="description" type="text" formControlName="description" placeholder="Coloc de 4 étudiants, ambiance calme" />
-        @if (createForm.controls.description.touched && createForm.controls.description.invalid) {
-          <span class="form-field-error light">Ajoutez une courte description.</span>
-        }
-      </div>
-      <button type="submit" class="btn btn-salmon" [disabled]="busy()">Créer</button>
-    </form>
+        <div class="form-field">
+          <label for="name">Nom de la colocation</label>
+          <input id="name" type="text" formControlName="name" placeholder="La coloc des Lilas" />
+          @if (createForm.controls.name.touched && createForm.controls.name.invalid) {
+            <span class="form-field-error light">Donnez un nom à votre coloc.</span>
+          }
+        </div>
+        <div class="form-field">
+          <label for="address">Adresse</label>
+          <input id="address" type="text" formControlName="address" placeholder="12 rue des Lilas, Paris" />
+          @if (createForm.controls.address.touched && createForm.controls.address.invalid) {
+            <span class="form-field-error light">Indiquez l'adresse de la coloc.</span>
+          }
+        </div>
+        <div class="form-field">
+          <label for="description">Description</label>
+          <input id="description" type="text" formControlName="description" placeholder="Coloc de 4 étudiants, ambiance calme" />
+          @if (createForm.controls.description.touched && createForm.controls.description.invalid) {
+            <span class="form-field-error light">Ajoutez une courte description.</span>
+          }
+        </div>
+        <button type="submit" class="btn btn-salmon" [disabled]="busy()">Créer</button>
+      </form>
+    </div>
 
-    <app-house-illustration class="illustration" [size]="200" />
+    <app-house-illustration class="illustration" [size]="400" />
   </section>
 
   <section class="join" aria-labelledby="join-title">
-    <h1 id="join-title">Rejoignez une coloc</h1>
-    <p class="intro">Un colocataire vous a envoyé un code ? Entrez-le ici pour rejoindre votre coloc.</p>
+    <div class="panel">
+      <h1 id="join-title">Rejoignez une coloc</h1>
+      <p class="intro">Un colocataire vous a envoyé un code ? Entrez-le ici pour rejoindre votre coloc.</p>
 
-    <form [formGroup]="joinForm" (ngSubmit)="join()" novalidate>
-      @if (joinError()) {
-        <p class="form-alert" role="alert">{{ joinError() }}</p>
-      }
-      <div class="form-field">
-        <label for="code">Code d'invitation</label>
-        <input id="code" type="text" formControlName="invitationCode" placeholder="CH54SK7P" autocomplete="off" />
-        @if (joinForm.controls.invitationCode.touched && joinForm.controls.invitationCode.invalid) {
-          <span class="form-field-error">Entrez le code reçu.</span>
+      <form [formGroup]="joinForm" (ngSubmit)="join()" novalidate>
+        @if (joinError()) {
+          <p class="form-alert" role="alert">{{ joinError() }}</p>
         }
-      </div>
-      <button type="submit" class="btn btn-primary" [disabled]="busy()">Rejoindre</button>
-    </form>
+        <div class="form-field">
+          <label for="code">Code d'invitation</label>
+          <input id="code" type="text" formControlName="invitationCode" placeholder="CH54SK7P" autocomplete="off" />
+          @if (joinForm.controls.invitationCode.touched && joinForm.controls.invitationCode.invalid) {
+            <span class="form-field-error">Entrez le code reçu.</span>
+          }
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="busy()">Rejoindre</button>
+      </form>
+    </div>
   </section>
 </main>

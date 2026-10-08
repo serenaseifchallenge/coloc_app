@@ -1,5 +1,5 @@
-.settings { max-width: 1000px; padding: 48px 5% 48px; }
-h1 { margin: 0 0 16px; font-size: 26px; font-weight: 700; }
+.settings { padding: 56px 54px 64px; }
+h1 { margin: 0 0 24px; font-size: 1.9rem; font-weight: 700; letter-spacing: -0.01em; }
 .card { margin-bottom: 26px; }
 
 /* Boutons communs */
@@ -50,6 +50,7 @@ h1 { margin: 0 0 16px; font-size: 26px; font-weight: 700; }
 .leave-btn:hover { background: #4038c9; }
 
 @media (max-width: 760px) {
+  .settings { padding: 20px 16px 32px; }
   .profile { flex-wrap: wrap; }
   .house { grid-template-columns: 1fr; gap: 20px; }
   .house-main { border-right: none; }

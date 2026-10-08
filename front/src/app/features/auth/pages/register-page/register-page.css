@@ -1,6 +1,11 @@
-.auth-title { margin-bottom: 14px; }
-.auth-subtitle { max-width: none; margin-bottom: 20px; }
-.form-field { margin-bottom: 14px; }
+.auth-subtitle { max-width: none; }
+.form-field { margin-bottom: 12px; gap: 6px; }
 
-.login-text { margin: 0; max-width: 250px; font-size: 14px; line-height: 1.7; letter-spacing: 0.3px; }
-.login-btn { align-self: flex-end; }
+/* Deux champs côte à côte */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+
+form .btn { margin-top: 6px; }
+
+@media (max-width: 520px) {
+  .form-row { grid-template-columns: 1fr; }
+}

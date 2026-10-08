@@ -1,11 +1,4 @@
-.actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  max-width: 340px;
-  margin-top: 4px;
-}
-.forgot { color: var(--muted); font-size: 11px; text-decoration: underline; }
+form .btn { margin-top: 4px; }
 
-.signup { margin-top: 84px; }
-.signup p { margin: 0 0 16px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.signup { margin-top: clamp(32px, 7vh, 72px); }
+.signup p { margin: 0 0 14px; color: var(--muted); font-size: 14px; line-height: 1.6; }
