@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { catchError, of } from 'rxjs';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -41,6 +41,14 @@ export class HomePage {
   protected readonly members = computed(() =>
     (this.house()?.members ?? []).map((m) => ({ ...m, title: titleFor(m.points).toLowerCase() })),
   );
+
+  constructor() {
+    // Les points changent quand on coche des tâches : on les relit à chaque arrivée sur l'accueil.
+    this.auth.refreshUser().pipe(takeUntilDestroyed()).subscribe();
+    this.houses.load(true).catch(() => {
+      /* on garde les anciennes infos si le back ne répond pas */
+    });
+  }
 
   /**
    * Mes tâches pas encore faites (undefined = chargement, null = erreur).

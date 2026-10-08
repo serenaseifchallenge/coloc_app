@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, firstValueFrom, tap } from 'rxjs';
+import { EMPTY, Observable, catchError, firstValueFrom, tap } from 'rxjs';
 import { Roommate } from '../../shared/models/roommate.model';
 import { AuthResponse, LoginRequest, RegisterRequest, UpdateCredentialsRequest } from './auth.model';
 import { SharedHouseService } from '../shared-house/shared-house.service';
@@ -40,6 +40,14 @@ export class AuthService {
       this.logout();
       return null;
     }
+  }
+
+  /** Relit l'utilisateur connecté depuis le back (par exemple après avoir gagné des points). */
+  refreshUser(): Observable<Roommate> {
+    return this.http.get<Roommate>('/api/me').pipe(
+      tap((me) => this.user.set(me)),
+      catchError(() => EMPTY),
+    );
   }
 
   updateCredentials(body: UpdateCredentialsRequest): Observable<Roommate> {
