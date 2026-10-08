@@ -71,6 +71,12 @@ public class ArticleService {
         article.setBought(true);
     }
 
+    @Transactional
+    public void deleteArticle(Long articleId) {
+        Article article = findAccessibleArticle(articleId);
+        articleRepository.delete(article);
+    }
+
     private Article findAccessibleArticle(Long articleId) {
         Long sharedHouseId = currentUserService.getCurrentSharedHouse().getId();
         Long currentRoommateId = currentUserService.getCurrentRoommateId();
