@@ -1,0 +1,28 @@
+<svg class="ring" viewBox="0 0 100 100" role="img" [attr.aria-label]="'Progression : ' + progress().percent + ' %'">
+  <circle class="track" cx="50" cy="50" [attr.r]="radius" />
+  <circle
+    class="value"
+    cx="50"
+    cy="50"
+    transform="rotate(-90 50 50)"
+    [attr.r]="radius"
+    [attr.stroke-dasharray]="circumference"
+    [attr.stroke-dashoffset]="dashOffset()"
+  />
+  <text class="percent" x="50" y="50" text-anchor="middle" dominant-baseline="central">
+    {{ progress().percent }}%
+  </text>
+</svg>
+
+<div class="text">
+  @if (progress().nextTitle; as nextTitle) {
+    <p class="goal">Atteignez le titre de « {{ nextTitle }} »</p>
+    <p class="detail">
+      Il ne vous manque que {{ progress().missingPoints }} point{{ progress().missingPoints > 1 ? 's' : '' }}
+      pour obtenir ce titre
+    </p>
+  } @else {
+    <p class="goal">Vous avez atteint le titre ultime : « {{ progress().currentTitle }} » 🎉</p>
+    <p class="detail">Continuez comme ça jusqu'à la fin du mois !</p>
+  }
+</div>

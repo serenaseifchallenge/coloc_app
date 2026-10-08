@@ -12,6 +12,13 @@ export const TITLES: ReadonlyArray<{ min: number; label: string }> = [
   { min: 450, label: 'Légende du foyer' },
 ];
 
+export interface TitleProgress {
+  currentTitle: string;
+  nextTitle: string | null;
+  missingPoints: number;
+  percent: number;
+}
+
 export function titleFor(points: number | null | undefined): string {
   const value = points ?? 0;
   let label = TITLES[0].label;
@@ -21,4 +28,23 @@ export function titleFor(points: number | null | undefined): string {
     }
   }
   return label;
+}
+
+export function titleProgress(points: number | null | undefined): TitleProgress {
+  const value = Math.max(points ?? 0, 0);
+  const reachedTitles = TITLES.filter((title) => value >= title.min);
+  const currentTitle = reachedTitles[reachedTitles.length - 1] ?? TITLES[0];
+  const nextTitle = TITLES[reachedTitles.length];
+
+  if (!nextTitle) {
+    return { currentTitle: currentTitle.label, nextTitle: null, missingPoints: 0, percent: 100 };
+  }
+
+  const percent = Math.round(((value - currentTitle.min) / (nextTitle.min - currentTitle.min)) * 100);
+  return {
+    currentTitle: currentTitle.label,
+    nextTitle: nextTitle.label,
+    missingPoints: nextTitle.min - value,
+    percent,
+  };
 }

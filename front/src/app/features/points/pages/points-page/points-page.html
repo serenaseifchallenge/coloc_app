@@ -1,0 +1,32 @@
+<main class="page">
+  <h1>Classement</h1>
+
+  <section class="card">
+    <h2>Résultats du mois dernier</h2>
+    @if (lastMonthResults(); as results) {
+      <app-last-month-podium [results]="results" />
+    } @else if (lastMonthResults() === null) {
+      <p class="info">Résultats indisponibles pour le moment.</p>
+    } @else {
+      <p class="info">Chargement…</p>
+    }
+  </section>
+
+  <section class="card">
+    <h2>Points de ce mois</h2>
+    @if (members().length === 0) {
+      <p class="info">Aucun colocataire pour le moment.</p>
+    } @else {
+      <div class="members">
+        @for (member of members(); track member.id) {
+          <app-member-points-card [roommate]="member" />
+        }
+      </div>
+    }
+  </section>
+
+  <section class="card">
+    <h2>Prochain objectif</h2>
+    <app-next-title-goal [progress]="myProgress()" />
+  </section>
+</main>

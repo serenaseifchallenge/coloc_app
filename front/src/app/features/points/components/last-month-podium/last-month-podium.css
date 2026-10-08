@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+
+.month {
+  margin: -10px 0 0;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.podium {
+  position: relative;
+  max-width: 440px;
+  margin: 0px auto 0;
+}
+
+.podium-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.slot {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transform: translate(-50%, -60%);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.slot[data-rank='1'] {
+  top: 28%;
+  left: 51%;
+}
+
+.slot[data-rank='2'] {
+  top: 45%;
+  left: 30%;
+}
+
+.slot[data-rank='3'] {
+  top: 52%;
+  left: 72%;
+}
+
+.name {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.points {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+
+.info {
+  margin: 12px 0 0;
+  color: var(--color-muted);
+}

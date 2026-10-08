@@ -52,7 +52,11 @@ export const routes: Routes = [
       // { path: 'expenses', loadComponent: ... },
       // { path: 'calendar', loadComponent: ... },
       // { path: 'notes', loadComponent: ... },
-      // { path: 'points', loadComponent: ... },
+      {
+        path: 'points',
+        loadComponent: () => import('./features/points/pages/points-page/points-page').then((m) => m.PointsPage),
+      },
+      
       { path: '', pathMatch: 'full', redirectTo: 'home' },
     ],
   },
