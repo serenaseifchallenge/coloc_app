@@ -8,6 +8,7 @@ import { SharedHouseService } from '../../../../core/shared-house/shared-house.s
 import { titleFor } from '../../../../shared/utils/titles';
 import { TaskService } from '../../../tasks/services/task.service';
 import { todayIso } from '../../../tasks/utils/task-status';
+import { ArticleService } from '../../../shopping/services/article.service';
 
 interface HomeTile {
   title: string;
@@ -31,6 +32,7 @@ export class HomePage {
   private readonly auth = inject(AuthService);
   private readonly houses = inject(SharedHouseService);
   private readonly taskService = inject(TaskService);
+  private readonly articleService = inject(ArticleService);
 
   protected readonly today = new Date();
   protected readonly user = this.auth.user;
@@ -57,6 +59,28 @@ export class HomePage {
   });
 
   /**
+   * Mes courses pas encore faites (undefined = chargement, null = erreur).
+   * toSignal s'abonne et se désabonne tout seul quand on quitte la page.
+   */
+  private readonly sharedArticles = toSignal(
+    this.articleService.getArticles('SHARED').pipe(catchError(() => of(null))),
+  );
+
+  private readonly personalArticles = toSignal(
+    this.articleService.getArticles('PERSONAL').pipe(catchError(() => of(null))),
+  );
+
+  private readonly shoppingLines = computed<string[]>(() => {
+    const shared = this.sharedArticles();
+    const personal = this.personalArticles();
+    if (shared === undefined || personal === undefined) return ['…'];
+    if (shared === null || personal === null) return ['Courses indisponibles'];
+    return [
+      `${count(shared.length, 'article')} pour ${this.house()?.name ?? 'la coloc'}`,
+      `${count(personal.length, 'article')} pour vous`];
+  });
+
+  /**
    * TODO équipe : remplacer les « — » par les vraies valeurs quand vos API seront prêtes
    * (même principe que les tâches ci-dessus).
    * L'ordre compte : la grille se remplit ligne par ligne (Tâches, Dépenses, Courses, ...).
@@ -66,7 +90,7 @@ export class HomePage {
     return [
       { title: 'Tâches', route: '/tasks', color: 'salmon', lines: this.taskLines() },
       { title: 'Dépenses', route: '/expenses', color: 'purple', lines: ['— € dû'] },
-      { title: 'Courses', route: '/shopping', color: 'purple', lines: [`— pour ${this.house()?.name ?? 'la coloc'}`, '— pour vous'] },
+      { title: 'Courses', route: '/shopping', color: 'purple', lines: this.shoppingLines() },
       { title: 'Évènements', route: '/calendar', color: 'salmon', lines: ['— ce mois-ci', '— aujourd’hui'] },
       { title: 'Notes', route: '/notes', color: 'salmon', lines: ['— affichées', '— vote en cours'] },
       {
