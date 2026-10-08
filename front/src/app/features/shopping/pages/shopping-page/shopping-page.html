@@ -7,17 +7,23 @@
       heading="Mes courses"
       description="Vous seul avez accès au contenu de cette liste"
     >
-      <span listIcon class="list-icon personal">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="8" r="4" />
-          <path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5" />
-        </svg>
-      </span>
+      <ng-container ngProjectAs="[listIcon]">
+        @if (auth.user(); as roommate) {
+          <app-roommate-avatar class="list-icon" [roommate]="roommate" />
+        } @else {
+          <span class="list-icon personal">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5" />
+            </svg>
+          </span>
+        }
+      </ng-container>
     </app-shopping-list>
 
     <app-shopping-list
       listType="SHARED"
-      heading="Liste commune"
+      [heading]="sharedListHeading()"
       description="Tous les colocataires ont accès au contenu de cette liste"
     >
       <span listIcon class="list-icon shared">
