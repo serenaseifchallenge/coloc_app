@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,5 +35,11 @@ public class ArticleController {
     @ResponseStatus(HttpStatus.CREATED)
     public List<ArticleResponse> createArticles(@Valid @RequestBody CreateArticlesRequest request) {
         return articleService.createArticles(request);
+    }
+
+    @PatchMapping("/{id}/buy")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void buyArticle(@PathVariable Long id) {
+        articleService.buyArticle(id);
     }
 }

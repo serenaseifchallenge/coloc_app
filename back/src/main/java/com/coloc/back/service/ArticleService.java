@@ -8,8 +8,10 @@ import com.coloc.back.entity.Roommate;
 import com.coloc.back.entity.SharedHouse;
 import com.coloc.back.repository.ArticleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -49,6 +51,25 @@ public class ArticleService {
         return articleRepository.saveAll(articles).stream()
                 .map(ArticleResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public void buyArticle(Long articleId) {
+        Article article = findAccessibleArticle(articleId);
+        article.setBought(true);
+    }
+
+    private Article findAccessibleArticle(Long articleId) {
+        Long sharedHouseId = currentUserService.getCurrentSharedHouse().getId();
+        Long currentRoommateId = currentUserService.getCurrentRoommateId();
+
+        return articleRepository.findByIdAndSharedHouseId(articleId, sharedHouseId)
+                .filter(article -> isAccessibleBy(article, currentRoommateId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Article introuvable"));
+    }
+
+    private boolean isAccessibleBy(Article article, Long roommateId) {
+        return article.getOwner() == null || roommateId.equals(article.getOwner().getId());
     }
 
     private Article buildArticle(SharedHouse sharedHouse, Roommate owner, String name) {
