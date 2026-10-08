@@ -3,6 +3,7 @@ package com.coloc.back.controller;
 import com.coloc.back.dto.ArticleResponse;
 import com.coloc.back.dto.CreateArticlesRequest;
 import com.coloc.back.dto.ShoppingListType;
+import com.coloc.back.dto.UpdateArticleRequest;
 import com.coloc.back.service.ArticleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,11 @@ public class ArticleController {
     @ResponseStatus(HttpStatus.CREATED)
     public List<ArticleResponse> createArticles(@Valid @RequestBody CreateArticlesRequest request) {
         return articleService.createArticles(request);
+    }
+
+    @PatchMapping("/{id}")
+    public ArticleResponse updateArticle(@PathVariable Long id, @Valid @RequestBody UpdateArticleRequest request) {
+        return articleService.updateArticle(id, request);
     }
 
     @PatchMapping("/{id}/buy")

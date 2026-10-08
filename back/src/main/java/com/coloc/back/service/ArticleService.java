@@ -3,6 +3,7 @@ package com.coloc.back.service;
 import com.coloc.back.dto.ArticleResponse;
 import com.coloc.back.dto.CreateArticlesRequest;
 import com.coloc.back.dto.ShoppingListType;
+import com.coloc.back.dto.UpdateArticleRequest;
 import com.coloc.back.entity.Article;
 import com.coloc.back.entity.Roommate;
 import com.coloc.back.entity.SharedHouse;
@@ -51,6 +52,17 @@ public class ArticleService {
         return articleRepository.saveAll(articles).stream()
                 .map(ArticleResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public ArticleResponse updateArticle(Long articleId, UpdateArticleRequest request) {
+        Article article = findAccessibleArticle(articleId);
+        if (article.isBought()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cet article a déjà été acheté");
+        }
+
+        article.setName(request.name().trim());
+        return ArticleResponse.from(article);
     }
 
     @Transactional
