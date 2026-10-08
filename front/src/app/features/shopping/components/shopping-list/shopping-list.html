@@ -1,0 +1,27 @@
+<header class="list-header">
+  <ng-content select="[listIcon]" />
+  <div>
+    <h2>{{ heading() }}</h2>
+    @if (description()) {
+      <p class="description">{{ description() }}</p>
+    }
+  </div>
+</header>
+
+<div class="list-body">
+  @if (errorMessage(); as message) {
+    <p class="error">{{ message }}</p>
+  } @else if (loading()) {
+    <p class="info">Chargement…</p>
+  } @else if (articles().length === 0) {
+    <p class="info">Aucun article pour le moment.</p>
+  } @else {
+    <ul class="articles">
+      @for (article of articles(); track article.id) {
+        <li>
+          <app-article-item [article]="article" />
+        </li>
+      }
+    </ul>
+  }
+</div>

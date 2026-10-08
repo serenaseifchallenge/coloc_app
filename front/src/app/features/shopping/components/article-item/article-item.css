@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 9px 4px;
+}
+
+.checkbox {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border: 2px solid var(--color-text);
+  border-radius: 3px;
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.95rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

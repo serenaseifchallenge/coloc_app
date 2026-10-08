@@ -1,0 +1,32 @@
+<main class="page">
+  <h1>Courses</h1>
+
+  <div class="lists">
+    <app-shopping-list
+      listType="PERSONAL"
+      heading="Mes courses"
+      description="Vous seul avez accès au contenu de cette liste"
+    >
+      <span listIcon class="list-icon personal">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5" />
+        </svg>
+      </span>
+    </app-shopping-list>
+
+    <app-shopping-list
+      listType="SHARED"
+      heading="Liste commune"
+      description="Tous les colocataires ont accès au contenu de cette liste"
+    >
+      <span listIcon class="list-icon shared">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 11l9-7 9 7" />
+          <path d="M5 10v10h14V10" />
+          <path d="M10 20v-6h4v6" />
+        </svg>
+      </span>
+    </app-shopping-list>
+  </div>
+</main>

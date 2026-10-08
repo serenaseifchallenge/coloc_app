@@ -42,7 +42,13 @@ export const routes: Routes = [
         path: 'tasks',
         loadComponent: () => import('./features/tasks/pages/tasks-page/tasks-page').then((m) => m.TasksPage),
       },
-      // { path: 'shopping', loadComponent: ... },
+      
+      { 
+        path: 'shopping',
+        loadComponent: () => import('./features/shopping/pages/shopping-page/shopping-page').then((m) => m.ShoppingPage),
+      },
+
+
       // { path: 'expenses', loadComponent: ... },
       // { path: 'calendar', loadComponent: ... },
       // { path: 'notes', loadComponent: ... },

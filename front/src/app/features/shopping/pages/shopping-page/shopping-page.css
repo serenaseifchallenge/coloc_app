@@ -1,0 +1,55 @@
+.page {
+  padding: 56px 24px 64px 64px;
+}
+
+h1 {
+  margin: 0 0 28px;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.lists {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.list-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.list-icon.personal {
+  background: var(--color-primary);
+}
+
+.list-icon.shared {
+  background: #ff7a59;
+}
+
+.list-icon svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 32px 20px 48px;
+  }
+
+  .lists {
+    grid-template-columns: 1fr;
+  }
+}
