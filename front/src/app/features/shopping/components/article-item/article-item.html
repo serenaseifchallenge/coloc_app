@@ -1,2 +1,9 @@
-<span class="checkbox" aria-hidden="true"></span>
+<input
+  type="checkbox"
+  class="checkbox"
+  [checked]="buying()"
+  [disabled]="buying()"
+  [attr.aria-label]="'Marquer « ' + article().name + ' » comme acheté'"
+  (change)="buyRequested.emit(article())"
+/>
 <span class="name">{{ article().name }}</span>

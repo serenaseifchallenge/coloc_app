@@ -21,7 +21,11 @@
     <ul class="articles">
       @for (article of articles(); track article.id) {
         <li>
-          <app-article-item [article]="article" />
+          <app-article-item
+            [article]="article"
+            [buying]="buyingIds().has(article.id)"
+            (buyRequested)="buyArticle($event)"
+          />
         </li>
       }
 
@@ -48,7 +52,7 @@
 </div>
 
 <footer class="list-footer">
-  @if (saveError(); as message) {
+  @if (actionError(); as message) {
     <p class="error">{{ message }}</p>
   }
   @if (adding()) {

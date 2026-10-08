@@ -16,4 +16,8 @@ export class ArticleService {
     const request: CreateArticlesRequest = { list: listType, names };
     return this.http.post<Article[]>(this.apiUrl, request);
   }
+
+  buyArticle(articleId: number): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/${articleId}/buy`, null);
+  }
 }

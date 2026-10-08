@@ -30,11 +30,12 @@ export class ShoppingList implements OnInit {
   readonly articles = signal<Article[]>([]);
   readonly loading = signal(true);
   readonly errorMessage = signal<string | null>(null);
+  readonly actionError = signal<string | null>(null);
 
   readonly adding = signal(false);
   readonly drafts = signal<ArticleDraft[]>([]);
   readonly saving = signal(false);
-  readonly saveError = signal<string | null>(null);
+  readonly buyingIds = signal<ReadonlySet<number>>(new Set());
 
   ngOnInit(): void {
     this.loadArticles();
@@ -65,11 +66,42 @@ export class ShoppingList implements OnInit {
   cancelAdding(): void {
     this.adding.set(false);
     this.drafts.set([]);
-    this.saveError.set(null);
+    this.actionError.set(null);
+  }
+
+  buyArticle(article: Article): void {
+    this.setBuying(article.id, true);
+    this.actionError.set(null);
+
+    this.articleService
+      .buyArticle(article.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.articles.update((articles) => articles.filter((current) => current.id !== article.id));
+          this.setBuying(article.id, false);
+        },
+        error: () => {
+          this.setBuying(article.id, false);
+          this.actionError.set(`« ${article.name} » n'a pas pu être coché. Réessaie.`);
+        },
+      });
+  }
+
+  private setBuying(articleId: number, buying: boolean): void {
+    this.buyingIds.update((ids) => {
+      const nextIds = new Set(ids);
+      if (buying) {
+        nextIds.add(articleId);
+      } else {
+        nextIds.delete(articleId);
+      }
+      return nextIds;
+    });
   }
 
   private startAdding(): void {
-    this.saveError.set(null);
+    this.actionError.set(null);
     this.drafts.set([this.createDraft()]);
     this.adding.set(true);
   }
@@ -85,7 +117,7 @@ export class ShoppingList implements OnInit {
     }
 
     this.saving.set(true);
-    this.saveError.set(null);
+    this.actionError.set(null);
 
     this.articleService
       .createArticles(this.listType(), names)
@@ -97,7 +129,7 @@ export class ShoppingList implements OnInit {
           this.cancelAdding();
         },
         error: () => {
-          this.saveError.set("Les articles n'ont pas pu être ajoutés. Réessaie.");
+          this.actionError.set("Les articles n'ont pas pu être ajoutés. Réessaie.");
           this.saving.set(false);
         },
       });
