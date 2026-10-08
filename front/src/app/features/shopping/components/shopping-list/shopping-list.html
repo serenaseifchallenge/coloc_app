@@ -13,15 +13,48 @@
     <p class="error">{{ message }}</p>
   } @else if (loading()) {
     <p class="info">Chargement…</p>
-  } @else if (articles().length === 0) {
-    <p class="info">Aucun article pour le moment.</p>
   } @else {
+    @if (articles().length === 0 && !adding()) {
+      <p class="info">Aucun article pour le moment.</p>
+    }
+
     <ul class="articles">
       @for (article of articles(); track article.id) {
         <li>
           <app-article-item [article]="article" />
         </li>
       }
+
+      @for (draft of drafts(); track draft.id) {
+        <li class="draft">
+          <span class="checkbox" aria-hidden="true"></span>
+          <input
+            #draftInput
+            appAutoFocus
+            class="draft-input"
+            type="text"
+            maxlength="100"
+            placeholder="…"
+            aria-label="Nouvel article"
+            [value]="draft.name"
+            (input)="updateDraft(draft.id, draftInput.value)"
+            (keydown.enter)="onDraftEnter(draft.id)"
+            (keydown.escape)="cancelAdding()"
+          />
+        </li>
+      }
     </ul>
   }
 </div>
+
+<footer class="list-footer">
+  @if (saveError(); as message) {
+    <p class="error">{{ message }}</p>
+  }
+  @if (adding()) {
+    <p class="hint">Entrée pour ajouter une ligne · Échap pour annuler</p>
+  }
+  <button type="button" class="footer-button" [disabled]="saving() || loading()" (click)="onFooterButtonClick()">
+    {{ adding() ? (saving() ? 'Enregistrement…' : 'Valider') : 'Ajouter' }}
+  </button>
+</footer>

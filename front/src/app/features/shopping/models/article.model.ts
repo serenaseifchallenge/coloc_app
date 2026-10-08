@@ -4,3 +4,8 @@ export interface Article {
   id: number;
   name: string;
 }
+
+export interface CreateArticlesRequest {
+  list: ShoppingListType;
+  names: string[];
+}

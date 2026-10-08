@@ -36,7 +36,7 @@ h2 {
 
 .list-body {
   flex: 1;
-  max-height: 280px;
+  max-height: 235px;
   margin-top: 14px;
   padding: 0 8px;
   overflow-y: auto;
@@ -50,12 +50,86 @@ h2 {
   list-style: none;
 }
 
+.draft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 9px 4px;
+}
+
+.draft .checkbox {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border: 2px solid var(--color-border);
+  border-radius: 3px;
+}
+
+.draft-input {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 0;
+  border: none;
+  background: transparent;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.draft-input::placeholder {
+  color: var(--color-muted);
+}
+
+.draft-input:focus {
+  box-shadow: 0 1px 0 var(--list-color);
+}
+
+.list-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.footer-button {
+  width: 100%;
+  height: 42px;
+  border: none;
+  border-radius: 8px;
+  background: var(--list-color);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.footer-button:hover:not(:disabled) {
+  filter: brightness(0.94);
+}
+
+.footer-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.footer-button:focus-visible {
+  outline: 2px solid var(--list-color);
+  outline-offset: 2px;
+}
+
 .info {
   color: var(--color-muted);
   font-size: 0.9rem;
 }
 
 .error {
+  margin: 0;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
   background: #fdecec;
