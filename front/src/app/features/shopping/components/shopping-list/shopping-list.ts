@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AutoFocus } from '../../../../shared/directives/auto-focus';
@@ -36,6 +37,8 @@ export class ShoppingList implements OnInit {
   readonly drafts = signal<ArticleDraft[]>([]);
   readonly saving = signal(false);
   readonly buyingIds = signal<ReadonlySet<number>>(new Set());
+  readonly editingId = signal<number | null>(null);
+  readonly renamingId = signal<number | null>(null);
 
   ngOnInit(): void {
     this.loadArticles();
@@ -67,6 +70,53 @@ export class ShoppingList implements OnInit {
     this.adding.set(false);
     this.drafts.set([]);
     this.actionError.set(null);
+  }
+
+  startEditing(article: Article): void {
+    this.actionError.set(null);
+    this.editingId.set(article.id);
+  }
+
+  cancelEditing(): void {
+    this.editingId.set(null);
+  }
+
+  renameArticle(article: Article, newName: string): void {
+    if (this.editingId() !== article.id || this.renamingId() === article.id) {
+      return;
+    }
+
+    const name = newName.trim();
+    if (!name || name === article.name) {
+      this.cancelEditing();
+      return;
+    }
+
+    this.renamingId.set(article.id);
+    this.actionError.set(null);
+
+    this.articleService
+      .updateArticle(article.id, name)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (updatedArticle) => {
+          this.articles.update((articles) =>
+            articles.map((current) => (current.id === updatedArticle.id ? updatedArticle : current)),
+          );
+          this.renamingId.set(null);
+          this.cancelEditing();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.renamingId.set(null);
+          if (error.status === 404 || error.status === 409) {
+            this.articles.update((articles) => articles.filter((current) => current.id !== article.id));
+            this.cancelEditing();
+            this.actionError.set(`« ${article.name} » a été acheté ou supprimé entre-temps.`);
+          } else {
+            this.actionError.set(`« ${article.name} » n'a pas pu être modifié. Réessaie.`);
+          }
+        },
+      });
   }
 
   buyArticle(article: Article): void {

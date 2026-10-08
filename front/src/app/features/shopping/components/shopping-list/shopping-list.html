@@ -24,7 +24,12 @@
           <app-article-item
             [article]="article"
             [buying]="buyingIds().has(article.id)"
+            [editing]="editingId() === article.id"
+            [saving]="renamingId() === article.id"
             (buyRequested)="buyArticle($event)"
+            (editRequested)="startEditing($event)"
+            (renameRequested)="renameArticle(article, $event)"
+            (editCancelled)="cancelEditing()"
           />
         </li>
       }

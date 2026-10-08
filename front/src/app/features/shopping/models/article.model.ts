@@ -9,3 +9,7 @@ export interface CreateArticlesRequest {
   list: ShoppingListType;
   names: string[];
 }
+
+export interface UpdateArticleRequest {
+  name: string;
+}

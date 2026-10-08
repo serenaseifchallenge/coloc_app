@@ -30,7 +30,7 @@
 }
 
 .checkbox:disabled {
-  cursor: wait;
+  cursor: default;
 }
 
 .checkbox:focus-visible {
@@ -39,6 +39,7 @@
 }
 
 .name {
+  flex: 1;
   min-width: 0;
   overflow: hidden;
   font-size: 0.95rem;
@@ -50,4 +51,65 @@
 :host(.buying) .name {
   color: var(--color-muted);
   text-decoration: line-through;
+}
+
+.name-input {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 0;
+  border: none;
+  background: transparent;
+  box-shadow: 0 1px 0 var(--list-color, var(--color-primary));
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.name-input:disabled {
+  color: var(--color-muted);
+}
+
+.edit-button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: opacity 0.15s, background-color 0.15s, color 0.15s;
+}
+
+.edit-button:hover:not(:disabled) {
+  background: var(--color-primary-soft);
+  color: var(--list-color, var(--color-primary));
+}
+
+.edit-button:focus-visible {
+  outline: 2px solid var(--list-color, var(--color-primary));
+  outline-offset: 2px;
+}
+
+.edit-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (hover: hover) {
+  .edit-button {
+    opacity: 0;
+  }
+
+  :host(:hover) .edit-button,
+  :host(:focus-within) .edit-button {
+    opacity: 1;
+  }
 }

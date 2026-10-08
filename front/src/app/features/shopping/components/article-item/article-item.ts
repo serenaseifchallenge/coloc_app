@@ -1,8 +1,10 @@
 import { Component, input, output } from '@angular/core';
+import { AutoFocus } from '../../../../shared/directives/auto-focus';
 import { Article } from '../../models/article.model';
 
 @Component({
   selector: 'app-article-item',
+  imports: [AutoFocus],
   templateUrl: './article-item.html',
   styleUrl: './article-item.css',
   host: { '[class.buying]': 'buying()' },
@@ -10,5 +12,11 @@ import { Article } from '../../models/article.model';
 export class ArticleItem {
   readonly article = input.required<Article>();
   readonly buying = input(false);
+  readonly editing = input(false);
+  readonly saving = input(false);
+
   readonly buyRequested = output<Article>();
+  readonly editRequested = output<Article>();
+  readonly renameRequested = output<string>();
+  readonly editCancelled = output<void>();
 }

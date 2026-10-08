@@ -2,8 +2,38 @@
   type="checkbox"
   class="checkbox"
   [checked]="buying()"
-  [disabled]="buying()"
+  [disabled]="buying() || editing()"
   [attr.aria-label]="'Marquer « ' + article().name + ' » comme acheté'"
   (change)="buyRequested.emit(article())"
 />
-<span class="name">{{ article().name }}</span>
+
+@if (editing()) {
+  <input
+    #nameInput
+    appAutoFocus
+    class="name-input"
+    type="text"
+    maxlength="100"
+    aria-label="Nouveau nom de l'article"
+    [value]="article().name"
+    [disabled]="saving()"
+    (keydown.enter)="renameRequested.emit(nameInput.value)"
+    (keydown.escape)="editCancelled.emit()"
+    (blur)="renameRequested.emit(nameInput.value)"
+  />
+} @else {
+  <span class="name">{{ article().name }}</span>
+  <button
+    type="button"
+    class="edit-button"
+    title="Modifier"
+    [attr.aria-label]="'Modifier « ' + article().name + ' »'"
+    [disabled]="buying()"
+    (click)="editRequested.emit(article())"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 20h4L19 9l-4-4L4 16v4z" />
+      <path d="M13.5 6.5l4 4" />
+    </svg>
+  </button>
+}
