@@ -29,9 +29,6 @@ public class Task {
     @Column(nullable = false, length = 150)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
     @Column(name = "completion_date")
     private LocalDate completionDate;
 

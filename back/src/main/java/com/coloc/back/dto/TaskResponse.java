@@ -7,7 +7,6 @@ import java.time.LocalDate;
 public record TaskResponse(
         Long id,
         String name,
-        String description,
         LocalDate deadline,
         LocalDate completionDate,
         boolean done,
@@ -19,7 +18,6 @@ public record TaskResponse(
         return new TaskResponse(
                 task.getId(),
                 task.getName(),
-                task.getDescription(),
                 task.getDeadline(),
                 task.getCompletionDate(),
                 task.isDone(),

@@ -26,7 +26,6 @@ CREATE TABLE task (
     shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
     assigned_id     BIGINT REFERENCES roommate(id) ON DELETE SET NULL, 
     name            VARCHAR(150) NOT NULL,
-    description     TEXT,
     completion_date DATE,
     deadline        DATE,
     status          BOOLEAN NOT NULL DEFAULT FALSE,

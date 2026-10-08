@@ -27,6 +27,8 @@ public class SharedHouseService {
     private final SharedHouseRepository sharedHouseRepository;
     private final RoommateRepository roommateRepository;
     private final CurrentUserService currentUserService;
+    private final TaskService taskService;
+    private final ArticleService articleService;
 
     @Transactional(readOnly = true)
     public SharedHouseResponse getMine() {
@@ -83,6 +85,9 @@ public class SharedHouseService {
         if (house == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Vous n'êtes dans aucune colocation");
         }
+
+        taskService.unassignToDoTasksOf(house.getId(), me.getId());
+        articleService.deletePersonalArticlesOf(house.getId(), me.getId());
 
         me.setSharedHouse(null);
         roommateRepository.save(me);

@@ -100,6 +100,11 @@ public class TaskService {
         taskRepository.delete(task);
     }
 
+    @Transactional
+    public void unassignToDoTasksOf(Long sharedHouseId, Long roommateId) {
+        taskRepository.unassignToDoTasks(sharedHouseId, roommateId);
+    }
+
     private Task findTaskForUpdate(Long taskId) {
         Long sharedHouseId = currentUserService.getCurrentSharedHouse().getId();
         return taskRepository.findForUpdateByIdAndSharedHouseId(taskId, sharedHouseId)

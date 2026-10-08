@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +28,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Modifying
     @Query("DELETE FROM Task task WHERE task.done = true AND task.completionDate < :limitDate")
     int deleteDoneTasksCompletedBefore(@Param("limitDate") LocalDate limitDate);
+
+    @Modifying
+    @Query("UPDATE Task task SET task.assigned = null "
+            + "WHERE task.sharedHouse.id = :sharedHouseId AND task.assigned.id = :roommateId AND task.done = false")
+    int unassignToDoTasks(@Param("sharedHouseId") Long sharedHouseId, @Param("roommateId") Long roommateId);
 }

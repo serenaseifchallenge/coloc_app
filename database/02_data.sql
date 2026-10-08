@@ -10,13 +10,13 @@ INSERT INTO roommate (shared_house_id, name, surname, email, password, points, b
   (1,    'Chloé', 'Petit',  'chloe@test.fr', '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 40, '2003-07-25'),
   (NULL, 'Dan',   'Leroy',  'dan@test.fr',   '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 0,  '2000-01-30');
 
-INSERT INTO task (shared_house_id, assigned_id, name, description, deadline, status, completion_date, points) VALUES
-  (1, 2,    'Sortir les poubelles',      'Jaunes et noires',          CURRENT_DATE + 1, FALSE, NULL,         5),
-  (1, 3,    'Nettoyer la salle de bain', NULL,                        CURRENT_DATE + 3, FALSE, NULL,         20),
-  (1, NULL, 'Arroser les plantes',       'Personne n''est assigné',   CURRENT_DATE + 2, FALSE, NULL,         5),
-  (1, 1,    'Faire la vaisselle',        NULL,                        CURRENT_DATE,     TRUE,  CURRENT_DATE, 10),
-  (1, 3,    'Passer l''aspirateur',      NULL,                        CURRENT_DATE,     TRUE,  CURRENT_DATE, 15),
-  (1, 3,    'Nettoyer le frigo',         NULL,                        CURRENT_DATE,     TRUE,  CURRENT_DATE, 25);
+INSERT INTO task (shared_house_id, assigned_id, name, deadline, status, completion_date, points) VALUES
+  (1, 2,    'Sortir les poubelles',               CURRENT_DATE + 1, FALSE, NULL,         5),
+  (1, 3,    'Nettoyer la salle de bain',                       CURRENT_DATE + 3, FALSE, NULL,         20),
+  (1, NULL, 'Arroser les plantes',      CURRENT_DATE + 2, FALSE, NULL,         5),
+  (1, 1,    'Faire la vaisselle',                           CURRENT_DATE,     TRUE,  CURRENT_DATE, 10),
+  (1, 3,    'Passer l''aspirateur',                         CURRENT_DATE,     TRUE,  CURRENT_DATE, 15),
+  (1, 3,    'Nettoyer le frigo',                     CURRENT_DATE,     TRUE,  CURRENT_DATE, 25);
 
 INSERT INTO expense (shared_house_id, payer_id, name, amount, expense_date) VALUES
   (1, 1, 'Courses Carrefour', 60.00, CURRENT_DATE - 2),

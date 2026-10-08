@@ -4,6 +4,7 @@ import com.coloc.back.entity.Article;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +20,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @Modifying
     @Query("DELETE FROM Article article WHERE article.bought = true")
     int deleteBoughtArticles();
+
+    @Modifying
+    @Query("DELETE FROM Article article WHERE article.sharedHouse.id = :sharedHouseId AND article.owner.id = :ownerId")
+    int deletePersonalArticles(@Param("sharedHouseId") Long sharedHouseId, @Param("ownerId") Long ownerId);
 }
