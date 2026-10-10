@@ -1,0 +1,71 @@
+<div class="exp-columns">
+  <div class="exp-stack">
+    <section class="exp-card">
+      <h2 class="exp-card-title">Remboursements à faire</h2>
+      <p class="exp-muted">Le minimum de virement pour que tout le monde soit à zéro.</p>
+
+      @if (transfers().length === 0) {
+        <p class="exp-empty">🎉 Tout le monde est à zéro, personne ne doit rien.</p>
+      }
+      <ul class="exp-list">
+        @for (transfer of transfers(); track transfer.from.id + '-' + transfer.to.id) {
+          <li class="exp-transfer">
+            <app-roommate-avatar [roommate]="transfer.from" />
+            <span class="exp-row-text">
+              <strong>{{ transfer.from.name }} doit {{ transfer.amount | eur }} à {{ transfer.to.name }}</strong>
+              <span class="exp-muted">Remboursement conseillé</span>
+            </span>
+            <strong class="exp-row-amount">{{ transfer.amount | eur }}</strong>
+            @if (involvesMe(transfer)) {
+              <button type="button" class="btn btn-primary" (click)="reimburse.emit(transfer)">Rembourser</button>
+            }
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section class="exp-card">
+      <h2 class="exp-card-title">Derniers remboursements</h2>
+      @if (reimbursements().length === 0) {
+        <p class="exp-muted">Aucun remboursement enregistré.</p>
+      }
+      <ul class="exp-list">
+        @for (reimbursement of reimbursements(); track reimbursement.id) {
+          <li class="exp-transfer">
+            <app-roommate-avatar [roommate]="reimbursement.payer" />
+            <span class="exp-row-text">
+              <strong>{{ reimbursement.payer.name }} a remboursé {{ reimbursement.receiver.name }}</strong>
+              <span class="exp-muted">{{ toDate(reimbursement.reimbursementDate) | date: 'd MMM y' }} - {{ method(reimbursement) }}</span>
+            </span>
+            <strong class="exp-row-amount">{{ reimbursement.amount | eur }}</strong>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
+
+  <section class="exp-card">
+    <h2 class="exp-card-title">Solde de chacun</h2>
+    <ul class="exp-list">
+      @for (row of rows(); track row.item.roommateId) {
+        <li class="exp-solde">
+          @if (row.summary) {
+            <app-roommate-avatar [roommate]="row.summary" size="small" />
+          }
+          <span class="exp-solde-name">{{ row.item.name }}</span>
+          <span class="exp-solde-bar" aria-hidden="true">
+            @if (row.cents > 0) {
+              <span class="exp-solde-fill exp-fill-pos" [style.width.%]="row.width"></span>
+            } @else if (row.cents < 0) {
+              <span class="exp-solde-fill exp-fill-neg" [style.width.%]="row.width"></span>
+            }
+          </span>
+          <strong [class.exp-positive]="row.cents > 0" [class.exp-negative]="row.cents < 0">
+            {{ row.item.amount | eur:'signed' }}
+          </strong>
+        </li>
+      }
+    </ul>
+    <p class="exp-muted exp-legend">Vert : on te doit de l'argent - Rouge : tu en dois.</p>
+  </section>
+</div>

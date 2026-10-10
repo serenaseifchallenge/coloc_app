@@ -1,0 +1,80 @@
+<app-modal [heading]="expense() ? 'Modifier la dépense' : 'Nouvelle dépense'" (closed)="closed.emit()">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-field">
+      <label for="exp-name">Titre</label>
+      <input id="exp-name" formControlName="name" placeholder="Ex : Course Carrefour" autocomplete="off" />
+      @if (hasError('name')) {
+        <span class="form-field-error">Le titre est obligatoire (150 caractères maximum).</span>
+      }
+    </div>
+
+    <div class="exp-row">
+      <div class="form-field">
+        <label for="exp-amount">Montant (€)</label>
+        <input id="exp-amount" type="number" step="0.01" min="0" formControlName="amount" placeholder="0,00" />
+        @if (hasError('amount')) {
+          <span class="form-field-error">Montant invalide (supérieur à 0, 2 décimales maximum).</span>
+        }
+      </div>
+      <div class="form-field">
+        <label for="exp-date">Date</label>
+        <input id="exp-date" type="date" formControlName="expenseDate" />
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="exp-payer">Payé par</label>
+      <select id="exp-payer" class="exp-select" formControlName="payerId">
+        @for (roommate of roommates(); track roommate.id) {
+          <option [ngValue]="roommate.id">{{ roommate.name }} {{ roommate.surname }}{{ isMe(roommate) ? ' (moi)' : '' }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="exp-category">Ajouté à</label>
+      <select id="exp-category" class="exp-select" formControlName="category">
+        @for (category of categories; track category.value) {
+          <option [value]="category.value">{{ category.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="exp-participants-head">
+      <span>Qui participe ?</span>
+      <button type="button" class="exp-link" (click)="selectAll()" [disabled]="allSelected()">Tout sélectionner</button>
+    </div>
+    <div class="exp-participants">
+      @for (roommate of roommates(); track roommate.id) {
+        <label class="exp-participant">
+          <input type="checkbox" [checked]="selected().has(roommate.id)" (change)="toggle(roommate.id)" />
+          <app-roommate-avatar [roommate]="roommate" size="small" />
+          <span class="exp-participant-name">{{ roommate.name }}</span>
+          <span class="exp-share">{{ shares().get(roommate.id) ?? 0 | eur }}</span>
+        </label>
+      }
+    </div>
+    @if (count() === 0) {
+      <p class="form-field-error">Sélectionne au moins un participant.</p>
+    } @else {
+      <p class="exp-recap">
+        {{ count() }} participant{{ count() > 1 ? 's' : '' }} - {{ perPerson() | eur }} chacun
+      </p>
+    }
+
+    @if (errorMessage(); as message) {
+      <p class="form-alert">{{ message }}</p>
+    }
+
+    <div class="exp-actions">
+      @if (expense()) {
+        <button type="button" class="exp-btn exp-btn-danger" (click)="remove()" [disabled]="submitting()">Supprimer</button>
+      }
+      <span class="exp-spacer"></span>
+      <button type="button" class="exp-btn exp-btn-grey" (click)="cancel()">Annuler</button>
+      <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+        {{ submitting() ? 'Enregistrement…' : 'Valider' }}
+      </button>
+    </div>
+  </form>
+</app-modal>
