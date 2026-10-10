@@ -5,6 +5,7 @@
 
     <div>
       <h1>Calendrier des événements</h1>
+
       <p class="calendar-subtitle">
         Retrouvez les événements de votre colocation.
       </p>
@@ -17,13 +18,13 @@
         <button
           [class.active]="view === 'week'"
           (click)="setView('week')">
-          semaine
+          Semaine
         </button>
 
         <button
           [class.active]="view === 'month'"
           (click)="setView('month')">
-          mois
+          Mois
         </button>
 
       </div>
@@ -74,15 +75,19 @@
 
 
     <!-- VUE MOIS -->
+
     @if (view === 'month') {
 
       <div class="calendar-grid">
 
         @for (day of weekDays; track day) {
+
           <div class="weekday">
             {{ day }}
           </div>
+
         }
+
 
         @for (date of calendarDays; track $index) {
 
@@ -93,10 +98,13 @@
             [class.today]="isToday(date)"
             (click)="selectDate(date)">
 
+            <!-- NUMERO DU JOUR -->
             <span class="day-number">
               {{ formatDayNumber(date) }}
             </span>
 
+
+            <!-- EVENEMENTS -->
             <div class="day-events">
 
               @for (
@@ -115,6 +123,11 @@
 
                   <span class="event-mini-title">
                     {{ event.title }}
+                  </span>
+
+                  <!-- AVATAR DU CREATEUR -->
+                  <span class="creator-avatar-mini">
+                    {{ event.creatorInitials }}
                   </span>
 
                 </div>
@@ -141,6 +154,7 @@
 
 
     <!-- VUE SEMAINE -->
+
     @if (view === 'week') {
 
       <div class="week-view">
@@ -175,23 +189,35 @@
                     openEditEvent(event)
                   ">
 
-                  <strong>
-                    {{ event.title }}
-                  </strong>
+                  <!-- INFORMATIONS -->
+                  <div class="week-event-information">
 
-                  @if (event.allDay) {
+                    <strong>
+                      {{ event.title }}
+                    </strong>
 
-                    <span>
-                      Toute la journée
-                    </span>
+                    @if (event.allDay) {
 
-                  } @else {
+                      <span>
+                        Toute la journée
+                      </span>
 
-                    <span>
-                      {{ event.startTime }} - {{ event.endTime }}
-                    </span>
+                    } @else {
 
-                  }
+                      <span>
+                        {{ formatTime(event.startTime) }}
+                        -
+                        {{ formatTime(event.endTime) }}
+                      </span>
+
+                    }
+
+                  </div>
+
+                  <!-- AVATAR DU CREATEUR -->
+                  <span class="creator-avatar-week">
+                    {{ event.creatorInitials }}
+                  </span>
 
                 </div>
 
@@ -218,7 +244,8 @@
   </div>
 
 
-  <!-- ÉVÉNEMENTS DU JOUR -->
+  <!-- EVENEMENTS DU JOUR -->
+
   <section class="selected-day-section">
 
     <div class="selected-day-header">
@@ -254,6 +281,7 @@
                 {{ event.title }}
               </h3>
 
+
               @if (event.description) {
 
                 <p>
@@ -261,6 +289,7 @@
                 </p>
 
               }
+
 
               <div class="event-details">
 
@@ -273,10 +302,13 @@
                 } @else {
 
                   <span>
-                    {{ event.startTime }} - {{ event.endTime }}
+                    {{ formatTime(event.startTime) }}
+                    -
+                    {{ formatTime(event.endTime) }}
                   </span>
 
                 }
+
 
                 @if (event.startDate !== event.endDate) {
 
@@ -288,29 +320,72 @@
 
               </div>
 
-              <!-- CREATEUR -->
-              <div class="event-creator">
+            </div>
 
-                <span class="creator-avatar">
-                  {{ event.creatorInitials }}
-                </span>
 
-                <span>
-                  {{ event.creatorName }}
-                </span>
+            <!-- CREATEUR A DROITE -->
+            <div class="event-creator-right">
 
-              </div>
+              <span class="creator-avatar">
+                {{ event.creatorInitials }}
+              </span>
+
+              <span class="creator-name">
+                {{ event.creatorName }}
+              </span>
 
             </div>
 
+
+            <!-- POUBELLE -->
             <button
               class="delete-button"
               (click)="
                 $event.stopPropagation();
                 deleteEvent(event)
               "
-              aria-label="Supprimer l'événement">
-              ×
+              aria-label="Supprimer l'événement"
+              title="Supprimer l'événement">
+
+              <svg
+                class="trash-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true">
+
+                <path
+                  d="M4 7h16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+
+                <path
+                  d="M9 7V5.5C9 4.67 9.67 4 10.5 4h3c.83 0 1.5.67 1.5 1.5V7"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+
+                <path
+                  d="M6.5 7l.8 12.1c.06.9.81 1.6 1.71 1.6h6c.9 0 1.65-.7 1.71-1.6L17.5 7"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+
+                <path
+                  d="M10 11v6M14 11v6"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+
+              </svg>
+
             </button>
 
           </article>
@@ -325,6 +400,7 @@
 
 
   <!-- MODALE CREATION / MODIFICATION -->
+
   @if (showEventForm) {
 
     <div
@@ -339,23 +415,31 @@
         <div class="modal-header">
 
           <div>
+
             <h2>
               {{ modalTitle }}
             </h2>
 
             <p>
+
               @if (editingEventId === null) {
                 Ajoutez un événement à votre calendrier.
               } @else {
                 Modifiez les informations de votre événement.
               }
+
             </p>
+
           </div>
+
 
           <button
             class="close-button"
-            (click)="closeEventForm()">
+            (click)="closeEventForm()"
+            aria-label="Fermer">
+
             ×
+
           </button>
 
         </div>
@@ -374,7 +458,7 @@
             <input
               id="event-title"
               type="text"
-              placeholder="Ex : Anniversaire de Personne"
+              placeholder="Ex : Anniversaire, rendez-vous, ..."
               [(ngModel)]="newEvent.title">
 
           </div>
@@ -401,7 +485,7 @@
           </div>
 
 
-          <!-- DATES ET HEURES -->
+          <!-- DATE ET HEURE DE DEBUT -->
           <div class="date-time-row">
 
             <div class="date-time-group">
@@ -436,6 +520,7 @@
           </div>
 
 
+          <!-- DATE ET HEURE DE FIN -->
           <div class="date-time-row">
 
             <div class="date-time-group">

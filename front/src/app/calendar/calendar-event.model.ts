@@ -7,11 +7,9 @@ export interface CalendarEvent {
   allDay: boolean;
   startTime: string | null;
   endTime: string | null;
-
   creatorId: number;
   creatorName: string;
   creatorInitials: string;
-
   sharedHouseId: number;
 }
 
@@ -23,7 +21,6 @@ export interface CalendarEventRequest {
   allDay: boolean;
   startTime: string | null;
   endTime: string | null;
-
   creatorId: number;
   sharedHouseId: number;
 }

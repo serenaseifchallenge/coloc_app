@@ -13,12 +13,6 @@ type CalendarView = 'month' | 'week';
   styleUrl: './calendar.component.css'
 })
 export class CalendarComponent implements OnInit {
-
-  /*
-   * TEMPORAIRE
-   * En attendant que l'authentification soit terminée,
-   * on utilise la colocation 1 et le colocataire 1.
-   */
   readonly sharedHouseId = 1;
   readonly currentUserId = 1;
 
@@ -71,24 +65,21 @@ export class CalendarComponent implements OnInit {
     public calendarService: CalendarService
   ) {}
 
-  /*
-   * Chargement des événements depuis le backend
-   * lorsque le composant est affiché.
-   */
   ngOnInit(): void {
     this.loadEvents();
   }
 
-  /*
-   * Récupère les événements de la colocation depuis Spring Boot.
-   */
   private loadEvents(): void {
     this.calendarService
       .getEvents(this.sharedHouseId)
       .subscribe({
         next: events => {
-          console.log('Événements récupérés depuis le backend :', events);
+          console.log(
+            'Événements récupérés depuis le backend :',
+            events
+          );
         },
+
         error: error => {
           console.error(
             'Erreur lors du chargement des événements :',
@@ -123,7 +114,6 @@ export class CalendarComponent implements OnInit {
   get calendarDays(): Date[] {
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
-
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
 
@@ -151,10 +141,8 @@ export class CalendarComponent implements OnInit {
   get weekDaysDates(): Date[] {
     const date = new Date(this.selectedDate);
     const dayOfWeek = date.getDay();
-
     const sunday = new Date(date);
     sunday.setDate(date.getDate() - dayOfWeek);
-
     const days: Date[] = [];
 
     for (let i = 0; i < 7; i++) {
@@ -178,9 +166,6 @@ export class CalendarComponent implements OnInit {
           return 1;
         }
 
-        /*
-         * Les événements "all day" ont startTime = null.
-         */
         if (a.startTime === null) {
           return -1;
         }
@@ -229,34 +214,26 @@ export class CalendarComponent implements OnInit {
 
   previousWeek(): void {
     const date = new Date(this.selectedDate);
-
     date.setDate(date.getDate() - 7);
-
     this.selectedDate = date;
     this.currentDate = new Date(date);
-
     this.newEvent.startDate = this.formatDate(date);
     this.newEvent.endDate = this.formatDate(date);
   }
 
   nextWeek(): void {
     const date = new Date(this.selectedDate);
-
     date.setDate(date.getDate() + 7);
-
     this.selectedDate = date;
     this.currentDate = new Date(date);
-
     this.newEvent.startDate = this.formatDate(date);
     this.newEvent.endDate = this.formatDate(date);
   }
 
   goToToday(): void {
     const today = new Date();
-
     this.currentDate = new Date(today);
     this.selectedDate = new Date(today);
-
     this.newEvent.startDate = this.formatDate(today);
     this.newEvent.endDate = this.formatDate(today);
   }
@@ -291,14 +268,8 @@ export class CalendarComponent implements OnInit {
       startDate: event.startDate,
       endDate: event.endDate,
       allDay: event.allDay,
-
-      /*
-       * Le backend renvoie null pour les événements all-day.
-       * Le formulaire utilise cependant des strings.
-       */
       startTime: event.startTime ?? '18:00',
       endTime: event.endTime ?? '19:00',
-
       description: event.description ?? ''
     };
 
@@ -342,9 +313,6 @@ export class CalendarComponent implements OnInit {
       return;
     }
 
-    /*
-     * Données envoyées à Spring Boot.
-     */
     const eventRequest = {
       title: this.newEvent.title.trim(),
 
@@ -364,20 +332,11 @@ export class CalendarComponent implements OnInit {
         ? null
         : this.newEvent.endTime,
 
-      /*
-       * TEMPORAIRE :
-       * l'utilisateur connecté sera utilisé plus tard.
-       */
       creatorId: this.currentUserId,
 
       sharedHouseId: this.sharedHouseId
     };
 
-    /*
-     * =========================
-     * CRÉATION
-     * =========================
-     */
     if (this.editingEventId === null) {
 
       this.calendarService
@@ -414,12 +373,6 @@ export class CalendarComponent implements OnInit {
 
       return;
     }
-
-    /*
-     * =========================
-     * MODIFICATION
-     * =========================
-     */
 
     this.calendarService
       .updateEvent(
@@ -517,6 +470,14 @@ export class CalendarComponent implements OnInit {
 
   formatDayNumber(date: Date): number {
     return date.getDate();
+  }
+
+  formatTime(time: string | null): string {
+    if (!time) {
+      return '';
+    }
+
+    return time.substring(0, 5);
   }
 
   formatEventDate(event: CalendarEvent): string {
