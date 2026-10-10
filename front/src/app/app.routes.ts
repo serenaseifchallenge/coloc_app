@@ -49,7 +49,11 @@ export const routes: Routes = [
       },
 
 
-      // { path: 'expenses', loadComponent: ... },
+      {
+        path: 'expenses',
+        loadComponent: () =>
+          import('./features/expenses/pages/expenses-page/expenses-page').then((m) => m.ExpensesPage),
+      },
       // { path: 'calendar', loadComponent: ... },
       // { path: 'notes', loadComponent: ... },
       {
