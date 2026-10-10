@@ -1,0 +1,3143 @@
+Index: database/02_data.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>--  Données de test\r\n\r\nINSERT INTO shared_house (name, address, invitation_code, description) VALUES\r\n                                                                           ('La Coloc du 3e', '12 rue des Lilas, 75011 Paris', 'LILAS2026', 'Coloc de 3 étudiants, ambiance calme en semaine.'),\r\n                                                                           ('Villa Soleil',   '4 avenue du Port, 13002 Marseille', 'SOLEIL26', 'Grande maison avec jardin.');\r\n\r\nINSERT INTO roommate (shared_house_id, name, surname, email, password, points, birthday) VALUES\r\n                                                                                             (1,    'Alice', 'Martin', 'alice@test.fr', '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 10, '2002-03-14'),\r\n                                                                                             (1,    'Bob',   'Durand', 'bob@test.fr',   '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 0,  '2001-11-02'),\r\n                                                                                             (1,    'Chloé', 'Petit',  'chloe@test.fr', '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 40, '2003-07-25'),\r\n                                                                                             (NULL, 'Dan',   'Leroy',  'dan@test.fr',   '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 0,  '2000-01-30');\r\n\r\nINSERT INTO task (shared_house_id, assigned_id, name, deadline, status, completion_date, points) VALUES\r\n                                                                                                     (1, 2,    'Sortir les poubelles',      CURRENT_DATE + 1, FALSE, NULL,         5),\r\n                                                                                                     (1, 3,    'Nettoyer la salle de bain', CURRENT_DATE + 3, FALSE, NULL,         20),\r\n                                                                                                     (1, NULL, 'Arroser les plantes',       CURRENT_DATE + 2, FALSE, NULL,         5),\r\n                                                                                                     (1, 1,    'Faire la vaisselle',        CURRENT_DATE,     TRUE,  CURRENT_DATE, 10),\r\n                                                                                                     (1, 3,    'Passer l''aspirateur',      CURRENT_DATE,     TRUE,  CURRENT_DATE, 15),\r\n                                                                                                     (1, 3,    'Nettoyer le frigo',         CURRENT_DATE,     TRUE,  CURRENT_DATE, 25);\r\n\r\nINSERT INTO expense (shared_house_id, payer_id, name, amount, expense_date, category) VALUES\r\n                                                                                          (1, 1, 'Courses Carrefour', 60.00, CURRENT_DATE - 2, 'COURANTE'),\r\n                                                                                          (1, 3, 'Facture internet',  30.00, CURRENT_DATE - 5, 'INTERNET');\r\n\r\nINSERT INTO contribution (expense_id, roommate_id, status) VALUES\r\n                                                               (1, 1, TRUE),\r\n                                                               (1, 2, TRUE),\r\n                                                               (1, 3, FALSE),\r\n                                                               (2, 1, FALSE),\r\n                                                               (2, 2, FALSE),\r\n                                                               (2, 3, TRUE);\r\n\r\nINSERT INTO reimbursement (shared_house_id, payer_id, receiver_id, amount, method, reimbursement_date) VALUES\r\n    (1, 2, 1, 20.00, 'VIREMENT', CURRENT_DATE - 1);\r\n\r\nINSERT INTO pot (shared_house_id, created_by, name, type, target_amount, deadline) VALUES\r\n                                                                                       (1, 1, 'Machine à café',   'MATERIEL', 90.00,  NULL),\r\n                                                                                       (1, 1, 'Aspirateur robot', 'MATERIEL', 300.00, CURRENT_DATE + 30);\r\n\r\nINSERT INTO pot_participant (pot_id, roommate_id) VALUES\r\n                                                      (1, 1), (1, 2), (1, 3),\r\n                                                      (2, 1), (2, 2), (2, 3);\r\n\r\nINSERT INTO pot_payment (pot_id, roommate_id, amount, method, payment_date) VALUES\r\n                                                                                (1, 1, 30.00,  'VIREMENT',    CURRENT_DATE - 6),\r\n                                                                                (1, 2, 30.00,  'ESPECES',     CURRENT_DATE - 5),\r\n                                                                                (1, 3, 30.00,  'VIREMENT',    CURRENT_DATE - 4),\r\n                                                                                (2, 1, 100.00, 'VIREMENT',    CURRENT_DATE - 3),\r\n                                                                                (2, 2, 20.00,  'PAYPAL_WERO', CURRENT_DATE - 1);\r\n\r\nINSERT INTO note (shared_house_id, author_id, content, type, vote_end_date) VALUES\r\n                                                                                (1, 1, 'Le proprio passe jeudi pour le chauffe-eau !', 'AFFICHAGE', NULL),\r\n                                                                                (1, 2, 'On achète un lave-vaisselle ? Environ 120 € chacun', 'VOTE', NOW() + INTERVAL '7 days'),\r\n                                                                                (1, 3, 'Quel soir pour la soirée coloc ?', 'VOTE', NOW() + INTERVAL '3 days');\r\n\r\nINSERT INTO choice (note_id, choice_option) VALUES\r\n                                                (2, 'Oui'), (2, 'Non'), (2, 'Plus tard'),\r\n                                                (3, 'Vendredi'), (3, 'Samedi');\r\n\r\nINSERT INTO vote (roommate_id, choice_id) VALUES\r\n                                              (1, 1), (3, 1), (2, 2),\r\n                                              (1, 5), (2, 5);\r\n\r\nINSERT INTO article (shared_house_id, owner_id, name, bought) VALUES\r\n                                                                  (1, NULL, 'Papier toilette',   FALSE),\r\n                                                                  (1, NULL, 'Liquide vaisselle', TRUE),\r\n                                                                  (1, NULL, 'Éponges',           FALSE),\r\n                                                                  (1, 2,    'Céréales',          FALSE),\r\n                                                                  (1, 2,    'Lait d''avoine',    FALSE),\r\n                                                                  (1, 3,    'Pommes',            TRUE);\r\n\r\nINSERT INTO event (shared_house_id, creator_id, title, start_date, end_date) VALUES\r\n                                                                                 (1, 3, 'Soirée coloc',          NOW() + INTERVAL '5 days',  NOW() + INTERVAL '5 days 4 hours'),\r\n                                                                                 (1, 1, 'Visite du proprio',     NOW() + INTERVAL '3 days',  NOW() + INTERVAL '3 days 1 hour'),\r\n                                                                                 (1, 2, 'Grand ménage mensuel',  NOW() + INTERVAL '10 days', NOW() + INTERVAL '10 days 3 hours');\r\n\r\nINSERT INTO monthly_score (shared_house_id, roommate_id, month_start, points) VALUES\r\n                                                                                  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 480),\r\n                                                                                  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 370),\r\n                                                                                  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 290),\r\n                                                                                  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 410),\r\n                                                                                  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 150),\r\n                                                                                  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 95);
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/database/02_data.sql b/database/02_data.sql
+--- a/database/02_data.sql	(revision 012f001eaf820dfaf97469648a3650d03dc145e0)
++++ b/database/02_data.sql	(date 1791647156874)
+@@ -1,83 +1,66 @@
+ --  Données de test
+ 
+ INSERT INTO shared_house (name, address, invitation_code, description) VALUES
+-                                                                           ('La Coloc du 3e', '12 rue des Lilas, 75011 Paris', 'LILAS2026', 'Coloc de 3 étudiants, ambiance calme en semaine.'),
+-                                                                           ('Villa Soleil',   '4 avenue du Port, 13002 Marseille', 'SOLEIL26', 'Grande maison avec jardin.');
++  ('La Coloc du 3e', '12 rue des Lilas, 75011 Paris', 'LILAS2026', 'Coloc de 3 étudiants, ambiance calme en semaine.'),
++  ('Villa Soleil',   '4 avenue du Port, 13002 Marseille', 'SOLEIL26', 'Grande maison avec jardin.');
+ 
+ INSERT INTO roommate (shared_house_id, name, surname, email, password, points, birthday) VALUES
+-                                                                                             (1,    'Alice', 'Martin', 'alice@test.fr', '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 10, '2002-03-14'),
+-                                                                                             (1,    'Bob',   'Durand', 'bob@test.fr',   '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 0,  '2001-11-02'),
+-                                                                                             (1,    'Chloé', 'Petit',  'chloe@test.fr', '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 40, '2003-07-25'),
+-                                                                                             (NULL, 'Dan',   'Leroy',  'dan@test.fr',   '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 0,  '2000-01-30');
++  (1,    'Alice', 'Martin', 'alice@test.fr', '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 10, '2002-03-14'),
++  (1,    'Bob',   'Durand', 'bob@test.fr',   '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 0,  '2001-11-02'),
++  (1,    'Chloé', 'Petit',  'chloe@test.fr', '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 40, '2003-07-25'),
++  (NULL, 'Dan',   'Leroy',  'dan@test.fr',   '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 0,  '2000-01-30');
+ 
+ INSERT INTO task (shared_house_id, assigned_id, name, deadline, status, completion_date, points) VALUES
+-                                                                                                     (1, 2,    'Sortir les poubelles',      CURRENT_DATE + 1, FALSE, NULL,         5),
+-                                                                                                     (1, 3,    'Nettoyer la salle de bain', CURRENT_DATE + 3, FALSE, NULL,         20),
+-                                                                                                     (1, NULL, 'Arroser les plantes',       CURRENT_DATE + 2, FALSE, NULL,         5),
+-                                                                                                     (1, 1,    'Faire la vaisselle',        CURRENT_DATE,     TRUE,  CURRENT_DATE, 10),
+-                                                                                                     (1, 3,    'Passer l''aspirateur',      CURRENT_DATE,     TRUE,  CURRENT_DATE, 15),
+-                                                                                                     (1, 3,    'Nettoyer le frigo',         CURRENT_DATE,     TRUE,  CURRENT_DATE, 25);
++  (1, 2,    'Sortir les poubelles',               CURRENT_DATE + 1, FALSE, NULL,         5),
++  (1, 3,    'Nettoyer la salle de bain',                       CURRENT_DATE + 3, FALSE, NULL,         20),
++  (1, NULL, 'Arroser les plantes',      CURRENT_DATE + 2, FALSE, NULL,         5),
++  (1, 1,    'Faire la vaisselle',                           CURRENT_DATE,     TRUE,  CURRENT_DATE, 10),
++  (1, 3,    'Passer l''aspirateur',                         CURRENT_DATE,     TRUE,  CURRENT_DATE, 15),
++  (1, 3,    'Nettoyer le frigo',                     CURRENT_DATE,     TRUE,  CURRENT_DATE, 25);
+ 
+-INSERT INTO expense (shared_house_id, payer_id, name, amount, expense_date, category) VALUES
+-                                                                                          (1, 1, 'Courses Carrefour', 60.00, CURRENT_DATE - 2, 'COURANTE'),
+-                                                                                          (1, 3, 'Facture internet',  30.00, CURRENT_DATE - 5, 'INTERNET');
++INSERT INTO expense (shared_house_id, payer_id, name, amount, expense_date) VALUES
++  (1, 1, 'Courses Carrefour', 60.00, CURRENT_DATE - 2),
++  (1, 3, 'Facture internet',  30.00, CURRENT_DATE - 5);
+ 
+ INSERT INTO contribution (expense_id, roommate_id, status) VALUES
+-                                                               (1, 1, TRUE),
+-                                                               (1, 2, TRUE),
+-                                                               (1, 3, FALSE),
+-                                                               (2, 1, FALSE),
+-                                                               (2, 2, FALSE),
+-                                                               (2, 3, TRUE);
++  (1, 1, TRUE),
++  (1, 2, TRUE),
++  (1, 3, FALSE),
++  (2, 1, FALSE),
++  (2, 2, FALSE),
++  (2, 3, TRUE);
+ 
+-INSERT INTO reimbursement (shared_house_id, payer_id, receiver_id, amount, method, reimbursement_date) VALUES
+-    (1, 2, 1, 20.00, 'VIREMENT', CURRENT_DATE - 1);
+-
+-INSERT INTO pot (shared_house_id, created_by, name, type, target_amount, deadline) VALUES
+-                                                                                       (1, 1, 'Machine à café',   'MATERIEL', 90.00,  NULL),
+-                                                                                       (1, 1, 'Aspirateur robot', 'MATERIEL', 300.00, CURRENT_DATE + 30);
+-
+-INSERT INTO pot_participant (pot_id, roommate_id) VALUES
+-                                                      (1, 1), (1, 2), (1, 3),
+-                                                      (2, 1), (2, 2), (2, 3);
+-
+-INSERT INTO pot_payment (pot_id, roommate_id, amount, method, payment_date) VALUES
+-                                                                                (1, 1, 30.00,  'VIREMENT',    CURRENT_DATE - 6),
+-                                                                                (1, 2, 30.00,  'ESPECES',     CURRENT_DATE - 5),
+-                                                                                (1, 3, 30.00,  'VIREMENT',    CURRENT_DATE - 4),
+-                                                                                (2, 1, 100.00, 'VIREMENT',    CURRENT_DATE - 3),
+-                                                                                (2, 2, 20.00,  'PAYPAL_WERO', CURRENT_DATE - 1);
+-
+ INSERT INTO note (shared_house_id, author_id, content, type, vote_end_date) VALUES
+-                                                                                (1, 1, 'Le proprio passe jeudi pour le chauffe-eau !', 'AFFICHAGE', NULL),
+-                                                                                (1, 2, 'On achète un lave-vaisselle ? Environ 120 € chacun', 'VOTE', NOW() + INTERVAL '7 days'),
+-                                                                                (1, 3, 'Quel soir pour la soirée coloc ?', 'VOTE', NOW() + INTERVAL '3 days');
++  (1, 1, 'Le proprio passe jeudi pour le chauffe-eau !', 'AFFICHAGE', NULL),
++  (1, 2, 'On achète un lave-vaisselle ? Environ 120 € chacun', 'VOTE', NOW() + INTERVAL '7 days'),
++  (1, 3, 'Quel soir pour la soirée coloc ?', 'VOTE', NOW() + INTERVAL '3 days');
+ 
+ INSERT INTO choice (note_id, choice_option) VALUES
+-                                                (2, 'Oui'), (2, 'Non'), (2, 'Plus tard'),
+-                                                (3, 'Vendredi'), (3, 'Samedi');
++  (2, 'Oui'), (2, 'Non'), (2, 'Plus tard'),
++  (3, 'Vendredi'), (3, 'Samedi');
+ 
+ INSERT INTO vote (roommate_id, choice_id) VALUES
+-                                              (1, 1), (3, 1), (2, 2),
+-                                              (1, 5), (2, 5);
++  (1, 1), (3, 1), (2, 2), 
++  (1, 5), (2, 5);
+ 
+ INSERT INTO article (shared_house_id, owner_id, name, bought) VALUES
+-                                                                  (1, NULL, 'Papier toilette',   FALSE),
+-                                                                  (1, NULL, 'Liquide vaisselle', TRUE),
+-                                                                  (1, NULL, 'Éponges',           FALSE),
+-                                                                  (1, 2,    'Céréales',          FALSE),
+-                                                                  (1, 2,    'Lait d''avoine',    FALSE),
+-                                                                  (1, 3,    'Pommes',            TRUE);
++  (1, NULL, 'Papier toilette',   FALSE),
++  (1, NULL, 'Liquide vaisselle', TRUE),
++  (1, NULL, 'Éponges',           FALSE),
++  (1, 2,    'Céréales',          FALSE),
++  (1, 2,    'Lait d''avoine',    FALSE),
++  (1, 3,    'Pommes',            TRUE);
+ 
+ INSERT INTO event (shared_house_id, creator_id, title, start_date, end_date) VALUES
+-                                                                                 (1, 3, 'Soirée coloc',          NOW() + INTERVAL '5 days',  NOW() + INTERVAL '5 days 4 hours'),
+-                                                                                 (1, 1, 'Visite du proprio',     NOW() + INTERVAL '3 days',  NOW() + INTERVAL '3 days 1 hour'),
+-                                                                                 (1, 2, 'Grand ménage mensuel',  NOW() + INTERVAL '10 days', NOW() + INTERVAL '10 days 3 hours');
++  (1, 3, 'Soirée coloc',          NOW() + INTERVAL '5 days', NOW() + INTERVAL '5 days 4 hours'),
++  (1, 1, 'Visite du proprio',     NOW() + INTERVAL '3 days', NOW() + INTERVAL '3 days 1 hour'),
++  (1, 2, 'Grand ménage mensuel',  NOW() + INTERVAL '10 days', NOW() + INTERVAL '10 days 3 hours');
+ 
++
+ INSERT INTO monthly_score (shared_house_id, roommate_id, month_start, points) VALUES
+-                                                                                  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 480),
+-                                                                                  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 370),
+-                                                                                  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 290),
+-                                                                                  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 410),
+-                                                                                  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 150),
+-                                                                                  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 95);
+\ No newline at end of file
++  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 480),
++  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 370),
++  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 290),
++  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 410),
++  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 150),
++  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 95);
+\ No newline at end of file
+Index: database/01_schema.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>-- Schéma de l'application de gestion de colocation\r\n\r\nCREATE TABLE shared_house (\r\n                              id               BIGSERIAL PRIMARY KEY,\r\n                              name             VARCHAR(100) NOT NULL,\r\n                              address          VARCHAR(255) NOT NULL,\r\n                              invitation_code  VARCHAR(20)  NOT NULL UNIQUE,\r\n                              creation_date    TIMESTAMP NOT NULL DEFAULT NOW(),\r\n                              description      TEXT NOT NULL\r\n);\r\n\r\nCREATE TABLE roommate (\r\n                          id              BIGSERIAL PRIMARY KEY,\r\n                          shared_house_id BIGINT REFERENCES shared_house(id) ON DELETE SET NULL,\r\n                          name            VARCHAR(100) NOT NULL,\r\n                          surname         VARCHAR(100) NOT NULL,\r\n                          email           VARCHAR(255) NOT NULL UNIQUE,\r\n                          password        VARCHAR(255) NOT NULL,\r\n                          points          INTEGER,\r\n                          creation_date   TIMESTAMP NOT NULL DEFAULT NOW(),\r\n                          birthday        TIMESTAMP NOT NULL DEFAULT NOW()\r\n);\r\n\r\nCREATE TABLE task (\r\n                      id              BIGSERIAL PRIMARY KEY,\r\n                      shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,\r\n                      assigned_id     BIGINT REFERENCES roommate(id) ON DELETE SET NULL,\r\n                      name            VARCHAR(150) NOT NULL,\r\n                      completion_date DATE,\r\n                      deadline        DATE,\r\n                      status          BOOLEAN NOT NULL DEFAULT FALSE,\r\n                      points          INTEGER NOT NULL DEFAULT 10\r\n);\r\n\r\nCREATE TABLE expense (\r\n                         id              BIGSERIAL PRIMARY KEY,\r\n                         shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,\r\n                         payer_id        BIGINT NOT NULL REFERENCES roommate(id),\r\n                         name            VARCHAR(150) NOT NULL,\r\n                         amount          NUMERIC(10,2) NOT NULL CHECK (amount > 0),\r\n                         expense_date    DATE NOT NULL DEFAULT CURRENT_DATE,\r\n                         category        VARCHAR(20) NOT NULL DEFAULT 'COURANTE'\r\n                             CHECK (category IN ('COURANTE', 'EAU', 'INTERNET', 'AUTRE'))\r\n);\r\n\r\nCREATE TABLE contribution (\r\n                              expense_id      BIGINT NOT NULL REFERENCES expense(id) ON DELETE CASCADE,\r\n                              roommate_id     BIGINT NOT NULL REFERENCES roommate(id),\r\n                              status          BOOLEAN NOT NULL DEFAULT FALSE,\r\n                              PRIMARY KEY (expense_id, roommate_id)\r\n);\r\n\r\nCREATE TABLE reimbursement (\r\n                               id                 BIGSERIAL PRIMARY KEY,\r\n                               shared_house_id    BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,\r\n                               payer_id           BIGINT NOT NULL REFERENCES roommate(id),\r\n                               receiver_id        BIGINT NOT NULL REFERENCES roommate(id),\r\n                               amount             NUMERIC(10,2) NOT NULL CHECK (amount > 0),\r\n                               method             VARCHAR(20) NOT NULL DEFAULT 'VIREMENT'\r\n                                   CHECK (method IN ('VIREMENT', 'ESPECES', 'PAYPAL_WERO', 'AUTRE')),\r\n                               reimbursement_date DATE NOT NULL DEFAULT CURRENT_DATE,\r\n                               CHECK (payer_id <> receiver_id)\r\n);\r\n\r\nCREATE TABLE pot (\r\n                     id              BIGSERIAL PRIMARY KEY,\r\n                     shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,\r\n                     created_by      BIGINT NOT NULL REFERENCES roommate(id),\r\n                     name            VARCHAR(150) NOT NULL,\r\n                     type            VARCHAR(20) NOT NULL DEFAULT 'AUTRE'\r\n                         CHECK (type IN ('VOYAGE', 'CADEAU', 'EVENEMENT', 'MATERIEL', 'AUTRE')),\r\n                     target_amount   NUMERIC(10,2) NOT NULL CHECK (target_amount > 0),\r\n                     deadline        DATE,\r\n                     creation_date   TIMESTAMP NOT NULL DEFAULT NOW()\r\n);\r\n\r\nCREATE TABLE pot_participant (\r\n                                 pot_id      BIGINT NOT NULL REFERENCES pot(id) ON DELETE CASCADE,\r\n                                 roommate_id BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,\r\n                                 PRIMARY KEY (pot_id, roommate_id)\r\n);\r\n\r\nCREATE TABLE pot_payment (\r\n                             id           BIGSERIAL PRIMARY KEY,\r\n                             pot_id       BIGINT NOT NULL REFERENCES pot(id) ON DELETE CASCADE,\r\n                             roommate_id  BIGINT NOT NULL REFERENCES roommate(id),\r\n                             amount       NUMERIC(10,2) NOT NULL CHECK (amount > 0),\r\n                             method       VARCHAR(20) NOT NULL DEFAULT 'VIREMENT'\r\n                                 CHECK (method IN ('VIREMENT', 'ESPECES', 'PAYPAL_WERO', 'AUTRE')),\r\n                             payment_date DATE NOT NULL DEFAULT CURRENT_DATE\r\n);\r\n\r\nCREATE TABLE note (\r\n                      id              BIGSERIAL PRIMARY KEY,\r\n                      shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,\r\n                      author_id       BIGINT NOT NULL REFERENCES roommate(id),\r\n                      content         TEXT NOT NULL,\r\n                      type            VARCHAR(20) NOT NULL DEFAULT 'AFFICHAGE' CHECK (type IN ('AFFICHAGE','VOTE')),\r\n                      creation_date   TIMESTAMP NOT NULL DEFAULT NOW(),\r\n                      vote_end_date   TIMESTAMP,\r\n                      CHECK (type = 'VOTE' OR vote_end_date IS NULL),\r\n                      CHECK (vote_end_date >= creation_date)\r\n);\r\n\r\nCREATE TABLE choice (\r\n                        id              BIGSERIAL PRIMARY KEY,\r\n                        note_id         BIGINT NOT NULL REFERENCES note(id) ON DELETE CASCADE,\r\n                        choice_option   VARCHAR(150) NOT NULL\r\n);\r\n\r\nCREATE TABLE vote (\r\n                      roommate_id  BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,\r\n                      choice_id    BIGINT NOT NULL REFERENCES choice(id) ON DELETE CASCADE,\r\n                      PRIMARY KEY (roommate_id, choice_id)\r\n);\r\n\r\nCREATE TABLE article (\r\n                         id              BIGSERIAL PRIMARY KEY,\r\n                         shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,\r\n                         owner_id        BIGINT REFERENCES roommate(id) ON DELETE CASCADE,\r\n                         name            VARCHAR(100) NOT NULL,\r\n                         bought          BOOLEAN NOT NULL DEFAULT FALSE\r\n);\r\n\r\nCREATE TABLE event (\r\n                       id              BIGSERIAL PRIMARY KEY,\r\n                       shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,\r\n                       creator_id      BIGINT NOT NULL REFERENCES roommate(id),\r\n                       title           VARCHAR(150) NOT NULL,\r\n                       start_date      TIMESTAMP NOT NULL,\r\n                       end_date        TIMESTAMP NOT NULL,\r\n                       CHECK (end_date >= start_date)\r\n);\r\n\r\nCREATE TABLE hidden_task_name (\r\n                                  id              BIGSERIAL PRIMARY KEY,\r\n                                  shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,\r\n                                  name            VARCHAR(150) NOT NULL,\r\n                                  UNIQUE (shared_house_id, name)\r\n);\r\n\r\nCREATE TABLE custom_task_name (\r\n                                  id              BIGSERIAL PRIMARY KEY,\r\n                                  shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,\r\n                                  name            VARCHAR(150) NOT NULL,\r\n                                  UNIQUE (shared_house_id, name)\r\n);\r\n\r\nCREATE TABLE monthly_score (\r\n                               id              BIGSERIAL PRIMARY KEY,\r\n                               shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,\r\n                               roommate_id     BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,\r\n                               month_start     DATE NOT NULL,\r\n                               points          INTEGER NOT NULL,\r\n                               UNIQUE (roommate_id, month_start)\r\n);
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/database/01_schema.sql b/database/01_schema.sql
+--- a/database/01_schema.sql	(revision 012f001eaf820dfaf97469648a3650d03dc145e0)
++++ b/database/01_schema.sql	(date 1791647189627)
+@@ -1,156 +1,114 @@
+ -- Schéma de l'application de gestion de colocation
+ 
+ CREATE TABLE shared_house (
+-                              id               BIGSERIAL PRIMARY KEY,
+-                              name             VARCHAR(100) NOT NULL,
+-                              address          VARCHAR(255) NOT NULL,
+-                              invitation_code  VARCHAR(20)  NOT NULL UNIQUE,
+-                              creation_date    TIMESTAMP NOT NULL DEFAULT NOW(),
+-                              description      TEXT NOT NULL
++    id               BIGSERIAL PRIMARY KEY,
++    name             VARCHAR(100) NOT NULL,
++    address          VARCHAR(255) NOT NULL,
++    invitation_code  VARCHAR(20)  NOT NULL UNIQUE,
++    creation_date    TIMESTAMP NOT NULL DEFAULT NOW(),
++    description      TEXT NOT NULL
+ );
+ 
+ CREATE TABLE roommate (
+-                          id              BIGSERIAL PRIMARY KEY,
+-                          shared_house_id BIGINT REFERENCES shared_house(id) ON DELETE SET NULL,
+-                          name            VARCHAR(100) NOT NULL,
+-                          surname         VARCHAR(100) NOT NULL,
+-                          email           VARCHAR(255) NOT NULL UNIQUE,
+-                          password        VARCHAR(255) NOT NULL,
+-                          points          INTEGER,
+-                          creation_date   TIMESTAMP NOT NULL DEFAULT NOW(),
+-                          birthday        TIMESTAMP NOT NULL DEFAULT NOW()
++    id              BIGSERIAL PRIMARY KEY,
++    shared_house_id BIGINT REFERENCES shared_house(id) ON DELETE SET NULL,
++    name            VARCHAR(100) NOT NULL,
++    surname         VARCHAR(100) NOT NULL,
++    email           VARCHAR(255) NOT NULL UNIQUE,
++    password        VARCHAR(255) NOT NULL, 
++    points          INTEGER,
++    creation_date   TIMESTAMP NOT NULL DEFAULT NOW(),
++    birthday        TIMESTAMP NOT NULL DEFAULT NOW()
+ );
+ 
+ CREATE TABLE task (
+-                      id              BIGSERIAL PRIMARY KEY,
+-                      shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+-                      assigned_id     BIGINT REFERENCES roommate(id) ON DELETE SET NULL,
+-                      name            VARCHAR(150) NOT NULL,
+-                      completion_date DATE,
+-                      deadline        DATE,
+-                      status          BOOLEAN NOT NULL DEFAULT FALSE,
+-                      points          INTEGER NOT NULL DEFAULT 10
++    id              BIGSERIAL PRIMARY KEY,
++    shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
++    assigned_id     BIGINT REFERENCES roommate(id) ON DELETE SET NULL, 
++    name            VARCHAR(150) NOT NULL,
++    completion_date DATE,
++    deadline        DATE,
++    status          BOOLEAN NOT NULL DEFAULT FALSE,
++    points          INTEGER NOT NULL DEFAULT 10  
+ );
+ 
+ CREATE TABLE expense (
+-                         id              BIGSERIAL PRIMARY KEY,
+-                         shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+-                         payer_id        BIGINT NOT NULL REFERENCES roommate(id),
+-                         name            VARCHAR(150) NOT NULL,
+-                         amount          NUMERIC(10,2) NOT NULL CHECK (amount > 0),
+-                         expense_date    DATE NOT NULL DEFAULT CURRENT_DATE,
+-                         category        VARCHAR(20) NOT NULL DEFAULT 'COURANTE'
+-                             CHECK (category IN ('COURANTE', 'EAU', 'INTERNET', 'AUTRE'))
++    id              BIGSERIAL PRIMARY KEY,
++    shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
++    payer_id        BIGINT NOT NULL REFERENCES roommate(id),
++    name            VARCHAR(150) NOT NULL,
++    amount          NUMERIC(10,2) NOT NULL CHECK (amount > 0),
++    expense_date    DATE NOT NULL DEFAULT CURRENT_DATE
+ );
+ 
+ CREATE TABLE contribution (
+-                              expense_id      BIGINT NOT NULL REFERENCES expense(id) ON DELETE CASCADE,
+-                              roommate_id     BIGINT NOT NULL REFERENCES roommate(id),
+-                              status          BOOLEAN NOT NULL DEFAULT FALSE,
+-                              PRIMARY KEY (expense_id, roommate_id)
++    expense_id      BIGINT NOT NULL REFERENCES expense(id) ON DELETE CASCADE,
++    roommate_id     BIGINT NOT NULL REFERENCES roommate(id),
++    status          BOOLEAN NOT NULL DEFAULT FALSE,
++    PRIMARY KEY (expense_id, roommate_id)
+ );
+ 
+-CREATE TABLE reimbursement (
+-                               id                 BIGSERIAL PRIMARY KEY,
+-                               shared_house_id    BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+-                               payer_id           BIGINT NOT NULL REFERENCES roommate(id),
+-                               receiver_id        BIGINT NOT NULL REFERENCES roommate(id),
+-                               amount             NUMERIC(10,2) NOT NULL CHECK (amount > 0),
+-                               method             VARCHAR(20) NOT NULL DEFAULT 'VIREMENT'
+-                                   CHECK (method IN ('VIREMENT', 'ESPECES', 'PAYPAL_WERO', 'AUTRE')),
+-                               reimbursement_date DATE NOT NULL DEFAULT CURRENT_DATE,
+-                               CHECK (payer_id <> receiver_id)
+-);
+-
+-CREATE TABLE pot (
+-                     id              BIGSERIAL PRIMARY KEY,
+-                     shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+-                     created_by      BIGINT NOT NULL REFERENCES roommate(id),
+-                     name            VARCHAR(150) NOT NULL,
+-                     type            VARCHAR(20) NOT NULL DEFAULT 'AUTRE'
+-                         CHECK (type IN ('VOYAGE', 'CADEAU', 'EVENEMENT', 'MATERIEL', 'AUTRE')),
+-                     target_amount   NUMERIC(10,2) NOT NULL CHECK (target_amount > 0),
+-                     deadline        DATE,
+-                     creation_date   TIMESTAMP NOT NULL DEFAULT NOW()
+-);
+-
+-CREATE TABLE pot_participant (
+-                                 pot_id      BIGINT NOT NULL REFERENCES pot(id) ON DELETE CASCADE,
+-                                 roommate_id BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,
+-                                 PRIMARY KEY (pot_id, roommate_id)
+-);
+-
+-CREATE TABLE pot_payment (
+-                             id           BIGSERIAL PRIMARY KEY,
+-                             pot_id       BIGINT NOT NULL REFERENCES pot(id) ON DELETE CASCADE,
+-                             roommate_id  BIGINT NOT NULL REFERENCES roommate(id),
+-                             amount       NUMERIC(10,2) NOT NULL CHECK (amount > 0),
+-                             method       VARCHAR(20) NOT NULL DEFAULT 'VIREMENT'
+-                                 CHECK (method IN ('VIREMENT', 'ESPECES', 'PAYPAL_WERO', 'AUTRE')),
+-                             payment_date DATE NOT NULL DEFAULT CURRENT_DATE
+-);
+-
+ CREATE TABLE note (
+-                      id              BIGSERIAL PRIMARY KEY,
+-                      shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+-                      author_id       BIGINT NOT NULL REFERENCES roommate(id),
+-                      content         TEXT NOT NULL,
+-                      type            VARCHAR(20) NOT NULL DEFAULT 'AFFICHAGE' CHECK (type IN ('AFFICHAGE','VOTE')),
+-                      creation_date   TIMESTAMP NOT NULL DEFAULT NOW(),
+-                      vote_end_date   TIMESTAMP,
+-                      CHECK (type = 'VOTE' OR vote_end_date IS NULL),
+-                      CHECK (vote_end_date >= creation_date)
++    id              BIGSERIAL PRIMARY KEY,
++    shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
++    author_id       BIGINT NOT NULL REFERENCES roommate(id),
++    content         TEXT NOT NULL,
++    type            VARCHAR(20) NOT NULL DEFAULT 'AFFICHAGE' CHECK (type IN ('AFFICHAGE','VOTE')),
++    creation_date   TIMESTAMP NOT NULL DEFAULT NOW(),
++    vote_end_date   TIMESTAMP,                      
++    CHECK (type = 'VOTE' OR vote_end_date IS NULL),
++    CHECK (vote_end_date >= creation_date)
+ );
+ 
+ CREATE TABLE choice (
+-                        id              BIGSERIAL PRIMARY KEY,
+-                        note_id         BIGINT NOT NULL REFERENCES note(id) ON DELETE CASCADE,
+-                        choice_option   VARCHAR(150) NOT NULL
++    id              BIGSERIAL PRIMARY KEY,
++    note_id         BIGINT NOT NULL REFERENCES note(id) ON DELETE CASCADE,
++    choice_option   VARCHAR(150) NOT NULL
+ );
+ 
+ CREATE TABLE vote (
+-                      roommate_id  BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,
+-                      choice_id    BIGINT NOT NULL REFERENCES choice(id) ON DELETE CASCADE,
+-                      PRIMARY KEY (roommate_id, choice_id)
++    roommate_id  BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,
++    choice_id    BIGINT NOT NULL REFERENCES choice(id) ON DELETE CASCADE,
++    PRIMARY KEY (roommate_id, choice_id)
+ );
+ 
+ CREATE TABLE article (
+-                         id              BIGSERIAL PRIMARY KEY,
+-                         shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+-                         owner_id        BIGINT REFERENCES roommate(id) ON DELETE CASCADE,
+-                         name            VARCHAR(100) NOT NULL,
+-                         bought          BOOLEAN NOT NULL DEFAULT FALSE
++    id              BIGSERIAL PRIMARY KEY,
++    shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
++    owner_id        BIGINT REFERENCES roommate(id) ON DELETE CASCADE, -- si NULL : liste commune
++    name            VARCHAR(100) NOT NULL,
++    bought          BOOLEAN NOT NULL DEFAULT FALSE
+ );
+ 
+ CREATE TABLE event (
+-                       id              BIGSERIAL PRIMARY KEY,
+-                       shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+-                       creator_id      BIGINT NOT NULL REFERENCES roommate(id),
+-                       title           VARCHAR(150) NOT NULL,
+-                       start_date      TIMESTAMP NOT NULL,
+-                       end_date        TIMESTAMP NOT NULL,
+-                       CHECK (end_date >= start_date)
++    id              BIGSERIAL PRIMARY KEY,
++    shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
++    creator_id      BIGINT NOT NULL REFERENCES roommate(id),
++    title           VARCHAR(150) NOT NULL,
++    start_date      TIMESTAMP NOT NULL,
++    end_date        TIMESTAMP NOT NULL,
++    CHECK (end_date >= start_date)
+ );
+ 
+ CREATE TABLE hidden_task_name (
+-                                  id              BIGSERIAL PRIMARY KEY,
+-                                  shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+-                                  name            VARCHAR(150) NOT NULL,
+-                                  UNIQUE (shared_house_id, name)
++    id              BIGSERIAL PRIMARY KEY,
++    shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
++    name            VARCHAR(150) NOT NULL,
++    UNIQUE (shared_house_id, name)
+ );
+ 
+ CREATE TABLE custom_task_name (
+-                                  id              BIGSERIAL PRIMARY KEY,
+-                                  shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+-                                  name            VARCHAR(150) NOT NULL,
+-                                  UNIQUE (shared_house_id, name)
++    id              BIGSERIAL PRIMARY KEY,
++    shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
++    name            VARCHAR(150) NOT NULL,
++    UNIQUE (shared_house_id, name)
+ );
+ 
+ CREATE TABLE monthly_score (
+-                               id              BIGSERIAL PRIMARY KEY,
+-                               shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
+-                               roommate_id     BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,
+-                               month_start     DATE NOT NULL,
+-                               points          INTEGER NOT NULL,
+-                               UNIQUE (roommate_id, month_start)
++    id              BIGSERIAL PRIMARY KEY,
++    shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
++    roommate_id     BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,
++    month_start     DATE NOT NULL,
++    points          INTEGER NOT NULL,
++    UNIQUE (roommate_id, month_start)
+ );
+\ No newline at end of file
+Index: front/src/app/app.routes.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { Routes } from '@angular/router';\r\nimport { authGuard, guestGuard, hasHouseGuard, noHouseGuard } from './core/auth/auth.guards';\r\n\r\nexport const routes: Routes = [\r\n  // Pas connecté\r\n  {\r\n    path: 'login',\r\n    canActivate: [guestGuard],\r\n    loadComponent: () => import('./features/auth/pages/login-page/login-page').then((m) => m.LoginPage),\r\n  },\r\n  {\r\n    path: 'register',\r\n    canActivate: [guestGuard],\r\n    loadComponent: () => import('./features/auth/pages/register-page/register-page').then((m) => m.RegisterPage),\r\n  },\r\n\r\n  // Connecté, sans coloc\r\n  {\r\n    path: 'onboarding',\r\n    canActivate: [noHouseGuard],\r\n    loadComponent: () =>\r\n      import('./features/shared-house/pages/onboarding-page/onboarding-page').then((m) => m.OnboardingPage),\r\n  },\r\n\r\n  // Connecté, avec ou sans coloc\r\n  {\r\n    path: 'settings',\r\n    canActivate: [authGuard],\r\n    loadComponent: () => import('./features/settings/pages/settings-page/settings-page').then((m) => m.SettingsPage),\r\n  },\r\n\r\n  // Connecté ET dans une coloc : chacun ajoute ses pages ici\r\n  {\r\n    path: '',\r\n    canActivate: [hasHouseGuard],\r\n    children: [\r\n      {\r\n        path: 'home',\r\n        loadComponent: () => import('./features/home/pages/home-page/home-page').then((m) => m.HomePage),\r\n      },\r\n      {\r\n        path: 'tasks',\r\n        loadComponent: () => import('./features/tasks/pages/tasks-page/tasks-page').then((m) => m.TasksPage),\r\n      },\r\n      \r\n      { \r\n        path: 'shopping',\r\n        loadComponent: () => import('./features/shopping/pages/shopping-page/shopping-page').then((m) => m.ShoppingPage),\r\n      },\r\n\r\n\r\n      // { path: 'expenses', loadComponent: ... },\r\n      // { path: 'calendar', loadComponent: ... },\r\n      // { path: 'notes', loadComponent: ... },\r\n      {\r\n        path: 'points',\r\n        loadComponent: () => import('./features/points/pages/points-page/points-page').then((m) => m.PointsPage),\r\n      },\r\n      \r\n      { path: '', pathMatch: 'full', redirectTo: 'home' },\r\n    ],\r\n  },\r\n\r\n  { path: '**', redirectTo: '' },\r\n];\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/front/src/app/app.routes.ts b/front/src/app/app.routes.ts
+--- a/front/src/app/app.routes.ts	(revision 012f001eaf820dfaf97469648a3650d03dc145e0)
++++ b/front/src/app/app.routes.ts	(date 1791647122060)
+@@ -1,5 +1,6 @@
+ import { Routes } from '@angular/router';
+ import { authGuard, guestGuard, hasHouseGuard, noHouseGuard } from './core/auth/auth.guards';
++import { CalendarComponent } from './calendar/calendar.component';
+ 
+ export const routes: Routes = [
+   // Pas connecté
+@@ -48,9 +49,12 @@
+         loadComponent: () => import('./features/shopping/pages/shopping-page/shopping-page').then((m) => m.ShoppingPage),
+       },
+ 
++      {
++        path: 'calendar',
++        loadComponent: () => import('./calendar/calendar.component').then((m) => m.CalendarComponent),
++      },
+ 
+       // { path: 'expenses', loadComponent: ... },
+-      // { path: 'calendar', loadComponent: ... },
+       // { path: 'notes', loadComponent: ... },
+       {
+         path: 'points',
+Index: front/src/app/app.config.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { registerLocaleData } from '@angular/common';\r\nimport { provideHttpClient, withInterceptors } from '@angular/common/http';\r\nimport localeFr from '@angular/common/locales/fr';\r\nimport {\r\n  ApplicationConfig,\r\n  LOCALE_ID,\r\n  provideBrowserGlobalErrorListeners,\r\n  provideZoneChangeDetection,\r\n} from '@angular/core';\r\nimport { provideRouter } from '@angular/router';\r\n\r\nimport { routes } from './app.routes';\r\nimport { authInterceptor } from './core/auth/auth.interceptor';\r\n\r\n// Dates en français (« mar. 6 oct. »)\r\nregisterLocaleData(localeFr);\r\n\r\nexport const appConfig: ApplicationConfig = {\r\n  providers: [\r\n    provideBrowserGlobalErrorListeners(),\r\n    provideZoneChangeDetection({ eventCoalescing: true }),\r\n    provideRouter(routes),\r\n    provideHttpClient(withInterceptors([authInterceptor])),\r\n    { provide: LOCALE_ID, useValue: 'fr-FR' },\r\n  ],\r\n};\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/front/src/app/app.config.ts b/front/src/app/app.config.ts
+--- a/front/src/app/app.config.ts	(revision 012f001eaf820dfaf97469648a3650d03dc145e0)
++++ b/front/src/app/app.config.ts	(date 1791647122059)
+@@ -8,7 +8,6 @@
+   provideZoneChangeDetection,
+ } from '@angular/core';
+ import { provideRouter } from '@angular/router';
+-
+ import { routes } from './app.routes';
+ import { authInterceptor } from './core/auth/auth.interceptor';
+ 
+Index: front/tsconfig.app.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */\r\n/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */\r\n{\r\n  \"extends\": \"./tsconfig.json\",\r\n  \"compilerOptions\": {\r\n    \"outDir\": \"./out-tsc/app\",\r\n    \"types\": []\r\n  },\r\n  \"include\": [\r\n    \"src/**/*.ts\"\r\n  ],\r\n  \"exclude\": [\r\n    \"src/**/*.spec.ts\"\r\n  ]\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/front/tsconfig.app.json b/front/tsconfig.app.json
+--- a/front/tsconfig.app.json	(revision 012f001eaf820dfaf97469648a3650d03dc145e0)
++++ b/front/tsconfig.app.json	(date 1791647122063)
+@@ -4,6 +4,7 @@
+   "extends": "./tsconfig.json",
+   "compilerOptions": {
+     "outDir": "./out-tsc/app",
++    /*"rootDir": "./src",*/
+     "types": []
+   },
+   "include": [
+Index: back/src/main/java/com/coloc/back/entity/Event.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/back/src/main/java/com/coloc/back/entity/Event.java b/back/src/main/java/com/coloc/back/entity/Event.java
+new file mode 100644
+--- /dev/null	(date 1791647122054)
++++ b/back/src/main/java/com/coloc/back/entity/Event.java	(date 1791647122054)
+@@ -0,0 +1,50 @@
++package com.coloc.back.entity;
++
++import jakarta.persistence.*;
++import lombok.Getter;
++import lombok.NoArgsConstructor;
++import lombok.Setter;
++
++import java.time.LocalDate;
++import java.time.LocalTime;
++
++@Entity
++@Table(name = "event")
++@Getter
++@Setter
++@NoArgsConstructor
++public class Event {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    private Long id;
++
++    @Column(nullable = false, length = 150)
++    private String title;
++
++    @Column(columnDefinition = "TEXT")
++    private String description;
++
++    @Column(name = "start_date", nullable = false)
++    private LocalDate startDate;
++
++    @Column(name = "end_date", nullable = false)
++    private LocalDate endDate;
++
++    @Column(name = "all_day", nullable = false)
++    private boolean allDay;
++
++    @Column(name = "start_time")
++    private LocalTime startTime;
++
++    @Column(name = "end_time")
++    private LocalTime endTime;
++
++    @ManyToOne(fetch = FetchType.LAZY, optional = false)
++    @JoinColumn(name = "creator_id", nullable = false)
++    private Roommate creator;
++
++    @ManyToOne(fetch = FetchType.LAZY, optional = false)
++    @JoinColumn(name = "shared_house_id", nullable = false)
++    private SharedHouse sharedHouse;
++}
+\ No newline at end of file
+Index: back/src/main/java/com/coloc/back/service/EventService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/back/src/main/java/com/coloc/back/service/EventService.java b/back/src/main/java/com/coloc/back/service/EventService.java
+new file mode 100644
+--- /dev/null	(date 1791647122056)
++++ b/back/src/main/java/com/coloc/back/service/EventService.java	(date 1791647122056)
+@@ -0,0 +1,177 @@
++package com.coloc.back.service;
++
++import com.coloc.back.dto.EventRequest;
++import com.coloc.back.dto.EventResponse;
++import com.coloc.back.entity.Event;
++import com.coloc.back.entity.Roommate;
++import com.coloc.back.entity.SharedHouse;
++import com.coloc.back.repository.EventRepository;
++import com.coloc.back.repository.RoommateRepository;
++import com.coloc.back.repository.SharedHouseRepository;
++import org.springframework.http.HttpStatus;
++import org.springframework.stereotype.Service;
++import org.springframework.web.server.ResponseStatusException;
++
++import java.util.List;
++
++@Service
++public class EventService {
++
++    private final EventRepository eventRepository;
++    private final RoommateRepository roommateRepository;
++    private final SharedHouseRepository sharedHouseRepository;
++
++    public EventService(
++            EventRepository eventRepository,
++            RoommateRepository roommateRepository,
++            SharedHouseRepository sharedHouseRepository
++    ) {
++        this.eventRepository = eventRepository;
++        this.roommateRepository = roommateRepository;
++        this.sharedHouseRepository = sharedHouseRepository;
++    }
++
++    public List<EventResponse> getEvents(Long sharedHouseId) {
++
++        return eventRepository
++                .findBySharedHouseIdOrderByStartDateAscStartTimeAsc(sharedHouseId)
++                .stream()
++                .map(EventResponse::fromEntity)
++                .toList();
++    }
++
++    public EventResponse getEvent(Long id) {
++
++        Event event = eventRepository.findById(id)
++                .orElseThrow(() ->
++                        new ResponseStatusException(
++                                HttpStatus.NOT_FOUND,
++                                "Événement introuvable"
++                        )
++                );
++
++        return EventResponse.fromEntity(event);
++    }
++
++    public EventResponse createEvent(EventRequest request) {
++
++        validateDatesAndTimes(request);
++
++        Roommate creator = roommateRepository.findById(request.creatorId())
++                .orElseThrow(() ->
++                        new ResponseStatusException(
++                                HttpStatus.NOT_FOUND,
++                                "Colocataire introuvable"
++                        )
++                );
++
++        SharedHouse sharedHouse = sharedHouseRepository.findById(request.sharedHouseId())
++                .orElseThrow(() ->
++                        new ResponseStatusException(
++                                HttpStatus.NOT_FOUND,
++                                "Colocation introuvable"
++                        )
++                );
++
++        if (creator.getSharedHouse() == null
++                || !creator.getSharedHouse().getId().equals(sharedHouse.getId())) {
++
++            throw new ResponseStatusException(
++                    HttpStatus.BAD_REQUEST,
++                    "Le créateur n'appartient pas à cette colocation"
++            );
++        }
++
++        Event event = new Event();
++
++        event.setTitle(request.title().trim());
++        event.setDescription(request.description());
++        event.setStartDate(request.startDate());
++        event.setEndDate(request.endDate());
++        event.setAllDay(request.allDay());
++        event.setStartTime(request.allDay() ? null : request.startTime());
++        event.setEndTime(request.allDay() ? null : request.endTime());
++        event.setCreator(creator);
++        event.setSharedHouse(sharedHouse);
++
++        Event savedEvent = eventRepository.save(event);
++
++        return EventResponse.fromEntity(savedEvent);
++    }
++
++    public EventResponse updateEvent(Long id, EventRequest request) {
++
++        validateDatesAndTimes(request);
++
++        Event event = eventRepository.findById(id)
++                .orElseThrow(() ->
++                        new ResponseStatusException(
++                                HttpStatus.NOT_FOUND,
++                                "Événement introuvable"
++                        )
++                );
++
++        SharedHouse sharedHouse = sharedHouseRepository.findById(request.sharedHouseId())
++                .orElseThrow(() ->
++                        new ResponseStatusException(
++                                HttpStatus.NOT_FOUND,
++                                "Colocation introuvable"
++                        )
++                );
++
++        event.setTitle(request.title().trim());
++        event.setDescription(request.description());
++        event.setStartDate(request.startDate());
++        event.setEndDate(request.endDate());
++        event.setAllDay(request.allDay());
++        event.setStartTime(request.allDay() ? null : request.startTime());
++        event.setEndTime(request.allDay() ? null : request.endTime());
++        event.setSharedHouse(sharedHouse);
++
++        Event savedEvent = eventRepository.save(event);
++
++        return EventResponse.fromEntity(savedEvent);
++    }
++
++    public void deleteEvent(Long id) {
++
++        if (!eventRepository.existsById(id)) {
++            throw new ResponseStatusException(
++                    HttpStatus.NOT_FOUND,
++                    "Événement introuvable"
++            );
++        }
++
++        eventRepository.deleteById(id);
++    }
++
++    private void validateDatesAndTimes(EventRequest request) {
++
++        if (request.endDate().isBefore(request.startDate())) {
++            throw new ResponseStatusException(
++                    HttpStatus.BAD_REQUEST,
++                    "La date de fin doit être postérieure ou égale à la date de début"
++            );
++        }
++
++        if (request.allDay()) {
++            return;
++        }
++
++        if (request.startTime() == null || request.endTime() == null) {
++            throw new ResponseStatusException(
++                    HttpStatus.BAD_REQUEST,
++                    "Les heures de début et de fin sont obligatoires pour un événement avec horaires"
++            );
++        }
++
++        if (request.startDate().equals(request.endDate())
++                && !request.endTime().isAfter(request.startTime())) {
++
++            throw new ResponseStatusException(
++                    HttpStatus.BAD_REQUEST,
++                    "L'heure de fin doit être postérieure à l'heure de début"
++            );
++        }
++    }
++}
+\ No newline at end of file
+Index: front/src/app/calendar/calendar.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/front/src/app/calendar/calendar.component.ts b/front/src/app/calendar/calendar.component.ts
+new file mode 100644
+--- /dev/null	(date 1791647122063)
++++ b/front/src/app/calendar/calendar.component.ts	(date 1791647122063)
+@@ -0,0 +1,525 @@
++import { Component, OnInit } from '@angular/core';
++import { FormsModule } from '@angular/forms';
++
++import { CalendarService } from './calendar.service';
++import { CalendarEvent } from './calendar-event.model';
++
++type CalendarView = 'month' | 'week';
++
++@Component({
++  selector: 'app-calendar',
++  imports: [FormsModule],
++  templateUrl: './calendar.component.html',
++  styleUrl: './calendar.component.css'
++})
++export class CalendarComponent implements OnInit {
++  readonly sharedHouseId = 1;
++  readonly currentUserId = 1;
++
++  currentDate = new Date();
++
++  selectedDate = new Date();
++
++  view: CalendarView = 'month';
++
++  showEventForm = false;
++
++  editingEventId: number | null = null;
++
++  newEvent = {
++    title: '',
++    startDate: this.formatDate(this.selectedDate),
++    endDate: this.formatDate(this.selectedDate),
++    allDay: false,
++    startTime: '18:00',
++    endTime: '19:00',
++    description: ''
++  };
++
++  readonly weekDays = [
++    'DIM',
++    'LUN',
++    'MAR',
++    'MER',
++    'JEU',
++    'VEN',
++    'SAM'
++  ];
++
++  readonly monthNames = [
++    'Janvier',
++    'Février',
++    'Mars',
++    'Avril',
++    'Mai',
++    'Juin',
++    'Juillet',
++    'Août',
++    'Septembre',
++    'Octobre',
++    'Novembre',
++    'Décembre'
++  ];
++
++  constructor(
++    public calendarService: CalendarService
++  ) {}
++
++  ngOnInit(): void {
++    this.loadEvents();
++  }
++
++  private loadEvents(): void {
++    this.calendarService
++      .getEvents(this.sharedHouseId)
++      .subscribe({
++        next: events => {
++          console.log(
++            'Événements récupérés depuis le backend :',
++            events
++          );
++        },
++
++        error: error => {
++          console.error(
++            'Erreur lors du chargement des événements :',
++            error
++          );
++
++          alert(
++            'Impossible de charger les événements du calendrier.'
++          );
++        }
++      });
++  }
++
++  get currentMonthLabel(): string {
++    return `${this.monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
++  }
++
++  get selectedDateLabel(): string {
++    return new Intl.DateTimeFormat('fr-FR', {
++      day: 'numeric',
++      month: 'long',
++      year: 'numeric'
++    }).format(this.selectedDate);
++  }
++
++  get modalTitle(): string {
++    return this.editingEventId === null
++      ? 'Nouvel événement'
++      : 'Modifier l’événement';
++  }
++
++  get calendarDays(): Date[] {
++    const year = this.currentDate.getFullYear();
++    const month = this.currentDate.getMonth();
++    const firstDay = new Date(year, month, 1);
++    const lastDay = new Date(year, month + 1, 0);
++
++    const days: Date[] = [];
++
++    const previousMonthDays = firstDay.getDay();
++
++    for (let i = previousMonthDays - 1; i >= 0; i--) {
++      days.push(new Date(year, month, -i));
++    }
++
++    for (let day = 1; day <= lastDay.getDate(); day++) {
++      days.push(new Date(year, month, day));
++    }
++
++    const remainingDays = 42 - days.length;
++
++    for (let day = 1; day <= remainingDays; day++) {
++      days.push(new Date(year, month + 1, day));
++    }
++
++    return days;
++  }
++
++  get weekDaysDates(): Date[] {
++    const date = new Date(this.selectedDate);
++    const dayOfWeek = date.getDay();
++    const sunday = new Date(date);
++    sunday.setDate(date.getDate() - dayOfWeek);
++    const days: Date[] = [];
++
++    for (let i = 0; i < 7; i++) {
++      const day = new Date(sunday);
++      day.setDate(sunday.getDate() + i);
++      days.push(day);
++    }
++
++    return days;
++  }
++
++  get selectedDayEvents(): CalendarEvent[] {
++    return this.getEventsForDate(this.selectedDate)
++      .sort((a, b) => {
++
++        if (a.allDay && !b.allDay) {
++          return -1;
++        }
++
++        if (!a.allDay && b.allDay) {
++          return 1;
++        }
++
++        if (a.startTime === null) {
++          return -1;
++        }
++
++        if (b.startTime === null) {
++          return 1;
++        }
++
++        return a.startTime.localeCompare(b.startTime);
++      });
++  }
++
++  getEventsForDate(date: Date): CalendarEvent[] {
++    const dateString = this.formatDate(date);
++
++    return this.calendarService
++      .events()
++      .filter(event => {
++        return dateString >= event.startDate
++          && dateString <= event.endDate;
++      });
++  }
++
++  selectDate(date: Date): void {
++    this.selectedDate = new Date(date);
++
++    this.newEvent.startDate = this.formatDate(this.selectedDate);
++    this.newEvent.endDate = this.formatDate(this.selectedDate);
++  }
++
++  previousMonth(): void {
++    this.currentDate = new Date(
++      this.currentDate.getFullYear(),
++      this.currentDate.getMonth() - 1,
++      1
++    );
++  }
++
++  nextMonth(): void {
++    this.currentDate = new Date(
++      this.currentDate.getFullYear(),
++      this.currentDate.getMonth() + 1,
++      1
++    );
++  }
++
++  previousWeek(): void {
++    const date = new Date(this.selectedDate);
++    date.setDate(date.getDate() - 7);
++    this.selectedDate = date;
++    this.currentDate = new Date(date);
++    this.newEvent.startDate = this.formatDate(date);
++    this.newEvent.endDate = this.formatDate(date);
++  }
++
++  nextWeek(): void {
++    const date = new Date(this.selectedDate);
++    date.setDate(date.getDate() + 7);
++    this.selectedDate = date;
++    this.currentDate = new Date(date);
++    this.newEvent.startDate = this.formatDate(date);
++    this.newEvent.endDate = this.formatDate(date);
++  }
++
++  goToToday(): void {
++    const today = new Date();
++    this.currentDate = new Date(today);
++    this.selectedDate = new Date(today);
++    this.newEvent.startDate = this.formatDate(today);
++    this.newEvent.endDate = this.formatDate(today);
++  }
++
++  setView(view: CalendarView): void {
++    this.view = view;
++  }
++
++  openEventForm(): void {
++    this.editingEventId = null;
++
++    const selectedDate = this.formatDate(this.selectedDate);
++
++    this.newEvent = {
++      title: '',
++      startDate: selectedDate,
++      endDate: selectedDate,
++      allDay: false,
++      startTime: '18:00',
++      endTime: '19:00',
++      description: ''
++    };
++
++    this.showEventForm = true;
++  }
++
++  openEditEvent(event: CalendarEvent): void {
++    this.editingEventId = event.id;
++
++    this.newEvent = {
++      title: event.title,
++      startDate: event.startDate,
++      endDate: event.endDate,
++      allDay: event.allDay,
++      startTime: event.startTime ?? '18:00',
++      endTime: event.endTime ?? '19:00',
++      description: event.description ?? ''
++    };
++
++    this.showEventForm = true;
++  }
++
++  closeEventForm(): void {
++    this.showEventForm = false;
++    this.editingEventId = null;
++  }
++
++  createOrUpdateEvent(): void {
++
++    if (!this.newEvent.title.trim()) {
++      return;
++    }
++
++    if (!this.newEvent.startDate) {
++      return;
++    }
++
++    if (!this.newEvent.endDate) {
++      return;
++    }
++
++    if (this.newEvent.endDate < this.newEvent.startDate) {
++      alert(
++        'La date de fin doit être après ou égale à la date de début.'
++      );
++      return;
++    }
++
++    if (
++      !this.newEvent.allDay
++      && this.newEvent.endDate === this.newEvent.startDate
++      && this.newEvent.endTime <= this.newEvent.startTime
++    ) {
++      alert(
++        'L’heure de fin doit être après l’heure de début.'
++      );
++      return;
++    }
++
++    const eventRequest = {
++      title: this.newEvent.title.trim(),
++
++      description: this.newEvent.description.trim(),
++
++      startDate: this.newEvent.startDate,
++
++      endDate: this.newEvent.endDate,
++
++      allDay: this.newEvent.allDay,
++
++      startTime: this.newEvent.allDay
++        ? null
++        : this.newEvent.startTime,
++
++      endTime: this.newEvent.allDay
++        ? null
++        : this.newEvent.endTime,
++
++      creatorId: this.currentUserId,
++
++      sharedHouseId: this.sharedHouseId
++    };
++
++    if (this.editingEventId === null) {
++
++      this.calendarService
++        .addEvent(eventRequest)
++        .subscribe({
++          next: createdEvent => {
++
++            console.log(
++              'Événement créé :',
++              createdEvent
++            );
++
++            this.selectedDate =
++              this.parseDate(createdEvent.startDate);
++
++            this.currentDate =
++              new Date(this.selectedDate);
++
++            this.closeEventForm();
++          },
++
++          error: error => {
++
++            console.error(
++              'Erreur lors de la création :',
++              error
++            );
++
++            alert(
++              'Impossible de créer l’événement.'
++            );
++          }
++        });
++
++      return;
++    }
++
++    this.calendarService
++      .updateEvent(
++        this.editingEventId,
++        eventRequest
++      )
++      .subscribe({
++        next: updatedEvent => {
++
++          console.log(
++            'Événement modifié :',
++            updatedEvent
++          );
++
++          this.selectedDate =
++            this.parseDate(updatedEvent.startDate);
++
++          this.currentDate =
++            new Date(this.selectedDate);
++
++          this.closeEventForm();
++        },
++
++        error: error => {
++
++          console.error(
++            'Erreur lors de la modification :',
++            error
++          );
++
++          alert(
++            'Impossible de modifier l’événement.'
++          );
++        }
++      });
++  }
++
++  deleteEvent(event: CalendarEvent): void {
++
++    const confirmation = confirm(
++      `Voulez-vous supprimer l’événement "${event.title}" ?`
++    );
++
++    if (!confirmation) {
++      return;
++    }
++
++    this.calendarService
++      .deleteEvent(event.id)
++      .subscribe({
++        next: () => {
++
++          console.log(
++            'Événement supprimé :',
++            event.id
++          );
++        },
++
++        error: error => {
++
++          console.error(
++            'Erreur lors de la suppression :',
++            error
++          );
++
++          alert(
++            'Impossible de supprimer l’événement.'
++          );
++        }
++      });
++  }
++
++  isToday(date: Date): boolean {
++    const today = new Date();
++
++    return this.isSameDate(date, today);
++  }
++
++  isSelected(date: Date): boolean {
++    return this.isSameDate(date, this.selectedDate);
++  }
++
++  isCurrentMonth(date: Date): boolean {
++    return date.getMonth() === this.currentDate.getMonth()
++      && date.getFullYear() === this.currentDate.getFullYear();
++  }
++
++  formatDate(date: Date): string {
++    const year = date.getFullYear();
++    const month = String(date.getMonth() + 1).padStart(2, '0');
++    const day = String(date.getDate()).padStart(2, '0');
++
++    return `${year}-${month}-${day}`;
++  }
++
++  formatDayNumber(date: Date): number {
++    return date.getDate();
++  }
++
++  formatTime(time: string | null): string {
++    if (!time) {
++      return '';
++    }
++
++    return time.substring(0, 5);
++  }
++
++  formatEventDate(event: CalendarEvent): string {
++    const start = this.parseDate(event.startDate);
++    const end = this.parseDate(event.endDate);
++
++    const startText = new Intl.DateTimeFormat('fr-FR', {
++      day: 'numeric',
++      month: 'short'
++    }).format(start);
++
++    const endText = new Intl.DateTimeFormat('fr-FR', {
++      day: 'numeric',
++      month: 'short'
++    }).format(end);
++
++    if (event.startDate === event.endDate) {
++      return startText;
++    }
++
++    return `${startText} → ${endText}`;
++  }
++
++  private parseDate(date: string): Date {
++    const [year, month, day] = date
++      .split('-')
++      .map(Number);
++
++    return new Date(
++      year,
++      month - 1,
++      day
++    );
++  }
++
++  private isSameDate(
++    first: Date,
++    second: Date
++  ): boolean {
++
++    return first.getFullYear() === second.getFullYear()
++      && first.getMonth() === second.getMonth()
++      && first.getDate() === second.getDate();
++  }
++}
+\ No newline at end of file
+Index: front/src/app/calendar/calendar.service.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/front/src/app/calendar/calendar.service.ts b/front/src/app/calendar/calendar.service.ts
+new file mode 100644
+--- /dev/null	(date 1791647122063)
++++ b/front/src/app/calendar/calendar.service.ts	(date 1791647122063)
+@@ -0,0 +1,93 @@
++import { Injectable, signal } from '@angular/core';
++import { HttpClient } from '@angular/common/http';
++import { Observable, tap } from 'rxjs';
++
++import {
++  CalendarEvent,
++  CalendarEventRequest
++} from './calendar-event.model';
++
++@Injectable({
++  providedIn: 'root'
++})
++export class CalendarService {
++
++  private readonly apiUrl = 'http://localhost:8080/api/events';
++
++  events = signal<CalendarEvent[]>([]);
++
++  constructor(private http: HttpClient) {}
++
++  getEvents(sharedHouseId: number): Observable<CalendarEvent[]> {
++    return this.http
++      .get<CalendarEvent[]>(
++        `${this.apiUrl}?sharedHouseId=${sharedHouseId}`
++      )
++      .pipe(
++        tap(events => this.events.set(events))
++      );
++  }
++
++  getEvent(id: number): Observable<CalendarEvent> {
++    return this.http.get<CalendarEvent>(
++      `${this.apiUrl}/${id}`
++    );
++  }
++
++  addEvent(
++    event: CalendarEventRequest
++  ): Observable<CalendarEvent> {
++
++    return this.http
++      .post<CalendarEvent>(
++        this.apiUrl,
++        event
++      )
++      .pipe(
++        tap(createdEvent => {
++          this.events.update(events => [
++            ...events,
++            createdEvent
++          ]);
++        })
++      );
++  }
++
++  updateEvent(
++    id: number,
++    event: CalendarEventRequest
++  ): Observable<CalendarEvent> {
++
++    return this.http
++      .put<CalendarEvent>(
++        `${this.apiUrl}/${id}`,
++        event
++      )
++      .pipe(
++        tap(updatedEvent => {
++          this.events.update(events =>
++            events.map(event =>
++              event.id === id
++                ? updatedEvent
++                : event
++            )
++          );
++        })
++      );
++  }
++
++  deleteEvent(id: number): Observable<void> {
++
++    return this.http
++      .delete<void>(
++        `${this.apiUrl}/${id}`
++      )
++      .pipe(
++        tap(() => {
++          this.events.update(events =>
++            events.filter(event => event.id !== id)
++          );
++        })
++      );
++  }
++}
+\ No newline at end of file
+Index: back/src/main/java/com/coloc/back/controller/EventController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/back/src/main/java/com/coloc/back/controller/EventController.java b/back/src/main/java/com/coloc/back/controller/EventController.java
+new file mode 100644
+--- /dev/null	(date 1791647122052)
++++ b/back/src/main/java/com/coloc/back/controller/EventController.java	(date 1791647122052)
+@@ -0,0 +1,69 @@
++package com.coloc.back.controller;
++
++import com.coloc.back.dto.EventRequest;
++import com.coloc.back.dto.EventResponse;
++import com.coloc.back.service.EventService;
++import jakarta.validation.Valid;
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++
++import java.util.List;
++
++@RestController
++@RequestMapping("/api/events")
++@CrossOrigin(origins = "http://localhost:4200")
++public class EventController {
++
++    private final EventService eventService;
++
++    public EventController(EventService eventService) {
++        this.eventService = eventService;
++    }
++
++    @GetMapping
++    public ResponseEntity<List<EventResponse>> getEvents(
++            @RequestParam Long sharedHouseId
++    ) {
++        return ResponseEntity.ok(
++                eventService.getEvents(sharedHouseId)
++        );
++    }
++
++    @GetMapping("/{id}")
++    public ResponseEntity<EventResponse> getEvent(
++            @PathVariable Long id
++    ) {
++        return ResponseEntity.ok(
++                eventService.getEvent(id)
++        );
++    }
++
++    @PostMapping
++    public ResponseEntity<EventResponse> createEvent(
++            @Valid @RequestBody EventRequest request
++    ) {
++        return ResponseEntity
++                .status(HttpStatus.CREATED)
++                .body(eventService.createEvent(request));
++    }
++
++    @PutMapping("/{id}")
++    public ResponseEntity<EventResponse> updateEvent(
++            @PathVariable Long id,
++            @Valid @RequestBody EventRequest request
++    ) {
++        return ResponseEntity.ok(
++                eventService.updateEvent(id, request)
++        );
++    }
++
++    @DeleteMapping("/{id}")
++    public ResponseEntity<Void> deleteEvent(
++            @PathVariable Long id
++    ) {
++        eventService.deleteEvent(id);
++
++        return ResponseEntity.noContent().build();
++    }
++}
+\ No newline at end of file
+Index: back/src/main/java/com/coloc/back/repository/EventRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/back/src/main/java/com/coloc/back/repository/EventRepository.java b/back/src/main/java/com/coloc/back/repository/EventRepository.java
+new file mode 100644
+--- /dev/null	(date 1791647122055)
++++ b/back/src/main/java/com/coloc/back/repository/EventRepository.java	(date 1791647122055)
+@@ -0,0 +1,11 @@
++package com.coloc.back.repository;
++
++import com.coloc.back.entity.Event;
++import org.springframework.data.jpa.repository.JpaRepository;
++
++import java.util.List;
++
++public interface EventRepository extends JpaRepository<Event, Long> {
++
++    List<Event> findBySharedHouseIdOrderByStartDateAscStartTimeAsc(Long sharedHouseId);
++}
+\ No newline at end of file
+Index: back/src/main/java/com/coloc/back/dto/EventRequest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/back/src/main/java/com/coloc/back/dto/EventRequest.java b/back/src/main/java/com/coloc/back/dto/EventRequest.java
+new file mode 100644
+--- /dev/null	(date 1791647122053)
++++ b/back/src/main/java/com/coloc/back/dto/EventRequest.java	(date 1791647122053)
+@@ -0,0 +1,36 @@
++package com.coloc.back.dto;
++
++import jakarta.validation.constraints.NotBlank;
++import jakarta.validation.constraints.NotNull;
++import jakarta.validation.constraints.Size;
++
++import java.time.LocalDate;
++import java.time.LocalTime;
++
++public record EventRequest(
++
++        @NotBlank(message = "Le titre est obligatoire")
++        @Size(max = 150, message = "Le titre ne peut pas dépasser 150 caractères")
++        String title,
++
++        String description,
++
++        @NotNull(message = "La date de début est obligatoire")
++        LocalDate startDate,
++
++        @NotNull(message = "La date de fin est obligatoire")
++        LocalDate endDate,
++
++        boolean allDay,
++
++        LocalTime startTime,
++
++        LocalTime endTime,
++
++        @NotNull(message = "Le créateur est obligatoire")
++        Long creatorId,
++
++        @NotNull(message = "La colocation est obligatoire")
++        Long sharedHouseId
++) {
++}
+\ No newline at end of file
+Index: back/src/main/java/com/coloc/back/dto/EventResponse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/back/src/main/java/com/coloc/back/dto/EventResponse.java b/back/src/main/java/com/coloc/back/dto/EventResponse.java
+new file mode 100644
+--- /dev/null	(date 1791647122054)
++++ b/back/src/main/java/com/coloc/back/dto/EventResponse.java	(date 1791647122054)
+@@ -0,0 +1,69 @@
++package com.coloc.back.dto;
++
++import com.coloc.back.entity.Event;
++
++import java.time.LocalDate;
++import java.time.LocalTime;
++
++public record EventResponse(
++
++        Long id,
++
++        String title,
++
++        String description,
++
++        LocalDate startDate,
++
++        LocalDate endDate,
++
++        boolean allDay,
++
++        LocalTime startTime,
++
++        LocalTime endTime,
++
++        Long creatorId,
++
++        String creatorName,
++
++        String creatorInitials,
++
++        Long sharedHouseId
++) {
++
++    public static EventResponse fromEntity(Event event) {
++
++        String creatorName =
++                event.getCreator().getName() + " " + event.getCreator().getSurname();
++
++        String creatorInitials = "";
++
++        if (event.getCreator().getName() != null
++                && !event.getCreator().getName().isBlank()) {
++            creatorInitials +=
++                    event.getCreator().getName().substring(0, 1).toUpperCase();
++        }
++
++        if (event.getCreator().getSurname() != null
++                && !event.getCreator().getSurname().isBlank()) {
++            creatorInitials +=
++                    event.getCreator().getSurname().substring(0, 1).toUpperCase();
++        }
++
++        return new EventResponse(
++                event.getId(),
++                event.getTitle(),
++                event.getDescription(),
++                event.getStartDate(),
++                event.getEndDate(),
++                event.isAllDay(),
++                event.getStartTime(),
++                event.getEndTime(),
++                event.getCreator().getId(),
++                creatorName,
++                creatorInitials,
++                event.getSharedHouse().getId()
++        );
++    }
++}
+\ No newline at end of file
+Index: front/src/app/calendar/calendar.component.css
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/front/src/app/calendar/calendar.component.css b/front/src/app/calendar/calendar.component.css
+new file mode 100644
+--- /dev/null	(date 1791647122061)
++++ b/front/src/app/calendar/calendar.component.css	(date 1791647122061)
+@@ -0,0 +1,910 @@
++:host {
++  display: block;
++  min-height: 100vh;
++}
++
++* {
++  box-sizing: border-box;
++}
++
++.calendar-page {
++  min-height: 100vh;
++  padding: 38px 5%;
++  background: #f3f3ff;
++  color: #20202a;
++  font-family: Arial, Helvetica, sans-serif;
++}
++
++.calendar-header {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  gap: 24px;
++  margin-bottom: 26px;
++}
++
++.calendar-header h1 {
++  margin: 0;
++  font-size: 30px;
++  font-weight: 700;
++}
++
++.calendar-subtitle {
++  margin: 8px 0 0;
++  color: #77778a;
++  font-size: 16px;
++}
++
++.header-actions {
++  display: flex;
++  align-items: center;
++  gap: 12px;
++}
++
++.view-switcher {
++  display: flex;
++  background: #e7e7f4;
++  border-radius: 8px;
++  padding: 3px;
++}
++
++.view-switcher button {
++  border: none;
++  background: transparent;
++  padding: 11px 20px;
++  border-radius: 6px;
++  cursor: pointer;
++  color: #666679;
++  font-size: 15px;
++  font-weight: 500;
++}
++
++.view-switcher button.active {
++  background: white;
++  color: #27273a;
++  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
++}
++
++.add-event-button {
++  border: none;
++  border-radius: 8px;
++  padding: 12px 19px;
++  background: #f5aa95;
++  color: #542d25;
++  cursor: pointer;
++  font-size: 15px;
++  font-weight: 600;
++}
++
++.add-event-button:hover {
++  background: #ee9b83;
++}
++
++.calendar-card {
++  background: white;
++  border-radius: 12px;
++  padding: 24px 26px 28px;
++  box-shadow: 0 5px 20px rgba(50, 50, 100, 0.07);
++}
++
++.calendar-navigation {
++  display: grid;
++  grid-template-columns: 1fr auto 1fr;
++  align-items: center;
++  margin-bottom: 20px;
++}
++
++.today-button {
++  justify-self: start;
++  border: 1px solid #dedee9;
++  background: white;
++  border-radius: 7px;
++  padding: 9px 14px;
++  cursor: pointer;
++  color: #67677a;
++  font-size: 14px;
++  font-weight: 500;
++}
++
++.today-button:hover {
++  background: #fcfcfc;
++}
++
++.month-title {
++  font-size: 21px;
++  font-weight: 600;
++  text-transform: capitalize;
++}
++
++.navigation-buttons {
++  justify-self: end;
++  display: flex;
++  gap: 6px;
++}
++
++.navigation-buttons button {
++  width: 36px;
++  height: 36px;
++  border: none;
++  background: transparent;
++  border-radius: 50%;
++  cursor: pointer;
++  font-size: 28px;
++  line-height: 1;
++  color: #5d6b85;
++}
++
++.navigation-buttons button:hover {
++  background: #f0f0f8;
++}
++
++.calendar-grid {
++  display: grid;
++  grid-template-columns: repeat(7, 1fr);
++}
++
++.weekday {
++  text-align: center;
++  color: #9a9aa8;
++  font-size: 13px;
++  font-weight: 600;
++  padding: 11px 0;
++}
++
++.calendar-day {
++  position: relative;
++  min-height: 98px;
++  border: none;
++  border-top: 1px solid #eeeeF4;
++  background: white;
++  padding: 5px 7px 9px;
++  text-align: center;
++  cursor: pointer;
++  color: #33333f;
++}
++
++.calendar-day:hover {
++  background: #fcfcfc;
++}
++
++.calendar-day.other-month {
++  color: #c5c5cf;
++}
++
++.calendar-day.selected {
++  background: #f9f9f9;
++}
++
++.day-number {
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  width: 32px;
++  height: 32px;
++  margin: 0 auto;
++  border-radius: 50%;
++  font-size: 15px;
++  font-weight: 500;
++}
++
++.calendar-day.today .day-number {
++  background: #e5e8f5;
++  color: #5869a9;
++  font-weight: 700;
++}
++
++.calendar-day.selected .day-number {
++  background: #5869a9;
++  color: white;
++}
++
++.day-events {
++  margin-top: 5px;
++  display: flex;
++  flex-direction: column;
++  align-items: flex-start;
++  gap: 3px;
++}
++
++.calendar-event-mini {
++  display: flex;
++  align-items: center;
++  width: 100%;
++  min-width: 0;
++  gap: 5px;
++  padding: 4px 5px;
++  border-radius: 4px;
++  background: #f3f1ff;
++  text-align: left;
++  cursor: pointer;
++}
++
++/*
++.event-dot {
++  flex-shrink: 0;
++  width: 6px;
++  height: 6px;
++  border-radius: 50%;
++  background: #6569b5;
++}
++*/
++
++.event-mini-title {
++  flex: 1;
++  min-width: 0;
++  overflow: hidden;
++  text-overflow: ellipsis;
++  white-space: nowrap;
++  color: #565687;
++  font-size: 11px;
++  font-weight: 500;
++}
++
++.creator-avatar-mini {
++  flex-shrink: 0;
++  width: 22px;
++  height: 22px;
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  border-radius: 50%;
++  background: #6c70c0;
++  color: white;
++  font-size: 8px;
++  font-weight: 700;
++}
++
++.more-events {
++  color: #8a8a9b;
++  font-size: 11px;
++  padding-left: 2px;
++}
++
++.week-view {
++  display: grid;
++  grid-template-columns: repeat(7, 1fr);
++  gap: 10px;
++}
++
++.week-day {
++  min-height: 210px;
++  border: 1px solid #eeeeF4;
++  border-radius: 8px;
++  background: white;
++  padding: 14px 11px;
++  cursor: pointer;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  text-align: center;
++}
++
++.week-day:hover {
++  background: #fafaff;
++}
++
++.week-day.selected {
++  border-color: #858bd0;
++  background: #f7f7ff;
++}
++
++.week-day-name {
++  display: block;
++  width: 100%;
++  color: #9999aa;
++  font-size: 13px;
++  font-weight: 600;
++  text-align: center;
++}
++
++.week-day-number {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  margin-top: 7px;
++  width: 36px;
++  height: 36px;
++  border-radius: 50%;
++  font-size: 16px;
++  font-weight: 600;
++}
++
++.week-day.today .week-day-number {
++  background: #e5f0f5;
++  color: #52728a;
++}
++
++.week-day.selected .week-day-number {
++  background: #5869a9;
++  color: white;
++}
++
++.week-events {
++  margin-top: 14px;
++  display: flex;
++  flex-direction: column;
++  gap: 8px;
++  width: 100%;
++}
++
++.week-event {
++  display: flex;
++  align-items: center;
++  gap: 7px;
++  width: 100%;
++  padding: 9px;
++  border-radius: 7px;
++  background: #f2f0ff;
++  text-align: left;
++  cursor: pointer;
++}
++
++.week-event-information {
++  flex: 1;
++  min-width: 0;
++  display: flex;
++  flex-direction: column;
++  gap: 4px;
++}
++
++.week-event strong {
++  overflow: hidden;
++  text-overflow: ellipsis;
++  white-space: nowrap;
++  color: #4e4e7c;
++  font-size: 13px;
++  font-weight: 600;
++}
++
++.week-event span:not(.creator-avatar-week) {
++  color: #8a8a9a;
++  font-size: 11px;
++}
++
++.creator-avatar-week {
++  flex-shrink: 0;
++  width: 27px;
++  height: 27px;
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  border-radius: 50%;
++  background: #6c70c0;
++  color: white;
++  font-size: 9px;
++  font-weight: 700;
++}
++
++.no-week-event {
++  color: #c0c0ca;
++  font-size: 12px;
++}
++
++.selected-day-section {
++  margin-top: 30px;
++}
++
++.selected-day-header {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  margin-bottom: 12px;
++}
++
++.selected-day-header h2 {
++  margin: 0;
++  font-size: 19px;
++  font-weight: 700;
++  text-transform: capitalize;
++}
++
++.empty-events {
++  min-height: 58px;
++  padding: 0 17px;
++  display: flex;
++  align-items: center;
++  background: white;
++  border-radius: 9px;
++  box-shadow: 0 5px 20px rgba(50, 50, 100, 0.05);
++  color: #555563;
++  font-size: 14px;
++}
++
++.events-list {
++  display: flex;
++  flex-direction: column;
++  gap: 11px;
++}
++
++.event-card {
++  position: relative;
++  display: flex;
++  align-items: center;
++  gap: 17px;
++  padding: 17px 19px;
++  background: white;
++  border-radius: 10px;
++  box-shadow: 0 5px 20px rgba(50, 50, 100, 0.05);
++  cursor: pointer;
++}
++
++.event-card:hover {
++  box-shadow: 0 7px 24px rgba(50, 50, 100, 0.10);
++}
++
++.event-color {
++  width: 5px;
++  align-self: stretch;
++  min-height: 60px;
++  border-radius: 5px;
++  background: #686ab7;
++}
++
++.event-information {
++  flex: 1;
++  min-width: 0;
++}
++
++.event-information h3 {
++  margin: 0 0 6px;
++  font-size: 17px;
++}
++
++.event-information p {
++  margin: 0 0 8px;
++  color: #777788;
++  font-size: 13px;
++}
++
++.event-details {
++  display: flex;
++  gap: 17px;
++  flex-wrap: wrap;
++  color: #858594;
++  font-size: 12px;
++}
++
++.event-creator-right {
++  flex-shrink: 0;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  gap: 5px;
++  min-width: 72px;
++  color: #6f6f7d;
++  font-size: 11px;
++  text-align: center;
++}
++
++.creator-name {
++  max-width: 90px;
++  overflow: hidden;
++  text-overflow: ellipsis;
++  white-space: nowrap;
++}
++
++.creator-avatar {
++  width: 38px;
++  height: 38px;
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  border-radius: 50%;
++  background: #6c70c0;
++  color: white;
++  font-size: 11px;
++  font-weight: 700;
++}
++
++.delete-button {
++  flex-shrink: 0;
++  width: 38px;
++  height: 38px;
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  border: none;
++  border-radius: 50%;
++  background: transparent;
++  color: #aaaab6;
++  cursor: pointer;
++}
++
++.delete-button:hover {
++  background: #f7eeee;
++  color: #c65d5d;
++}
++
++.trash-icon {
++  width: 20px;
++  height: 20px;
++  display: block;
++}
++
++.modal-overlay {
++  position: fixed;
++  inset: 0;
++  z-index: 1000;
++  display: flex;
++  justify-content: center;
++  align-items: center;
++  padding: 20px;
++  background: rgba(35, 35, 55, 0.45);
++}
++
++.event-modal {
++  width: min(520px, 100%);
++  max-height: 90vh;
++  overflow-y: auto;
++  border-radius: 12px;
++  background: white;
++  box-shadow: 0 20px 60px rgba(20, 20, 50, 0.2);
++}
++
++.modal-header {
++  display: flex;
++  justify-content: space-between;
++  align-items: flex-start;
++  padding: 23px 29px 16px;
++  border-bottom: 1px solid #eeeeF4;
++}
++
++.modal-header h2 {
++  margin: 0 0 6px;
++  font-size: 22px;
++}
++
++.modal-header p {
++  margin: 0;
++  color: #858595;
++  font-size: 14px;
++}
++
++.close-button {
++  width: 34px;
++  height: 34px;
++  border: none;
++  border-radius: 50%;
++  background: transparent;
++  color: #777786;
++  cursor: pointer;
++  font-size: 25px;
++}
++
++.close-button:hover {
++  background: #f2f2f7;
++}
++
++.form-content {
++  padding: 22px 29px;
++}
++
++.form-group {
++  display: flex;
++  flex-direction: column;
++  gap: 7px;
++  margin-bottom: 19px;
++}
++
++.form-group label {
++  color: #454552;
++  font-size: 14px;
++  font-weight: 600;
++}
++
++.form-group input,
++.form-group textarea,
++.date-time-group input {
++  width: 100%;
++  border: 1px solid #ddddE7;
++  border-radius: 7px;
++  outline: none;
++  padding: 11px 12px;
++  color: #30303b;
++  background: white;
++  font-family: inherit;
++  font-size: 14px;
++}
++
++.form-group input:focus,
++.form-group textarea:focus,
++.date-time-group input:focus {
++  border-color: #777dc2;
++  box-shadow: 0 0 0 3px rgba(119, 125, 194, 0.1);
++}
++
++.form-group textarea {
++  resize: vertical;
++}
++
++.all-day-row {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  margin: 4px 0 19px;
++}
++
++.all-day-row > label:first-child {
++  color: #454552;
++  font-size: 14px;
++  font-weight: 600;
++}
++
++.toggle {
++  position: relative;
++  width: 44px;
++  height: 24px;
++  display: block;
++}
++
++.toggle input {
++  width: 0;
++  height: 0;
++  opacity: 0;
++}
++
++.toggle-slider {
++  position: absolute;
++  inset: 0;
++  background: #bdbec3;
++  border-radius: 20px;
++  cursor: pointer;
++  transition: 0.2s;
++}
++
++.toggle-slider::before {
++  content: "";
++  position: absolute;
++  width: 20px;
++  height: 20px;
++  left: 2px;
++  top: 2px;
++  border-radius: 50%;
++  background: white;
++  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
++  transition: 0.2s;
++}
++
++.toggle input:checked + .toggle-slider {
++  background: #686ab7;
++}
++
++.toggle input:checked + .toggle-slider::before {
++  transform: translateX(20px);
++}
++
++.date-time-row {
++  display: grid;
++  grid-template-columns: 1.4fr 1fr;
++  gap: 13px;
++  margin-bottom: 17px;
++}
++
++.date-time-group {
++  display: flex;
++  flex-direction: column;
++  gap: 7px;
++}
++
++.date-time-group label {
++  color: #454552;
++  font-size: 14px;
++  font-weight: 600;
++}
++
++.date-time-group input {
++  min-height: 42px;
++}
++
++.modal-actions {
++  display: flex;
++  justify-content: flex-end;
++  gap: 10px;
++  padding: 16px 29px 21px;
++  border-top: 1px solid #eeeeF4;
++}
++
++.cancel-button,
++.create-button {
++  border: none;
++  border-radius: 7px;
++  padding: 11px 20px;
++  cursor: pointer;
++  font-size: 14px;
++  font-weight: 500;
++}
++
++.cancel-button {
++  background: #eeeeF5;
++  color: #555565;
++}
++
++.create-button {
++  background: #f0aa94;
++  color: #542d25;
++}
++
++.create-button:hover:not(:disabled) {
++  background: #e99b82;
++}
++
++.create-button:disabled {
++  opacity: 0.45;
++  cursor: not-allowed;
++}
++
++@media (max-width: 1000px) {
++  .calendar-page {
++    padding: 30px 3%;
++  }
++
++  .calendar-header h1 {
++    font-size: 27px;
++  }
++
++  .calendar-subtitle {
++    font-size: 15px;
++  }
++
++  .calendar-day {
++    min-height: 90px;
++  }
++
++  .week-event strong {
++    font-size: 12px;
++  }
++
++  .creator-avatar-week {
++    width: 25px;
++    height: 25px;
++  }
++}
++
++@media (max-width: 800px) {
++  .calendar-page {
++    padding: 25px 15px;
++  }
++
++  .calendar-header {
++    flex-direction: column;
++    align-items: flex-start;
++  }
++
++  .header-actions {
++    width: 100%;
++    justify-content: space-between;
++  }
++
++  .calendar-card {
++    padding: 18px;
++  }
++
++  .calendar-day {
++    min-height: 75px;
++  }
++
++  .day-events {
++    display: none;
++  }
++
++  .week-view {
++    overflow-x: auto;
++    grid-template-columns: repeat(7, minmax(130px, 1fr));
++  }
++
++  .week-day {
++    min-height: 190px;
++  }
++
++  .event-creator-right {
++    min-width: 60px;
++  }
++
++  .creator-name {
++    max-width: 70px;
++  }
++}
++
++@media (max-width: 500px) {
++  .calendar-header h1 {
++    font-size: 24px;
++  }
++
++  .calendar-subtitle {
++    font-size: 14px;
++  }
++
++  .header-actions {
++    flex-direction: column;
++    align-items: stretch;
++  }
++
++  .view-switcher {
++    width: 100%;
++  }
++
++  .view-switcher button {
++    flex: 1;
++  }
++
++  .add-event-button {
++    width: 100%;
++  }
++
++  .calendar-navigation {
++    grid-template-columns: 1fr auto;
++    row-gap: 12px;
++  }
++
++  .month-title {
++    grid-column: 1 / 2;
++    grid-row: 2;
++    font-size: 18px;
++  }
++
++  .navigation-buttons {
++    grid-column: 2 / 3;
++    grid-row: 2;
++  }
++
++  .date-time-row {
++    grid-template-columns: 1fr;
++    gap: 15px;
++  }
++
++  .calendar-day {
++    min-height: 55px;
++    padding: 5px 2px;
++  }
++
++  .weekday {
++    font-size: 9px;
++  }
++
++  .day-number {
++    width: 27px;
++    height: 27px;
++    font-size: 13px;
++  }
++
++  .event-card {
++    gap: 10px;
++    padding: 14px;
++  }
++
++  .event-information h3 {
++    font-size: 15px;
++  }
++
++  .event-information p {
++    font-size: 12px;
++  }
++
++  .event-details {
++    font-size: 11px;
++  }
++
++  .event-creator-right {
++    min-width: 45px;
++  }
++
++  .creator-avatar {
++    width: 32px;
++    height: 32px;
++    font-size: 9px;
++  }
++
++  .creator-name {
++    display: none;
++  }
++
++  .delete-button {
++    width: 34px;
++    height: 34px;
++  }
++
++  .trash-icon {
++    width: 18px;
++    height: 18px;
++  }
++}
+\ No newline at end of file
+Index: front/src/app/calendar/calendar.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/front/src/app/calendar/calendar.component.html b/front/src/app/calendar/calendar.component.html
+new file mode 100644
+--- /dev/null	(date 1791647122061)
++++ b/front/src/app/calendar/calendar.component.html	(date 1791647122061)
+@@ -0,0 +1,607 @@
++<div class="calendar-page">
++
++  <!-- HEADER -->
++  <div class="calendar-header">
++
++    <div>
++      <h1>Calendrier des événements</h1>
++
++      <p class="calendar-subtitle">
++        Retrouvez les événements de votre colocation.
++      </p>
++    </div>
++
++    <div class="header-actions">
++
++      <div class="view-switcher">
++
++        <button
++          [class.active]="view === 'week'"
++          (click)="setView('week')">
++          Semaine
++        </button>
++
++        <button
++          [class.active]="view === 'month'"
++          (click)="setView('month')">
++          Mois
++        </button>
++
++      </div>
++
++      <button
++        class="add-event-button"
++        (click)="openEventForm()">
++        + événement
++      </button>
++
++    </div>
++
++  </div>
++
++
++  <!-- CALENDRIER -->
++  <div class="calendar-card">
++
++    <div class="calendar-navigation">
++
++      <button
++        class="today-button"
++        (click)="goToToday()">
++        Aujourd’hui
++      </button>
++
++      <div class="month-title">
++        {{ currentMonthLabel }}
++      </div>
++
++      <div class="navigation-buttons">
++
++        <button
++          aria-label="Période précédente"
++          (click)="view === 'month' ? previousMonth() : previousWeek()">
++          ‹
++        </button>
++
++        <button
++          aria-label="Période suivante"
++          (click)="view === 'month' ? nextMonth() : nextWeek()">
++          ›
++        </button>
++
++      </div>
++
++    </div>
++
++
++    <!-- VUE MOIS -->
++
++    @if (view === 'month') {
++
++      <div class="calendar-grid">
++
++        @for (day of weekDays; track day) {
++
++          <div class="weekday">
++            {{ day }}
++          </div>
++
++        }
++
++
++        @for (date of calendarDays; track $index) {
++
++          <button
++            class="calendar-day"
++            [class.other-month]="!isCurrentMonth(date)"
++            [class.selected]="isSelected(date)"
++            [class.today]="isToday(date)"
++            (click)="selectDate(date)">
++
++            <!-- NUMERO DU JOUR -->
++            <span class="day-number">
++              {{ formatDayNumber(date) }}
++            </span>
++
++
++            <!-- EVENEMENTS -->
++            <div class="day-events">
++
++              @for (
++                event of getEventsForDate(date).slice(0, 2);
++                track event.id
++              ) {
++
++                <div
++                  class="calendar-event-mini"
++                  (click)="
++                    $event.stopPropagation();
++                    openEditEvent(event)
++                  ">
++
++                  <span class="event-dot"></span>
++
++                  <span class="event-mini-title">
++                    {{ event.title }}
++                  </span>
++
++                  <!-- AVATAR DU CREATEUR -->
++                  <span class="creator-avatar-mini">
++                    {{ event.creatorInitials }}
++                  </span>
++
++                </div>
++
++              }
++
++              @if (getEventsForDate(date).length > 2) {
++
++                <span class="more-events">
++                  +{{ getEventsForDate(date).length - 2 }}
++                </span>
++
++              }
++
++            </div>
++
++          </button>
++
++        }
++
++      </div>
++
++    }
++
++
++    <!-- VUE SEMAINE -->
++
++    @if (view === 'week') {
++
++      <div class="week-view">
++
++        @for (date of weekDaysDates; track $index) {
++
++          <button
++            class="week-day"
++            [class.selected]="isSelected(date)"
++            [class.today]="isToday(date)"
++            (click)="selectDate(date)">
++
++            <span class="week-day-name">
++              {{ weekDays[$index] }}
++            </span>
++
++            <span class="week-day-number">
++              {{ date.getDate() }}
++            </span>
++
++            <div class="week-events">
++
++              @for (
++                event of getEventsForDate(date);
++                track event.id
++              ) {
++
++                <div
++                  class="week-event"
++                  (click)="
++                    $event.stopPropagation();
++                    openEditEvent(event)
++                  ">
++
++                  <!-- INFORMATIONS -->
++                  <div class="week-event-information">
++
++                    <strong>
++                      {{ event.title }}
++                    </strong>
++
++                    @if (event.allDay) {
++
++                      <span>
++                        Toute la journée
++                      </span>
++
++                    } @else {
++
++                      <span>
++                        {{ formatTime(event.startTime) }}
++                        -
++                        {{ formatTime(event.endTime) }}
++                      </span>
++
++                    }
++
++                  </div>
++
++                  <!-- AVATAR DU CREATEUR -->
++                  <span class="creator-avatar-week">
++                    {{ event.creatorInitials }}
++                  </span>
++
++                </div>
++
++              }
++
++              @if (getEventsForDate(date).length === 0) {
++
++                <span class="no-week-event">
++                  Aucun événement
++                </span>
++
++              }
++
++            </div>
++
++          </button>
++
++        }
++
++      </div>
++
++    }
++
++  </div>
++
++
++  <!-- EVENEMENTS DU JOUR -->
++
++  <section class="selected-day-section">
++
++    <div class="selected-day-header">
++
++      <h2>
++        {{ selectedDateLabel }}
++      </h2>
++
++    </div>
++
++
++    @if (selectedDayEvents.length === 0) {
++
++      <div class="empty-events">
++        <span>Aucun événement de prévu</span>
++      </div>
++
++    } @else {
++
++      <div class="events-list">
++
++        @for (event of selectedDayEvents; track event.id) {
++
++          <article
++            class="event-card"
++            (click)="openEditEvent(event)">
++
++            <div class="event-color"></div>
++
++            <div class="event-information">
++
++              <h3>
++                {{ event.title }}
++              </h3>
++
++
++              @if (event.description) {
++
++                <p>
++                  {{ event.description }}
++                </p>
++
++              }
++
++
++              <div class="event-details">
++
++                @if (event.allDay) {
++
++                  <span>
++                    Toute la journée
++                  </span>
++
++                } @else {
++
++                  <span>
++                    {{ formatTime(event.startTime) }}
++                    -
++                    {{ formatTime(event.endTime) }}
++                  </span>
++
++                }
++
++
++                @if (event.startDate !== event.endDate) {
++
++                  <span>
++                    {{ formatEventDate(event) }}
++                  </span>
++
++                }
++
++              </div>
++
++            </div>
++
++
++            <!-- CREATEUR A DROITE -->
++            <div class="event-creator-right">
++
++              <span class="creator-avatar">
++                {{ event.creatorInitials }}
++              </span>
++
++              <span class="creator-name">
++                {{ event.creatorName }}
++              </span>
++
++            </div>
++
++
++            <!-- POUBELLE -->
++            <button
++              class="delete-button"
++              (click)="
++                $event.stopPropagation();
++                deleteEvent(event)
++              "
++              aria-label="Supprimer l'événement"
++              title="Supprimer l'événement">
++
++              <svg
++                class="trash-icon"
++                viewBox="0 0 24 24"
++                aria-hidden="true">
++
++                <path
++                  d="M4 7h16"
++                  fill="none"
++                  stroke="currentColor"
++                  stroke-width="2"
++                  stroke-linecap="round"
++                />
++
++                <path
++                  d="M9 7V5.5C9 4.67 9.67 4 10.5 4h3c.83 0 1.5.67 1.5 1.5V7"
++                  fill="none"
++                  stroke="currentColor"
++                  stroke-width="2"
++                  stroke-linecap="round"
++                />
++
++                <path
++                  d="M6.5 7l.8 12.1c.06.9.81 1.6 1.71 1.6h6c.9 0 1.65-.7 1.71-1.6L17.5 7"
++                  fill="none"
++                  stroke="currentColor"
++                  stroke-width="2"
++                  stroke-linejoin="round"
++                />
++
++                <path
++                  d="M10 11v6M14 11v6"
++                  fill="none"
++                  stroke="currentColor"
++                  stroke-width="2"
++                  stroke-linecap="round"
++                />
++
++              </svg>
++
++            </button>
++
++          </article>
++
++        }
++
++      </div>
++
++    }
++
++  </section>
++
++
++  <!-- MODALE CREATION / MODIFICATION -->
++
++  @if (showEventForm) {
++
++    <div
++      class="modal-overlay"
++      (click)="closeEventForm()">
++
++      <div
++        class="event-modal"
++        (click)="$event.stopPropagation()">
++
++        <!-- HEADER -->
++        <div class="modal-header">
++
++          <div>
++
++            <h2>
++              {{ modalTitle }}
++            </h2>
++
++            <p>
++
++              @if (editingEventId === null) {
++                Ajoutez un événement à votre calendrier.
++              } @else {
++                Modifiez les informations de votre événement.
++              }
++
++            </p>
++
++          </div>
++
++
++          <button
++            class="close-button"
++            (click)="closeEventForm()"
++            aria-label="Fermer">
++
++            ×
++
++          </button>
++
++        </div>
++
++
++        <!-- FORMULAIRE -->
++        <div class="form-content">
++
++          <!-- TITRE -->
++          <div class="form-group">
++
++            <label for="event-title">
++              Titre
++            </label>
++
++            <input
++              id="event-title"
++              type="text"
++              placeholder="Ex : Anniversaire, rendez-vous, ..."
++              [(ngModel)]="newEvent.title">
++
++          </div>
++
++
++          <!-- TOUTE LA JOURNEE -->
++          <div class="all-day-row">
++
++            <label for="all-day">
++              Toute la journée
++            </label>
++
++            <label class="toggle">
++
++              <input
++                id="all-day"
++                type="checkbox"
++                [(ngModel)]="newEvent.allDay">
++
++              <span class="toggle-slider"></span>
++
++            </label>
++
++          </div>
++
++
++          <!-- DATE ET HEURE DE DEBUT -->
++          <div class="date-time-row">
++
++            <div class="date-time-group">
++
++              <label>
++                Début
++              </label>
++
++              <input
++                type="date"
++                [(ngModel)]="newEvent.startDate">
++
++            </div>
++
++
++            @if (!newEvent.allDay) {
++
++              <div class="date-time-group">
++
++                <label>
++                  à
++                </label>
++
++                <input
++                  type="time"
++                  [(ngModel)]="newEvent.startTime">
++
++              </div>
++
++            }
++
++          </div>
++
++
++          <!-- DATE ET HEURE DE FIN -->
++          <div class="date-time-row">
++
++            <div class="date-time-group">
++
++              <label>
++                Fin
++              </label>
++
++              <input
++                type="date"
++                [(ngModel)]="newEvent.endDate">
++
++            </div>
++
++
++            @if (!newEvent.allDay) {
++
++              <div class="date-time-group">
++
++                <label>
++                  à
++                </label>
++
++                <input
++                  type="time"
++                  [(ngModel)]="newEvent.endTime">
++
++              </div>
++
++            }
++
++          </div>
++
++
++          <!-- NOTES -->
++          <div class="form-group">
++
++            <label for="event-description">
++              Notes
++            </label>
++
++            <textarea
++              id="event-description"
++              rows="4"
++              placeholder="Ajouter une note..."
++              [(ngModel)]="newEvent.description">
++            </textarea>
++
++          </div>
++
++        </div>
++
++
++        <!-- ACTIONS -->
++        <div class="modal-actions">
++
++          <button
++            class="cancel-button"
++            (click)="closeEventForm()">
++            Annuler
++          </button>
++
++          <button
++            class="create-button"
++            [disabled]="!newEvent.title.trim()"
++            (click)="createOrUpdateEvent()">
++
++            @if (editingEventId === null) {
++              Valider
++            } @else {
++              Enregistrer
++            }
++
++          </button>
++
++        </div>
++
++      </div>
++
++    </div>
++
++  }
++
++</div>
+\ No newline at end of file
+Index: front/src/app/calendar/calendar-event.model.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/front/src/app/calendar/calendar-event.model.ts b/front/src/app/calendar/calendar-event.model.ts
+new file mode 100644
+--- /dev/null	(date 1791647122060)
++++ b/front/src/app/calendar/calendar-event.model.ts	(date 1791647122060)
+@@ -0,0 +1,26 @@
++export interface CalendarEvent {
++  id: number;
++  title: string;
++  description: string | null;
++  startDate: string;
++  endDate: string;
++  allDay: boolean;
++  startTime: string | null;
++  endTime: string | null;
++  creatorId: number;
++  creatorName: string;
++  creatorInitials: string;
++  sharedHouseId: number;
++}
++
++export interface CalendarEventRequest {
++  title: string;
++  description: string | null;
++  startDate: string;
++  endDate: string;
++  allDay: boolean;
++  startTime: string | null;
++  endTime: string | null;
++  creatorId: number;
++  sharedHouseId: number;
++}
+\ No newline at end of file
