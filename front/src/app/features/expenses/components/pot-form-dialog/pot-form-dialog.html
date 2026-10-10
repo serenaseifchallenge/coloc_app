@@ -1,0 +1,67 @@
+<app-modal [heading]="pot() ? 'Modifier la cagnotte' : 'Créer une cagnotte'" (closed)="closed.emit()">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-field">
+      <label for="pot-name">Nom</label>
+      <input id="pot-name" formControlName="name" placeholder="Ex : Voyage à Lisbonne" autocomplete="off" />
+      @if (hasError('name')) {
+        <span class="form-field-error">Le nom est obligatoire (150 caractères maximum).</span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="pot-type">Type</label>
+      <select id="pot-type" class="exp-select" formControlName="type">
+        @for (type of types; track type.value) {
+          <option [value]="type.value">{{ type.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="exp-row">
+      <div class="form-field">
+        <label for="pot-target">Objectif total (€)</label>
+        <input id="pot-target" type="number" step="0.01" min="0" formControlName="targetAmount" placeholder="0,00" />
+        @if (hasError('targetAmount')) {
+          <span class="form-field-error">Montant invalide (supérieur à 0, 2 décimales maximum).</span>
+        }
+      </div>
+      <div class="form-field">
+        <label for="pot-deadline">Date limite <span class="exp-optional">(facultatif)</span></label>
+        <input id="pot-deadline" type="date" formControlName="deadline" />
+      </div>
+    </div>
+
+    <div class="exp-participants-head"><span>Qui cotise ?</span></div>
+    <div class="exp-participants">
+      @for (roommate of roommates(); track roommate.id) {
+        <label class="exp-participant">
+          <input type="checkbox" [checked]="selected().has(roommate.id)" (change)="toggle(roommate.id)" />
+          <app-roommate-avatar [roommate]="roommate" size="small" />
+          <span class="exp-participant-name">{{ roommate.name }} {{ roommate.surname }}</span>
+        </label>
+      }
+    </div>
+    @if (count() === 0) {
+      <p class="form-field-error">Sélectionne au moins un participant.</p>
+    } @else if (pot()) {
+      <p class="exp-info">{{ count() }} participant{{ count() > 1 ? 's' : '' }} · {{ perPerson() | eur:'short' }} chacun pour atteindre l'objectif.</p>
+    } @else {
+      <p class="exp-info">Par défaut tout le monde cotise. Le montant par personne se calcule avec l'objectif total.</p>
+    }
+
+    @if (errorMessage(); as message) {
+      <p class="form-alert">{{ message }}</p>
+    }
+
+    <div class="exp-actions">
+      @if (pot()) {
+        <button type="button" class="exp-btn exp-btn-danger" (click)="remove()" [disabled]="submitting()">Supprimer la cagnotte</button>
+      }
+      <span class="exp-spacer"></span>
+      <button type="button" class="exp-btn exp-btn-grey" (click)="cancel()">Annuler</button>
+      <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+        {{ submitting() ? 'Enregistrement…' : pot() ? 'Enregistrer' : 'Créer la cagnotte' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

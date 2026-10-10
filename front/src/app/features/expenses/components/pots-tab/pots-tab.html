@@ -1,0 +1,20 @@
+<div class="exp-pots-grid">
+  @for (pot of pots(); track pot.id) {
+    <button type="button" class="exp-card exp-pot-card" (click)="open.emit(pot)">
+      <span class="exp-muted">{{ typeLabel(pot) }}</span>
+      <strong class="exp-pot-name">{{ pot.name }}</strong>
+      <span class="exp-pot-progress">
+        <span class="exp-bar"><span class="exp-bar-fill" [class.exp-bar-done]="pot.percent >= 100" [style.width.%]="pot.percent"></span></span>
+        <span class="exp-percent">{{ pot.percent }} %</span>
+      </span>
+      <strong>{{ pot.collected | eur:'short' }} / {{ pot.targetAmount | eur:'short' }}</strong>
+      @if (pot.participant) {
+        <span class="exp-muted">Ta cotisation : {{ pot.myPaid | eur:'short' }} / {{ pot.myShare | eur:'short' }}</span>
+      } @else {
+        <span class="exp-muted">Tu ne participes pas à cette cagnotte</span>
+      }
+    </button>
+  }
+
+  <button type="button" class="exp-pot-new" (click)="create.emit()">+ Créer une cagnotte</button>
+</div>
