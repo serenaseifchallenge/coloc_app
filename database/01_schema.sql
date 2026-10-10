@@ -85,9 +85,15 @@ CREATE TABLE event (
     shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
     creator_id      BIGINT NOT NULL REFERENCES roommate(id),
     title           VARCHAR(150) NOT NULL,
-    start_date      TIMESTAMP NOT NULL,
-    end_date        TIMESTAMP NOT NULL,
-    CHECK (end_date >= start_date)
+    description     TEXT,
+    start_date      DATE NOT NULL,
+    end_date        DATE NOT NULL,
+    all_day         BOOLEAN NOT NULL DEFAULT FALSE,
+    start_time      TIME,
+    end_time        TIME,
+    CHECK (end_date >= start_date),
+    CHECK (all_day = TRUE OR (start_time IS NOT NULL AND end_time IS NOT NULL)),
+    CHECK (start_date <> end_date OR all_day = TRUE OR end_time > start_time)
 );
 
 CREATE TABLE hidden_task_name (

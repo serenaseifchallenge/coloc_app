@@ -51,11 +51,11 @@ INSERT INTO article (shared_house_id, owner_id, name, bought) VALUES
   (1, 2,    'Lait d''avoine',    FALSE),
   (1, 3,    'Pommes',            TRUE);
 
-INSERT INTO event (shared_house_id, creator_id, title, start_date, end_date) VALUES
-  (1, 3, 'Soirée coloc',          NOW() + INTERVAL '5 days', NOW() + INTERVAL '5 days 4 hours'),
-  (1, 1, 'Visite du proprio',     NOW() + INTERVAL '3 days', NOW() + INTERVAL '3 days 1 hour'),
-  (1, 2, 'Grand ménage mensuel',  NOW() + INTERVAL '10 days', NOW() + INTERVAL '10 days 3 hours');
-
+INSERT INTO event (shared_house_id, creator_id, title, description, start_date, end_date, all_day, start_time, end_time) VALUES
+  (1,3,'Soirée coloc','Soirée organisée avec les colocataires',CURRENT_DATE + 5,CURRENT_DATE + 5,FALSE,'19:00','23:00'),
+  (1,1,'Visite du propriétaire','Visite du propriétaire de la maison',CURRENT_DATE + 3,CURRENT_DATE + 3,FALSE,'14:00','15:00'),
+  (1,2,'Grand ménage mensuel','Grand ménage de la colocation',CURRENT_DATE + 10,CURRENT_DATE + 10,FALSE,'10:00','13:00'),
+  (1,3,'Week-end en famille','Absence de la colocataire',CURRENT_DATE + 15,CURRENT_DATE + 17,TRUE,NULL,NULL);
 
 INSERT INTO monthly_score (shared_house_id, roommate_id, month_start, points) VALUES
   (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 480),
