@@ -54,8 +54,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/expenses/pages/expenses-page/expenses-page').then((m) => m.ExpensesPage),
       },
-      // { path: 'calendar', loadComponent: ... },
-      // { path: 'notes', loadComponent: ... },
+
+      {
+        path: 'notes',
+        loadComponent: () => import('./notes/notes-page').then((m) => m.NotesPage),
+      },
+
+      // { path: 'expenses', loadComponent: ... },
       {
         path: 'points',
         loadComponent: () => import('./features/points/pages/points-page/points-page').then((m) => m.PointsPage),
