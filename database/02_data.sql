@@ -48,18 +48,6 @@ INSERT INTO pot_payment (pot_id, roommate_id, amount, method, payment_date) VALU
                                                                                 (2, 1, 100.00, 'VIREMENT',    CURRENT_DATE - 3),
                                                                                 (2, 2, 20.00,  'PAYPAL_WERO', CURRENT_DATE - 1);
 
-INSERT INTO note (shared_house_id, author_id, content, type, vote_end_date) VALUES
-                                                                                (1, 1, 'Le proprio passe jeudi pour le chauffe-eau !', 'AFFICHAGE', NULL),
-                                                                                (1, 2, 'On achète un lave-vaisselle ? Environ 120 € chacun', 'VOTE', NOW() + INTERVAL '7 days'),
-                                                                                (1, 3, 'Quel soir pour la soirée coloc ?', 'VOTE', NOW() + INTERVAL '3 days');
-
-INSERT INTO choice (note_id, choice_option) VALUES
-                                                (2, 'Oui'), (2, 'Non'), (2, 'Plus tard'),
-                                                (3, 'Vendredi'), (3, 'Samedi');
-
-INSERT INTO vote (roommate_id, choice_id) VALUES
-                                              (1, 1), (3, 1), (2, 2),
-                                              (1, 5), (2, 5);
 
 INSERT INTO article (shared_house_id, owner_id, name, bought) VALUES
                                                                   (1, NULL, 'Papier toilette',   FALSE),
@@ -81,3 +69,25 @@ INSERT INTO monthly_score (shared_house_id, roommate_id, month_start, points) VA
                                                                                   (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 410),
                                                                                   (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 150),
                                                                                   (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 95);
+
+INSERT INTO note(shared_house_id, creator_id, content, type, multiple_answers) VALUES
+    (1, 1, 'Le propriétaire passe jeudi pour le chauffe-eau !',
+     'ANNONCE', FALSE),
+    (1, 2, 'On achète un lave-vaisselle ? Environ 120 € chacun',
+     'SONDAGE', FALSE),
+    (1, 3, 'Quel soir pour la soirée coloc ?',
+     'SONDAGE', FALSE);
+
+INSERT INTO poll_option (note_id, label) VALUES
+    (2, 'Oui'),
+    (2, 'Non'),
+    (2, 'Plus tard'),
+    (3, 'Vendredi'),
+    (3, 'Samedi');
+
+INSERT INTO poll_vote (option_id, roommate_id) VALUES
+    (1, 1),
+    (1, 3),
+    (2, 2),
+    (5, 1),
+    (5, 2);

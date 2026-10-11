@@ -50,19 +50,17 @@ export const routes: Routes = [
 
 
       {
-<<<<<<< HEAD
         path: 'expenses',
         loadComponent: () =>
           import('./features/expenses/pages/expenses-page/expenses-page').then((m) => m.ExpensesPage),
       },
-      // { path: 'calendar', loadComponent: ... },
-=======
+
+      {
         path: 'notes',
         loadComponent: () => import('./notes/notes-page').then((m) => m.NotesPage),
       },
 
       // { path: 'expenses', loadComponent: ... },
->>>>>>> ba86cb2 (feat(front):notes)
       // { path: 'notes', loadComponent: ... },
       {
         path: 'points',

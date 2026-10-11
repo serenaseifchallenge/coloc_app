@@ -90,29 +90,6 @@ CREATE TABLE pot_payment (
                              payment_date DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
-CREATE TABLE note (
-                      id              BIGSERIAL PRIMARY KEY,
-                      shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
-                      author_id       BIGINT NOT NULL REFERENCES roommate(id),
-                      content         TEXT NOT NULL,
-                      type            VARCHAR(20) NOT NULL DEFAULT 'AFFICHAGE' CHECK (type IN ('AFFICHAGE','VOTE')),
-                      creation_date   TIMESTAMP NOT NULL DEFAULT NOW(),
-                      vote_end_date   TIMESTAMP,
-                      CHECK (type = 'VOTE' OR vote_end_date IS NULL),
-                      CHECK (vote_end_date >= creation_date)
-);
-
-CREATE TABLE choice (
-                        id              BIGSERIAL PRIMARY KEY,
-                        note_id         BIGINT NOT NULL REFERENCES note(id) ON DELETE CASCADE,
-                        choice_option   VARCHAR(150) NOT NULL
-);
-
-CREATE TABLE vote (
-                      roommate_id  BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,
-                      choice_id    BIGINT NOT NULL REFERENCES choice(id) ON DELETE CASCADE,
-                      PRIMARY KEY (roommate_id, choice_id)
-);
 
 CREATE TABLE article (
                          id              BIGSERIAL PRIMARY KEY,
@@ -154,3 +131,42 @@ CREATE TABLE monthly_score (
                                points          INTEGER NOT NULL,
                                UNIQUE (roommate_id, month_start)
 );
+
+CREATE TABLE note (
+    id BIGSERIAL PRIMARY KEY,
+    shared_house_id BIGINT NOT NULL
+        REFERENCES shared_house(id) ON DELETE CASCADE,
+    creator_id BIGINT NOT NULL REFERENCES roommate(id),
+    content TEXT NOT NULL,
+    type VARCHAR(20) NOT NULL
+        CHECK (type IN ('ANNONCE', 'SONDAGE')),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    multiple_answers BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE poll_option (
+    id BIGSERIAL PRIMARY KEY,
+    note_id BIGINT NOT NULL
+        REFERENCES note(id) ON DELETE CASCADE,
+    label VARCHAR(250) NOT NULL
+);
+
+CREATE TABLE poll_vote (
+    id BIGSERIAL PRIMARY KEY,
+    option_id BIGINT NOT NULL
+        REFERENCES poll_option(id) ON DELETE CASCADE,
+    roommate_id BIGINT NOT NULL
+        REFERENCES roommate(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uk_poll_vote_option_roommate
+        UNIQUE (option_id, roommate_id)
+);
+
+CREATE INDEX idx_note_shared_house_created
+    ON note(shared_house_id, created_at DESC);
+
+CREATE INDEX idx_poll_option_note
+    ON poll_option(note_id);
+
+CREATE INDEX idx_poll_vote_roommate
+    ON poll_vote(roommate_id);
