@@ -25,12 +25,6 @@ public record EventRequest(
 
         LocalTime startTime,
 
-        LocalTime endTime,
-
-        @NotNull(message = "Le créateur est obligatoire")
-        Long creatorId,
-
-        @NotNull(message = "La colocation est obligatoire")
-        Long sharedHouseId
+        LocalTime endTime
 ) {
 }

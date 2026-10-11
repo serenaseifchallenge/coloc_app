@@ -15,12 +15,10 @@ export interface CalendarEvent {
 
 export interface CalendarEventRequest {
   title: string;
-  description: string | null;
+  description: string;
   startDate: string;
   endDate: string;
   allDay: boolean;
   startTime: string | null;
   endTime: string | null;
-  creatorId: number;
-  sharedHouseId: number;
 }

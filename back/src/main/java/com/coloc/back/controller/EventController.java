@@ -22,21 +22,13 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EventResponse>> getEvents(
-            @RequestParam Long sharedHouseId
-    ) {
-        return ResponseEntity.ok(
-                eventService.getEvents(sharedHouseId)
-        );
+    public ResponseEntity<List<EventResponse>> getEvents() {
+        return ResponseEntity.ok(eventService.getEvents());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EventResponse> getEvent(
-            @PathVariable Long id
-    ) {
-        return ResponseEntity.ok(
-                eventService.getEvent(id)
-        );
+    public ResponseEntity<EventResponse> getEvent(@PathVariable Long id) {
+        return ResponseEntity.ok(eventService.getEvent(id));
     }
 
     @PostMapping
@@ -53,17 +45,12 @@ public class EventController {
             @PathVariable Long id,
             @Valid @RequestBody EventRequest request
     ) {
-        return ResponseEntity.ok(
-                eventService.updateEvent(id, request)
-        );
+        return ResponseEntity.ok(eventService.updateEvent(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvent(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteEvent(id);
-
         return ResponseEntity.noContent().build();
     }
 }

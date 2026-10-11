@@ -7,83 +7,91 @@ import com.coloc.back.entity.Roommate;
 import com.coloc.back.entity.SharedHouse;
 import com.coloc.back.repository.EventRepository;
 import com.coloc.back.repository.RoommateRepository;
-import com.coloc.back.repository.SharedHouseRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class EventService {
 
     private final EventRepository eventRepository;
     private final RoommateRepository roommateRepository;
-    private final SharedHouseRepository sharedHouseRepository;
 
     public EventService(
             EventRepository eventRepository,
-            RoommateRepository roommateRepository,
-            SharedHouseRepository sharedHouseRepository
+            RoommateRepository roommateRepository
     ) {
         this.eventRepository = eventRepository;
         this.roommateRepository = roommateRepository;
-        this.sharedHouseRepository = sharedHouseRepository;
     }
 
-    public List<EventResponse> getEvents(Long sharedHouseId) {
+    private Roommate getCurrentRoommate() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || !(authentication.getPrincipal() instanceof Long roommateId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Utilisateur non authentifié"
+            );
+        }
+
+        return roommateRepository.findById(roommateId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Compte utilisateur introuvable"
+                ));
+    }
+
+    private SharedHouse getCurrentSharedHouse(Roommate roommate) {
+        SharedHouse sharedHouse = roommate.getSharedHouse();
+
+        if (sharedHouse == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Vous devez appartenir à une colocation pour accéder au calendrier"
+            );
+        }
+
+        return sharedHouse;
+    }
+
+    public List<EventResponse> getEvents() {
+        Roommate roommate = getCurrentRoommate();
+        SharedHouse sharedHouse = getCurrentSharedHouse(roommate);
 
         return eventRepository
-                .findBySharedHouseIdOrderByStartDateAscStartTimeAsc(sharedHouseId)
+                .findBySharedHouseIdOrderByStartDateAscStartTimeAsc(
+                        sharedHouse.getId()
+                )
                 .stream()
                 .map(EventResponse::fromEntity)
                 .toList();
     }
 
     public EventResponse getEvent(Long id) {
-
-        Event event = eventRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Événement introuvable"
-                        )
-                );
+        Roommate roommate = getCurrentRoommate();
+        SharedHouse sharedHouse = getCurrentSharedHouse(roommate);
+        Event event = findEventInHouse(id, sharedHouse);
 
         return EventResponse.fromEntity(event);
     }
 
     public EventResponse createEvent(EventRequest request) {
+        Roommate creator = getCurrentRoommate();
+        SharedHouse sharedHouse = getCurrentSharedHouse(creator);
 
         validateDatesAndTimes(request);
 
-        Roommate creator = roommateRepository.findById(request.creatorId())
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Colocataire introuvable"
-                        )
-                );
-
-        SharedHouse sharedHouse = sharedHouseRepository.findById(request.sharedHouseId())
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Colocation introuvable"
-                        )
-                );
-
-        if (creator.getSharedHouse() == null
-                || !creator.getSharedHouse().getId().equals(sharedHouse.getId())) {
-
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Le créateur n'appartient pas à cette colocation"
-            );
-        }
-
         Event event = new Event();
-
         event.setTitle(request.title().trim());
         event.setDescription(request.description());
         event.setStartDate(request.startDate());
@@ -100,24 +108,11 @@ public class EventService {
     }
 
     public EventResponse updateEvent(Long id, EventRequest request) {
+        Roommate roommate = getCurrentRoommate();
+        SharedHouse sharedHouse = getCurrentSharedHouse(roommate);
+        Event event = findEventInHouse(id, sharedHouse);
 
         validateDatesAndTimes(request);
-
-        Event event = eventRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Événement introuvable"
-                        )
-                );
-
-        SharedHouse sharedHouse = sharedHouseRepository.findById(request.sharedHouseId())
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Colocation introuvable"
-                        )
-                );
 
         event.setTitle(request.title().trim());
         event.setDescription(request.description());
@@ -126,27 +121,41 @@ public class EventService {
         event.setAllDay(request.allDay());
         event.setStartTime(request.allDay() ? null : request.startTime());
         event.setEndTime(request.allDay() ? null : request.endTime());
-        event.setSharedHouse(sharedHouse);
 
+        // Le créateur et la colocation ne sont jamais modifiés par la requête.
         Event savedEvent = eventRepository.save(event);
 
         return EventResponse.fromEntity(savedEvent);
     }
 
     public void deleteEvent(Long id) {
+        Roommate roommate = getCurrentRoommate();
+        SharedHouse sharedHouse = getCurrentSharedHouse(roommate);
+        Event event = findEventInHouse(id, sharedHouse);
 
-        if (!eventRepository.existsById(id)) {
+        eventRepository.delete(event);
+    }
+
+    private Event findEventInHouse(Long id, SharedHouse sharedHouse) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Événement introuvable"
+                ));
+
+        if (event.getSharedHouse() == null
+                || !event.getSharedHouse().getId().equals(sharedHouse.getId())) {
+            // Ne révèle pas l'existence d'un événement d'une autre colocation.
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     "Événement introuvable"
             );
         }
 
-        eventRepository.deleteById(id);
+        return event;
     }
 
     private void validateDatesAndTimes(EventRequest request) {
-
         if (request.endDate().isBefore(request.startDate())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -167,7 +176,6 @@ public class EventService {
 
         if (request.startDate().equals(request.endDate())
                 && !request.endTime().isAfter(request.startTime())) {
-
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "L'heure de fin doit être postérieure à l'heure de début"

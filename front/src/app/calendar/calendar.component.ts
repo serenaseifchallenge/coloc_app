@@ -2,29 +2,32 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { CalendarService } from './calendar.service';
-import { CalendarEvent } from './calendar-event.model';
+import {
+  CalendarEvent,
+  CalendarEventRequest
+} from './calendar-event.model';
+import { AuthService } from '../core/auth/auth.service';
 
 type CalendarView = 'month' | 'week';
 
 @Component({
   selector: 'app-calendar',
+  standalone: true,
   imports: [FormsModule],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
 export class CalendarComponent implements OnInit {
-  readonly sharedHouseId = 1;
-  readonly currentUserId = 1;
-
   currentDate = new Date();
-
   selectedDate = new Date();
 
   view: CalendarView = 'month';
 
   showEventForm = false;
-
   editingEventId: number | null = null;
+
+  loading = false;
+  hasAccess = false;
 
   newEvent = {
     title: '',
@@ -62,35 +65,56 @@ export class CalendarComponent implements OnInit {
   ];
 
   constructor(
-    public calendarService: CalendarService
+    public calendarService: CalendarService,
+    private authService: AuthService
   ) {}
 
-  ngOnInit(): void {
-    this.loadEvents();
+  async ngOnInit(): Promise<void> {
+    this.loading = true;
+
+    try {
+      const user = await this.authService.loadUser();
+
+      if (!user) {
+        this.calendarService.clearEvents();
+        this.hasAccess = false;
+        alert('Veuillez vous connecter pour accéder au calendrier.');
+        return;
+      }
+
+      if (user.sharedHouseId === null) {
+        this.calendarService.clearEvents();
+        this.hasAccess = false;
+        alert(
+          'Vous devez rejoindre une colocation pour accéder au calendrier.'
+        );
+        return;
+      }
+
+      this.hasAccess = true;
+      this.loadEvents();
+    } finally {
+      this.loading = false;
+    }
   }
 
   private loadEvents(): void {
-    this.calendarService
-      .getEvents(this.sharedHouseId)
-      .subscribe({
-        next: events => {
-          console.log(
-            'Événements récupérés depuis le backend :',
-            events
-          );
-        },
+    this.calendarService.getEvents().subscribe({
+      next: events => {
+        console.log(
+          'Événements récupérés depuis le backend :',
+          events
+        );
+      },
+      error: error => {
+        console.error(
+          'Erreur lors du chargement des événements :',
+          error
+        );
 
-        error: error => {
-          console.error(
-            'Erreur lors du chargement des événements :',
-            error
-          );
-
-          alert(
-            'Impossible de charger les événements du calendrier.'
-          );
-        }
-      });
+        alert('Impossible de charger les événements du calendrier.');
+      }
+    });
   }
 
   get currentMonthLabel(): string {
@@ -114,11 +138,11 @@ export class CalendarComponent implements OnInit {
   get calendarDays(): Date[] {
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
+
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
 
     const days: Date[] = [];
-
     const previousMonthDays = firstDay.getDay();
 
     for (let i = previousMonthDays - 1; i >= 0; i--) {
@@ -140,9 +164,10 @@ export class CalendarComponent implements OnInit {
 
   get weekDaysDates(): Date[] {
     const date = new Date(this.selectedDate);
-    const dayOfWeek = date.getDay();
     const sunday = new Date(date);
-    sunday.setDate(date.getDate() - dayOfWeek);
+
+    sunday.setDate(date.getDate() - date.getDay());
+
     const days: Date[] = [];
 
     for (let i = 0; i < 7; i++) {
@@ -155,38 +180,34 @@ export class CalendarComponent implements OnInit {
   }
 
   get selectedDayEvents(): CalendarEvent[] {
-    return this.getEventsForDate(this.selectedDate)
-      .sort((a, b) => {
+    return [...this.getEventsForDate(this.selectedDate)].sort((a, b) => {
+      if (a.allDay && !b.allDay) {
+        return -1;
+      }
 
-        if (a.allDay && !b.allDay) {
-          return -1;
-        }
+      if (!a.allDay && b.allDay) {
+        return 1;
+      }
 
-        if (!a.allDay && b.allDay) {
-          return 1;
-        }
+      if (a.startTime === null) {
+        return -1;
+      }
 
-        if (a.startTime === null) {
-          return -1;
-        }
+      if (b.startTime === null) {
+        return 1;
+      }
 
-        if (b.startTime === null) {
-          return 1;
-        }
-
-        return a.startTime.localeCompare(b.startTime);
-      });
+      return a.startTime.localeCompare(b.startTime);
+    });
   }
 
   getEventsForDate(date: Date): CalendarEvent[] {
     const dateString = this.formatDate(date);
 
-    return this.calendarService
-      .events()
-      .filter(event => {
-        return dateString >= event.startDate
-          && dateString <= event.endDate;
-      });
+    return this.calendarService.events().filter(event =>
+      dateString >= event.startDate &&
+      dateString <= event.endDate
+    );
   }
 
   selectDate(date: Date): void {
@@ -215,6 +236,7 @@ export class CalendarComponent implements OnInit {
   previousWeek(): void {
     const date = new Date(this.selectedDate);
     date.setDate(date.getDate() - 7);
+
     this.selectedDate = date;
     this.currentDate = new Date(date);
     this.newEvent.startDate = this.formatDate(date);
@@ -224,6 +246,7 @@ export class CalendarComponent implements OnInit {
   nextWeek(): void {
     const date = new Date(this.selectedDate);
     date.setDate(date.getDate() + 7);
+
     this.selectedDate = date;
     this.currentDate = new Date(date);
     this.newEvent.startDate = this.formatDate(date);
@@ -232,6 +255,7 @@ export class CalendarComponent implements OnInit {
 
   goToToday(): void {
     const today = new Date();
+
     this.currentDate = new Date(today);
     this.selectedDate = new Date(today);
     this.newEvent.startDate = this.formatDate(today);
@@ -243,6 +267,11 @@ export class CalendarComponent implements OnInit {
   }
 
   openEventForm(): void {
+    if (!this.hasAccess) {
+      alert('Vous devez appartenir à une colocation pour créer un événement.');
+      return;
+    }
+
     this.editingEventId = null;
 
     const selectedDate = this.formatDate(this.selectedDate);
@@ -261,6 +290,10 @@ export class CalendarComponent implements OnInit {
   }
 
   openEditEvent(event: CalendarEvent): void {
+    if (!this.hasAccess) {
+      return;
+    }
+
     this.editingEventId = event.id;
 
     this.newEvent = {
@@ -282,135 +315,92 @@ export class CalendarComponent implements OnInit {
   }
 
   createOrUpdateEvent(): void {
+    if (!this.hasAccess) {
+      alert('Vous devez appartenir à une colocation pour continuer.');
+      return;
+    }
 
     if (!this.newEvent.title.trim()) {
+      alert('Le titre de l’événement est obligatoire.');
       return;
     }
 
-    if (!this.newEvent.startDate) {
-      return;
-    }
-
-    if (!this.newEvent.endDate) {
+    if (!this.newEvent.startDate || !this.newEvent.endDate) {
+      alert('Les dates de début et de fin sont obligatoires.');
       return;
     }
 
     if (this.newEvent.endDate < this.newEvent.startDate) {
       alert(
-        'La date de fin doit être après ou égale à la date de début.'
+        'La date de fin doit être postérieure ou égale à la date de début.'
       );
       return;
     }
 
     if (
-      !this.newEvent.allDay
-      && this.newEvent.endDate === this.newEvent.startDate
-      && this.newEvent.endTime <= this.newEvent.startTime
+      !this.newEvent.allDay &&
+      this.newEvent.endDate === this.newEvent.startDate &&
+      this.newEvent.endTime <= this.newEvent.startTime
     ) {
-      alert(
-        'L’heure de fin doit être après l’heure de début.'
-      );
+      alert('L’heure de fin doit être postérieure à l’heure de début.');
       return;
     }
 
-    const eventRequest = {
+    const eventRequest: CalendarEventRequest = {
       title: this.newEvent.title.trim(),
-
       description: this.newEvent.description.trim(),
-
       startDate: this.newEvent.startDate,
-
       endDate: this.newEvent.endDate,
-
       allDay: this.newEvent.allDay,
-
       startTime: this.newEvent.allDay
         ? null
         : this.newEvent.startTime,
-
       endTime: this.newEvent.allDay
         ? null
-        : this.newEvent.endTime,
-
-      creatorId: this.currentUserId,
-
-      sharedHouseId: this.sharedHouseId
+        : this.newEvent.endTime
     };
 
     if (this.editingEventId === null) {
+      this.calendarService.addEvent(eventRequest).subscribe({
+        next: createdEvent => {
+          console.log('Événement créé :', createdEvent);
 
-      this.calendarService
-        .addEvent(eventRequest)
-        .subscribe({
-          next: createdEvent => {
+          this.selectedDate = this.parseDate(createdEvent.startDate);
+          this.currentDate = new Date(this.selectedDate);
 
-            console.log(
-              'Événement créé :',
-              createdEvent
-            );
-
-            this.selectedDate =
-              this.parseDate(createdEvent.startDate);
-
-            this.currentDate =
-              new Date(this.selectedDate);
-
-            this.closeEventForm();
-          },
-
-          error: error => {
-
-            console.error(
-              'Erreur lors de la création :',
-              error
-            );
-
-            alert(
-              'Impossible de créer l’événement.'
-            );
-          }
-        });
+          this.closeEventForm();
+        },
+        error: error => {
+          console.error('Erreur lors de la création :', error);
+          alert('Impossible de créer l’événement.');
+        }
+      });
 
       return;
     }
 
     this.calendarService
-      .updateEvent(
-        this.editingEventId,
-        eventRequest
-      )
+      .updateEvent(this.editingEventId, eventRequest)
       .subscribe({
         next: updatedEvent => {
+          console.log('Événement modifié :', updatedEvent);
 
-          console.log(
-            'Événement modifié :',
-            updatedEvent
-          );
-
-          this.selectedDate =
-            this.parseDate(updatedEvent.startDate);
-
-          this.currentDate =
-            new Date(this.selectedDate);
+          this.selectedDate = this.parseDate(updatedEvent.startDate);
+          this.currentDate = new Date(this.selectedDate);
 
           this.closeEventForm();
         },
-
         error: error => {
-
-          console.error(
-            'Erreur lors de la modification :',
-            error
-          );
-
-          alert(
-            'Impossible de modifier l’événement.'
-          );
+          console.error('Erreur lors de la modification :', error);
+          alert('Impossible de modifier l’événement.');
         }
       });
   }
 
   deleteEvent(event: CalendarEvent): void {
+    if (!this.hasAccess) {
+      return;
+    }
 
     const confirmation = confirm(
       `Voulez-vous supprimer l’événement "${event.title}" ?`
@@ -420,35 +410,19 @@ export class CalendarComponent implements OnInit {
       return;
     }
 
-    this.calendarService
-      .deleteEvent(event.id)
-      .subscribe({
-        next: () => {
-
-          console.log(
-            'Événement supprimé :',
-            event.id
-          );
-        },
-
-        error: error => {
-
-          console.error(
-            'Erreur lors de la suppression :',
-            error
-          );
-
-          alert(
-            'Impossible de supprimer l’événement.'
-          );
-        }
-      });
+    this.calendarService.deleteEvent(event.id).subscribe({
+      next: () => {
+        console.log('Événement supprimé :', event.id);
+      },
+      error: error => {
+        console.error('Erreur lors de la suppression :', error);
+        alert('Impossible de supprimer l’événement.');
+      }
+    });
   }
 
   isToday(date: Date): boolean {
-    const today = new Date();
-
-    return this.isSameDate(date, today);
+    return this.isSameDate(date, new Date());
   }
 
   isSelected(date: Date): boolean {
@@ -456,8 +430,8 @@ export class CalendarComponent implements OnInit {
   }
 
   isCurrentMonth(date: Date): boolean {
-    return date.getMonth() === this.currentDate.getMonth()
-      && date.getFullYear() === this.currentDate.getFullYear();
+    return date.getMonth() === this.currentDate.getMonth() &&
+      date.getFullYear() === this.currentDate.getFullYear();
   }
 
   formatDate(date: Date): string {
@@ -473,11 +447,7 @@ export class CalendarComponent implements OnInit {
   }
 
   formatTime(time: string | null): string {
-    if (!time) {
-      return '';
-    }
-
-    return time.substring(0, 5);
+    return time ? time.substring(0, 5) : '';
   }
 
   formatEventDate(event: CalendarEvent): string {
@@ -502,24 +472,14 @@ export class CalendarComponent implements OnInit {
   }
 
   private parseDate(date: string): Date {
-    const [year, month, day] = date
-      .split('-')
-      .map(Number);
+    const [year, month, day] = date.split('-').map(Number);
 
-    return new Date(
-      year,
-      month - 1,
-      day
-    );
+    return new Date(year, month - 1, day);
   }
 
-  private isSameDate(
-    first: Date,
-    second: Date
-  ): boolean {
-
-    return first.getFullYear() === second.getFullYear()
-      && first.getMonth() === second.getMonth()
-      && first.getDate() === second.getDate();
+  private isSameDate(first: Date, second: Date): boolean {
+    return first.getFullYear() === second.getFullYear() &&
+      first.getMonth() === second.getMonth() &&
+      first.getDate() === second.getDate();
   }
 }
