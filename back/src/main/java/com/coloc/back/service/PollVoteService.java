@@ -1,3 +1,4 @@
+
 package com.coloc.back.service;
 
 import com.coloc.back.dto.VoteDTO;
@@ -41,6 +42,12 @@ public class PollVoteService {
     @Transactional
     public void vote(Long noteId, VoteDTO voteDTO) {
 
+        // 1. Vérifier la requête.
+        if (noteId == null) {
+            throw new IllegalArgumentException(
+                    "L'identifiant du sondage est obligatoire.");
+        }
+
         if (voteDTO == null || voteDTO.getRoommateId() == null) {
             throw new IllegalArgumentException(
                     "L'identifiant du colocataire est obligatoire.");
@@ -51,6 +58,7 @@ public class PollVoteService {
                     "La liste des options est obligatoire.");
         }
 
+        //Charger le sondage
         Note note = noteRepository.findById(noteId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Note introuvable."));
@@ -60,21 +68,22 @@ public class PollVoteService {
                     "Il est impossible de voter sur une annonce.");
         }
 
+        //Vérifier le colocataire
         Roommate roommate = roommateRepository
                 .findById(voteDTO.getRoommateId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Colocataire introuvable."));
 
-        if (roommate.getSharedHouse() == null
-                || !roommate.getSharedHouse().getId()
-                        .equals(note.getSharedHouse().getId())) {
+        if (note.getSharedHouse() == null
+                || roommate.getSharedHouse() == null
+                || !note.getSharedHouse().getId()
+                        .equals(roommate.getSharedHouse().getId())) {
             throw new IllegalArgumentException(
                     "Ce colocataire n'appartient pas à cette colocation.");
         }
 
+        // Éliminer les identifiants dupliqués et vérifier la sélection
         List<Long> optionIds = voteDTO.getOptionIds();
-
-        // Évite de recevoir plusieurs fois le même identifiant.
         Set<Long> uniqueOptionIds = new HashSet<>(optionIds);
 
         if (uniqueOptionIds.size() != optionIds.size()) {
@@ -82,12 +91,12 @@ public class PollVoteService {
                     "Une option ne peut pas être sélectionnée plusieurs fois.");
         }
 
-        // Un sondage à choix unique ne peut recevoir qu'une option.
-        if (!note.isMultipleAnswers() && optionIds.size() > 1) {
+        if (!note.isMultipleAnswers() && uniqueOptionIds.size() > 1) {
             throw new IllegalArgumentException(
                     "Ce sondage autorise une seule réponse.");
         }
 
+        //Charger et valider toutes les options avant toute suppression.
         List<PollOption> options =
                 pollOptionRepository.findAllById(uniqueOptionIds);
 
@@ -96,28 +105,26 @@ public class PollVoteService {
                     "Une ou plusieurs options sont introuvables.");
         }
 
-        // Toutes les options doivent appartenir au sondage concerné
         boolean invalidOption = options.stream()
                 .anyMatch(option ->
-                        !option.getNote().getId().equals(noteId));
+                        option.getNote() == null
+                                || !noteId.equals(option.getNote().getId()));
 
         if (invalidOption) {
             throw new IllegalArgumentException(
                     "Une option n'appartient pas à ce sondage.");
         }
 
-        // Supprime uniquement les anciens votes de ce colocataire pour ce sondage sans toucher à ses autres votes
-        List<PollVote> previousVotes =
-                pollVoteRepository.findByRoommate_Id(roommate.getId());
+        // Remplacer les votes existants pour le sondage actuel
+        pollVoteRepository.deleteByRoommate_IdAndOption_Note_Id(
+                roommate.getId(),
+                note.getId()
+        );
 
-        List<PollVote> votesToDelete = previousVotes.stream()
-                .filter(vote ->
-                        vote.getOption().getNote().getId().equals(noteId))
-                .toList();
+        // Exécuter les suppressions avant les insertions.
+        pollVoteRepository.flush();
 
-        pollVoteRepository.deleteAll(votesToDelete);
-
-        // Une liste vide permet de retirer son vote.
+        //Enregistrer chaque option choisie.
         for (PollOption option : options) {
             PollVote newVote = new PollVote();
             newVote.setOption(option);
@@ -125,5 +132,8 @@ public class PollVoteService {
 
             pollVoteRepository.save(newVote);
         }
+
+        // Forcer l'exécution des insertions dans la transaction
+        pollVoteRepository.flush();
     }
 }

@@ -14,4 +14,9 @@ public interface PollVoteRepository extends JpaRepository<PollVote, Long> {
     boolean existsByOption_IdAndRoommate_Id(Long optionId, Long roommateId);
 
     long countByOption_Id(Long optionId);
+
+    void deleteByRoommate_IdAndOption_Note_Id(
+        Long roommateId,
+        Long noteId
+    );
 }

@@ -61,7 +61,6 @@ export const routes: Routes = [
       },
 
       // { path: 'expenses', loadComponent: ... },
-      // { path: 'notes', loadComponent: ... },
       {
         path: 'points',
         loadComponent: () => import('./features/points/pages/points-page/points-page').then((m) => m.PointsPage),
