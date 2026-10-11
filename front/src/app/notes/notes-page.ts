@@ -1,16 +1,8 @@
-
 import { Component, DestroyRef, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import {
-  NotesService,
-  NoteDTO,
-  NoteType,
-  PollOptionDTO,
-  CreateNoteDTO
-} from './notes.service';
-
+import {NotesService,NoteDTO,NoteType,PollOptionDTO,CreateNoteDTO} from './notes.service';
 import { AuthService } from '../core/auth/auth.service';
 import { SharedHouseService } from '../core/shared-house/shared-house.service';
 
@@ -40,6 +32,7 @@ interface Note {
   templateUrl: './notes-page.html',
   styleUrl: './notes-page.css'
 })
+
 export class NotesPage {
   private readonly notesService = inject(NotesService);
   private readonly auth = inject(AuthService);
@@ -208,6 +201,7 @@ export class NotesPage {
       }
     } else {
       content = this.question.trim();
+
       validOptions = this.options
         .map(option => option.trim())
         .filter(option => option.length > 0);
@@ -292,7 +286,7 @@ export class NotesPage {
       return;
     }
 
-    // Sauvegarder les compteurs et sélections précédents.
+    // Garder une copie des données pour restaurer l'état si nécessaire.
     const previousOptions = note.options.map(item => ({
       id: item.id,
       selected: item.selected,
@@ -301,24 +295,23 @@ export class NotesPage {
 
     const wasSelected = option.selected;
 
+    // Mettre à jour immédiatement le bouton.
     if (note.multipleAnswers) {
-      // Sondage à réponses multiples.
       option.selected = !wasSelected;
     } else {
-      // Sondage à réponse unique.
-      for (const item of note.options) {
+      note.options.forEach(item => {
         item.selected = false;
-      }
+      });
 
       option.selected = !wasSelected;
     }
 
-    // Mettre à jour immédiatement le compteur et donc la barre.
-    for (const item of note.options) {
+    // Mettre à jour les compteurs et les barres immédiatement.
+    note.options.forEach(item => {
       const previous = previousOptions.find(old => old.id === item.id);
 
       if (!previous) {
-        continue;
+        return;
       }
 
       if (item.selected !== previous.selected) {
@@ -329,26 +322,26 @@ export class NotesPage {
       } else {
         item.votes = previous.votes;
       }
-    }
+    });
 
-    const selectedIds = note.options
+    const optionIds = note.options
       .filter(item => item.selected)
       .map(item => item.id);
 
+    this.pendingVotes.add(note.id);
     this.errorMessage = '';
     this.successMessage = '';
-    this.pendingVotes.add(note.id);
 
+    // Envoyer la sélection complète sans recharger toutes les notes
     this.notesService
       .vote(note.id, {
         roommateId: this.currentRoommateId,
-        optionIds: selectedIds
+        optionIds
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (updatedDto: NoteDTO) => {
-          // Les compteurs du serveur deviennent la référence.
-          // On ne recharge pas la liste entière des notes.
+          // Mettre à jour uniquement les données du sondage concerné.
           note.options = (updatedDto.options ?? []).map(item => ({
             id: item.id,
             label: item.label,
@@ -360,15 +353,15 @@ export class NotesPage {
           this.pendingVotes.delete(note.id);
         },
         error: () => {
-          // Restaurer exactement les compteurs et états précédents.
-          for (const item of note.options) {
+          // Restaurer les compteurs et les sélections précédentes.
+          note.options.forEach(item => {
             const previous = previousOptions.find(old => old.id === item.id);
 
             if (previous) {
               item.selected = previous.selected;
               item.votes = previous.votes;
             }
-          }
+          });
 
           this.pendingVotes.delete(note.id);
           this.errorMessage = 'Impossible d’enregistrer votre vote.';

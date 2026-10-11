@@ -42,7 +42,7 @@ public class PollVoteService {
     @Transactional
     public void vote(Long noteId, VoteDTO voteDTO) {
 
-        // 1. Vérifier la requête.
+        //Vérifier la requête.
         if (noteId == null) {
             throw new IllegalArgumentException(
                     "L'identifiant du sondage est obligatoire.");
