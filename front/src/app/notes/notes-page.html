@@ -1,0 +1,227 @@
+
+<div class="notes-page">
+  <div class="notes-toolbar">
+    <h1>Tableau de notes</h1>
+
+    <div class="toolbar-actions">
+      <div class="search-box">
+        <input
+          type="search"
+          placeholder="Rechercher une note"
+          aria-label="Rechercher une note"
+          [(ngModel)]="searchText">
+        <span class="search-icon">⌕</span>
+      </div>
+
+      <button class="add-note-button" (click)="openModal()">
+        + ajout note
+      </button>
+    </div>
+  </div>
+
+  <div class="notes-grid">
+    @for (note of filteredNotes; track note.id) {
+      <article class="note-card">
+        <button
+            type="button"
+            class="delete-note-button"
+            aria-label="Supprimer cette note"
+            title="Supprimer cette note"
+            (click)="deleteNote(note.id)">
+            ×
+        </button>
+
+        <div class="note-author" [attr.title]="note.author">
+            {{ note.initials }}
+        </div>
+
+        @if (note.type === 'ANNONCE') {
+          <div class="announcement-content">
+            {{ note.content }}
+          </div>
+        } @else {
+          <div class="poll-content">
+            <p class="poll-question">{{ note.content }}</p>
+
+            <div class="poll-options">
+              @for (option of note.options ?? []; track option.id) {
+                <button
+                type="button"
+                class="poll-option"
+                [class.option-selected]="option.selected"
+                [attr.aria-pressed]="option.selected"
+                (click)="toggleVote(note, option)">
+
+                <span
+                    class="vote-circle"
+                    [class.vote-circle-selected]="option.selected"
+                    aria-hidden="true">
+                </span>
+
+                <span class="option-label">
+                    {{ option.label }}
+                </span>
+
+                <span class="option-votes">
+                    {{ option.votes }}
+                </span>
+
+                <span class="vote-track">
+                    <span
+                    class="vote-fill"
+                    [style.width.%]="getVotePercentage(note, option)">
+                    </span>
+                </span>
+                </button>
+              }
+            </div>
+
+            @if (note.multipleAnswers) {
+              <p class="poll-hint">Plusieurs réponses possibles</p>
+            }
+
+            @if (note.expiresAt) {
+              <p class="poll-expiration">
+                Disponible jusqu'au
+                {{ note.expiresAt | date:'dd/MM/yy' }}
+              </p>
+            }
+          </div>
+        }
+
+        <div class="note-date">
+          {{ formatCreatedAt(note.createdAt) }}
+        </div>
+      </article>
+    } @empty {
+      <div class="empty-notes">
+        <h2>Aucune note trouvée</h2>
+        <p>Essayez une autre recherche ou ajoutez une note.</p>
+      </div>
+    }
+  </div>
+</div>
+
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <section
+      class="note-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      (click)="$event.stopPropagation()">
+
+      <header class="modal-header">
+        <h2 id="modal-title">Nouvelle note</h2>
+        <button
+          class="close-button"
+          type="button"
+          aria-label="Fermer"
+          (click)="closeModal()">×</button>
+      </header>
+
+      <form (ngSubmit)="createNote()">
+        <div class="form-group">
+          <label for="note-type">Type de note</label>
+          <select
+            id="note-type"
+            name="noteType"
+            required
+            [(ngModel)]="noteType">
+            <option value="" disabled>Sélectionner un type</option>
+            <option value="ANNONCE">Annonce</option>
+            <option value="SONDAGE">Sondage</option>
+          </select>
+        </div>
+
+        @if (noteType === 'ANNONCE') {
+          <div class="form-group">
+            <label for="note-description">Description</label>
+            <textarea
+              id="note-description"
+              name="description"
+              rows="4"
+              required
+              placeholder="Écrire votre annonce..."
+              [(ngModel)]="description">
+            </textarea>
+          </div>
+        }
+
+        @if (noteType === 'SONDAGE') {
+          <div class="form-group">
+            <label for="poll-question">Question</label>
+            <input
+              id="poll-question"
+              name="question"
+              type="text"
+              required
+              placeholder="Écrire une question à poser"
+              [(ngModel)]="question">
+          </div>
+
+          <div class="form-group">
+            <label>Options</label>
+
+            <div class="options-editor">
+              @for (option of options; track $index) {
+                <div class="option-input-row">
+                  <input
+                    type="text"
+                    [name]="'option-' + $index"
+                    [placeholder]="'Option ' + ($index + 1)"
+                    [(ngModel)]="options[$index]">
+
+                  @if (options.length > 2) {
+                    <button
+                      type="button"
+                      class="remove-option"
+                      aria-label="Supprimer cette option"
+                      (click)="removeOption($index)">×</button>
+                  }
+                </div>
+              }
+            </div>
+
+            <button
+              class="add-option-button"
+              type="button"
+              (click)="addOption()">
+              + Ajouter une option
+            </button>
+          </div>
+
+          <label class="multiple-answer-setting">
+            <span>Autoriser plusieurs réponses</span>
+            <input
+              type="checkbox"
+              name="multipleAnswers"
+              [(ngModel)]="multipleAnswers">
+            <span class="toggle-slider"></span>
+          </label>
+        }
+
+        <footer class="modal-actions">
+            <button
+                class="cancel-button"
+                type="button"
+                (click)="closeModal()">
+                Annuler
+            </button>
+
+            <button
+                class="submit-button"
+                type="submit"
+                [disabled]="
+                !noteType ||
+                (noteType === 'ANNONCE' && !description.trim()) ||
+                (noteType === 'SONDAGE' &&
+                    (!question.trim() || validOptionCount < 2))
+                ">
+                Valider
+            </button>
+        </footer>
+      </form>
+    </section>
+  </div>
+}
