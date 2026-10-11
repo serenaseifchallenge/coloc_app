@@ -1,0 +1,88 @@
+<div class="exp-cards">
+  <div class="exp-card exp-stat">
+    <span class="exp-stat-label">Dépense du mois</span>
+    <strong class="exp-stat-value">{{ summary()?.monthTotal ?? 0 | eur }}</strong>
+  </div>
+  <div class="exp-card exp-stat">
+    <span class="exp-stat-label">Votre part</span>
+    <strong class="exp-stat-value">{{ summary()?.myShare ?? 0 | eur }}</strong>
+  </div>
+  <div class="exp-card exp-stat">
+    <span class="exp-stat-label">Votre solde</span>
+    <strong class="exp-stat-value" [class]="balanceClass(summary()?.myBalance ?? 0)">
+      {{ summary()?.myBalance ?? 0 | eur:'signed' }}
+    </strong>
+  </div>
+</div>
+
+<div class="exp-columns">
+  <section class="exp-card">
+    <header class="exp-card-head">
+      <button type="button" class="exp-icon-btn" aria-label="Mois précédent" (click)="monthChange.emit(-1)">‹</button>
+      <h2 class="exp-month">{{ monthDate() | date: 'LLLL y' }}</h2>
+      <button type="button" class="exp-icon-btn" aria-label="Mois suivant" (click)="monthChange.emit(1)">›</button>
+    </header>
+
+    @if (loading()) {
+      <p class="exp-muted">Chargement…</p>
+    } @else if (expenses().length === 0) {
+      <p class="exp-muted">Aucune dépense ce mois-ci. Ajoute la première !</p>
+    } @else {
+      <ul class="exp-list">
+        @for (expense of expenses(); track expense.id) {
+          <li>
+            <button
+              type="button"
+              class="exp-row-btn"
+              [disabled]="!expense.canEdit"
+              [attr.title]="expense.canEdit ? 'Modifier ou supprimer' : 'Seul le payeur peut modifier'"
+              (click)="editExpense.emit(expense)"
+            >
+              <app-roommate-avatar [roommate]="expense.payer" />
+              <span class="exp-row-text">
+                <strong>{{ expense.name }}</strong>
+                <span class="exp-muted">
+                  Payé par {{ expense.payer.name }} - partagé à {{ expense.participantIds.length }} -
+                  {{ toDate(expense.expenseDate) | date: 'd MMM' }}
+                </span>
+              </span>
+              <strong class="exp-row-amount">{{ expense.amount | eur }}</strong>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <aside class="exp-side">
+    <section class="exp-card">
+      <h2 class="exp-card-title">Qui doit quoi ?</h2>
+      <ul class="exp-balance-list">
+        @for (item of balanceItems(); track item.roommateId) {
+          <li>
+            <span>{{ item.name }}</span>
+            <strong [class]="balanceClass(item.amount)">{{ item.amount | eur:'signed' }}</strong>
+          </li>
+        }
+      </ul>
+      <button type="button" class="btn btn-primary exp-full" (click)="goToBalances.emit()">Rembourser</button>
+    </section>
+
+    <section class="exp-card">
+      <h2 class="exp-card-title">Cagnottes</h2>
+      @if (previewPots().length === 0) {
+        <p class="exp-muted">Aucune cagnotte pour le moment.</p>
+      }
+      @for (pot of previewPots(); track pot.id) {
+        <button type="button" class="exp-pot-mini" (click)="openPot.emit(pot)">
+          <span class="exp-pot-mini-line">
+            <strong>{{ pot.name }}</strong>
+            <span class="exp-muted">{{ pot.collected | eur:'short' }} / {{ pot.targetAmount | eur:'short' }}</span>
+          </span>
+          <span class="exp-bar"><span class="exp-bar-fill" [class.exp-bar-done]="pot.percent >= 100" [style.width.%]="pot.percent"></span></span>
+        </button>
+      }
+      <button type="button" class="btn btn-salmon exp-full" (click)="createPot.emit()">+ Nouvelle cagnotte</button>
+    </section>
+  </aside>
+</div>

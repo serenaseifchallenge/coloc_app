@@ -1,0 +1,71 @@
+<button type="button" class="exp-crumb" (click)="back.emit()">‹ Cagnottes</button>
+
+<div class="exp-detail-head">
+  <div>
+    <h1 class="exp-detail-title">{{ pot().name }}</h1>
+    <p class="exp-muted">
+      Objectif total {{ pot().targetAmount | eur:'short' }} · {{ pot().sharePerPerson | eur:'short' }} estimés par personne
+      @if (pot().deadline) {
+        · avant le {{ toDate(pot().deadline!) | date: 'd MMM y' }}
+      }
+    </p>
+  </div>
+  <div class="exp-detail-actions">
+    @if (pot().canEdit) {
+      <button type="button" class="btn btn-primary" (click)="edit.emit()">Modifier</button>
+    }
+    @if (canPay()) {
+      <button type="button" class="btn btn-salmon" (click)="pay.emit()">+ Verser ma cotisation</button>
+    }
+  </div>
+</div>
+
+<div class="exp-columns">
+  <div class="exp-stack">
+    <section class="exp-card">
+      <h2 class="exp-card-title">Total récolté</h2>
+      <div class="exp-big">{{ pot().collected | eur:'short' }}</div>
+      <p class="exp-muted">sur {{ pot().targetAmount | eur:'short' }}</p>
+      <div class="exp-bar exp-bar-big"><div class="exp-bar-fill" [class.exp-bar-done]="pot().percent >= 100" [style.width.%]="pot().percent"></div></div>
+      @if (pot().remaining > 0) {
+        <p class="exp-muted">Il reste {{ pot().remaining | eur:'short' }} à collecter, soit {{ pot().remainingPerPerson | eur:'short' }} par personne.</p>
+      } @else {
+        <p class="exp-positive">🎉 Objectif atteint !</p>
+      }
+    </section>
+
+    <section class="exp-card">
+      <h2 class="exp-card-title">Cotisations de chacun</h2>
+      <ul class="exp-list">
+        @for (participant of pot().participants; track participant.roommate.id) {
+          <li class="exp-solde">
+            <app-roommate-avatar [roommate]="participant.roommate" size="small" />
+            <span class="exp-solde-name">{{ participant.roommate.name }}</span>
+            <span class="exp-bar"><span class="exp-bar-fill exp-bar-violet" [style.width.%]="percentOf(participant.paid, participant.share)"></span></span>
+            <strong [class.exp-negative]="participant.paid === 0">
+              {{ participant.paid | eur:'short' }} / {{ participant.share | eur:'short' }}
+            </strong>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
+
+  <section class="exp-card">
+    <h2 class="exp-card-title">Historique</h2>
+    @if (pot().payments.length === 0) {
+      <p class="exp-muted">Aucun versement pour le moment.</p>
+    }
+    <ul class="exp-list">
+      @for (payment of pot().payments; track payment.id) {
+        <li class="exp-transfer">
+          <span class="exp-row-text">
+            <strong>{{ payment.roommate.name }} a versé {{ payment.amount | eur:'short' }}</strong>
+            <span class="exp-muted">{{ toDate(payment.paymentDate) | date: 'd MMM y' }}</span>
+          </span>
+          <strong class="exp-positive">+ {{ payment.amount | eur:'short' }}</strong>
+        </li>
+      }
+    </ul>
+  </section>
+</div>

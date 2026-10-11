@@ -1,0 +1,47 @@
+<app-modal [heading]="'Rembourser ' + to().name" (closed)="closed.emit()">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="exp-arrow-head">
+      <app-roommate-avatar [roommate]="from()" size="large" />
+      <span class="exp-arrow">→</span>
+      <app-roommate-avatar [roommate]="to()" size="large" />
+    </div>
+
+    <div class="form-field">
+      <label for="reimb-amount">Montant (€)</label>
+      <input id="reimb-amount" type="number" step="0.01" min="0" formControlName="amount" />
+      @if (form.controls.amount.invalid && form.controls.amount.touched) {
+        <span class="form-field-error">Montant invalide (supérieur à 0, 2 décimales maximum).</span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="reimb-method">Comment as-tu réglé ?</label>
+      <select id="reimb-method" class="exp-select" formControlName="method">
+        @for (method of methods; track method.value) {
+          <option [value]="method.value">{{ method.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="reimb-date">Date</label>
+      <input id="reimb-date" type="date" formControlName="reimbursementDate" />
+    </div>
+
+    <p class="exp-info">
+      {{ to().name }} verra ce remboursement dans l'historique et le solde sera mis à jour.
+    </p>
+
+    @if (errorMessage(); as message) {
+      <p class="form-alert">{{ message }}</p>
+    }
+
+    <div class="exp-actions">
+      <span class="exp-spacer"></span>
+      <button type="button" class="exp-btn exp-btn-grey" (click)="cancel()">Annuler</button>
+      <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+        {{ submitting() ? 'Enregistrement…' : 'Confirmer' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

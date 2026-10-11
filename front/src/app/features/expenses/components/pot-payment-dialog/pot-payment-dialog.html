@@ -1,0 +1,60 @@
+<app-modal heading="Verser ma cotisation" (closed)="closed.emit()">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <p class="exp-muted">{{ pot().name }}</p>
+
+    <div class="exp-box">
+      <div class="exp-box-title">Déjà versé</div>
+      <div class="exp-box-line">
+        <strong>{{ pot().myPaid | eur:'short' }} / {{ myShare() | eur:'short' }}</strong>
+      </div>
+      <div class="exp-bar"><div class="exp-bar-fill exp-bar-violet" [style.width.%]="myPercent()"></div></div>
+      <div class="exp-muted">
+        @if (myRemaining() > 0) {
+          Il te reste {{ myRemaining() | eur:'short' }} à verser.
+        } @else {
+          Ta cotisation est complète.
+        }
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="payment-amount">Montant (€)</label>
+      <input id="payment-amount" type="number" step="0.01" min="0" formControlName="amount" />
+      @if (form.controls.amount.invalid && form.controls.amount.touched) {
+        <span class="form-field-error">
+          Montant invalide : entre 0,01 € et {{ pot().remaining | eur }} (reste à collecter).
+        </span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="payment-method">Comment as-tu payé ?</label>
+      <select id="payment-method" class="exp-select" formControlName="method">
+        @for (method of methods; track method.value) {
+          <option [value]="method.value">{{ method.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="payment-date">Date</label>
+      <input id="payment-date" type="date" formControlName="paymentDate" />
+    </div>
+
+    <p class="exp-info">
+      Après ce versement : cagnotte à {{ collectedAfter() | eur:'short' }} / {{ pot().targetAmount | eur:'short' }}{{ myCompleteAfter() ? ', ta cotisation complète' : '' }}.
+    </p>
+
+    @if (errorMessage(); as message) {
+      <p class="form-alert">{{ message }}</p>
+    }
+
+    <div class="exp-actions">
+      <span class="exp-spacer"></span>
+      <button type="button" class="exp-btn exp-btn-grey" (click)="cancel()">Annuler</button>
+      <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+        {{ submitting() ? 'Enregistrement…' : 'Confirmer le versement' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

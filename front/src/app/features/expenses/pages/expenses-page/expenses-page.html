@@ -1,0 +1,91 @@
+<main class="exp-page">
+  @if (!showPotDetail()) {
+    <h1>{{ activeTab().label }}</h1>
+
+    <div class="exp-toolbar">
+      <app-tab-group [options]="tabs" [selected]="activeTab()" (selectedChange)="selectTab($event)" />
+
+      @if (activeTab().value === 'expenses') {
+        <button type="button" class="btn btn-salmon" (click)="expenseDialog.set({ expense: null })">
+          + Ajouter une dépense
+        </button>
+      }
+    </div>
+  }
+
+  @if (errorMessage(); as message) {
+    <p class="exp-error" role="alert">{{ message }}</p>
+  }
+
+  @switch (activeTab().value) {
+    @case ('expenses') {
+      <app-expenses-tab
+        [month]="month()"
+        [summary]="summary()"
+        [expenses]="expenses()"
+        [balances]="balances()"
+        [pots]="pots()"
+        [loading]="loadingExpenses()"
+        (monthChange)="changeMonth($event)"
+        (editExpense)="expenseDialog.set({ expense: $event })"
+        (goToBalances)="selectTab(tabs[1])"
+        (createPot)="openPotCreation()"
+        (openPot)="openPotFromSummary($event)"
+      />
+    }
+    @case ('balances') {
+      <app-balances-tab
+        [balances]="balances()"
+        [reimbursements]="reimbursements()"
+        [meId]="meId()"
+        (reimburse)="reimbursementDialog.set($event)"
+      />
+    }
+    @case ('pots') {
+      @if (selectedPot(); as pot) {
+        <app-pot-detail
+          [pot]="pot"
+          (back)="selectedPotId.set(null)"
+          (edit)="potDialog.set({ pot: pot })"
+          (pay)="paymentPotId.set(pot.id)"
+        />
+      } @else {
+        <app-pots-tab [pots]="pots()" (open)="selectedPotId.set($event.id)" (create)="openPotCreation()" />
+      }
+    }
+  }
+
+  @if (expenseDialog(); as dialog) {
+    <app-expense-form-dialog
+      [expense]="dialog.expense"
+      [roommates]="members()"
+      [meId]="meId()"
+      (saved)="refresh()"
+      (closed)="expenseDialog.set(null)"
+    />
+  }
+
+  @if (reimbursementDialog(); as transfer) {
+    <app-reimbursement-dialog
+      [from]="transfer.from"
+      [to]="transfer.to"
+      [suggestedAmount]="transfer.amount"
+      (saved)="refresh()"
+      (closed)="reimbursementDialog.set(null)"
+    />
+  }
+
+  @if (potDialog(); as dialog) {
+    <app-pot-form-dialog
+      [pot]="dialog.pot"
+      [roommates]="members()"
+      (saved)="refresh()"
+      (deleted)="onPotDeleted()"
+      (closed)="potDialog.set(null)"
+    />
+  }
+
+  @if (paymentPot(); as pot) {
+    <app-pot-payment-dialog [pot]="pot" (saved)="refresh()" (closed)="paymentPotId.set(null)" />
+  }
+</main>

@@ -1,66 +1,83 @@
 --  Données de test
 
 INSERT INTO shared_house (name, address, invitation_code, description) VALUES
-  ('La Coloc du 3e', '12 rue des Lilas, 75011 Paris', 'LILAS2026', 'Coloc de 3 étudiants, ambiance calme en semaine.'),
-  ('Villa Soleil',   '4 avenue du Port, 13002 Marseille', 'SOLEIL26', 'Grande maison avec jardin.');
+                                                                           ('La Coloc du 3e', '12 rue des Lilas, 75011 Paris', 'LILAS2026', 'Coloc de 3 étudiants, ambiance calme en semaine.'),
+                                                                           ('Villa Soleil',   '4 avenue du Port, 13002 Marseille', 'SOLEIL26', 'Grande maison avec jardin.');
 
 INSERT INTO roommate (shared_house_id, name, surname, email, password, points, birthday) VALUES
-  (1,    'Alice', 'Martin', 'alice@test.fr', '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 10, '2002-03-14'),
-  (1,    'Bob',   'Durand', 'bob@test.fr',   '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 0,  '2001-11-02'),
-  (1,    'Chloé', 'Petit',  'chloe@test.fr', '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 40, '2003-07-25'),
-  (NULL, 'Dan',   'Leroy',  'dan@test.fr',   '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 0,  '2000-01-30');
+                                                                                             (1,    'Alice', 'Martin', 'alice@test.fr', '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 10, '2002-03-14'),
+                                                                                             (1,    'Bob',   'Durand', 'bob@test.fr',   '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 0,  '2001-11-02'),
+                                                                                             (1,    'Chloé', 'Petit',  'chloe@test.fr', '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 40, '2003-07-25'),
+                                                                                             (NULL, 'Dan',   'Leroy',  'dan@test.fr',   '$2b$10$R/3Qpl1ZIkEw7WfXzxvngemw97dv2y7srn/fWyo3Aq8HK3sKp/eh6', 0,  '2000-01-30');
 
 INSERT INTO task (shared_house_id, assigned_id, name, deadline, status, completion_date, points) VALUES
-  (1, 2,    'Sortir les poubelles',               CURRENT_DATE + 1, FALSE, NULL,         5),
-  (1, 3,    'Nettoyer la salle de bain',                       CURRENT_DATE + 3, FALSE, NULL,         20),
-  (1, NULL, 'Arroser les plantes',      CURRENT_DATE + 2, FALSE, NULL,         5),
-  (1, 1,    'Faire la vaisselle',                           CURRENT_DATE,     TRUE,  CURRENT_DATE, 10),
-  (1, 3,    'Passer l''aspirateur',                         CURRENT_DATE,     TRUE,  CURRENT_DATE, 15),
-  (1, 3,    'Nettoyer le frigo',                     CURRENT_DATE,     TRUE,  CURRENT_DATE, 25);
+                                                                                                     (1, 2,    'Sortir les poubelles',      CURRENT_DATE + 1, FALSE, NULL,         5),
+                                                                                                     (1, 3,    'Nettoyer la salle de bain', CURRENT_DATE + 3, FALSE, NULL,         20),
+                                                                                                     (1, NULL, 'Arroser les plantes',       CURRENT_DATE + 2, FALSE, NULL,         5),
+                                                                                                     (1, 1,    'Faire la vaisselle',        CURRENT_DATE,     TRUE,  CURRENT_DATE, 10),
+                                                                                                     (1, 3,    'Passer l''aspirateur',      CURRENT_DATE,     TRUE,  CURRENT_DATE, 15),
+                                                                                                     (1, 3,    'Nettoyer le frigo',         CURRENT_DATE,     TRUE,  CURRENT_DATE, 25);
 
-INSERT INTO expense (shared_house_id, payer_id, name, amount, expense_date) VALUES
-  (1, 1, 'Courses Carrefour', 60.00, CURRENT_DATE - 2),
-  (1, 3, 'Facture internet',  30.00, CURRENT_DATE - 5);
+INSERT INTO expense (shared_house_id, payer_id, name, amount, expense_date, category) VALUES
+                                                                                          (1, 1, 'Courses Carrefour', 60.00, CURRENT_DATE - 2, 'COURANTE'),
+                                                                                          (1, 3, 'Facture internet',  30.00, CURRENT_DATE - 5, 'INTERNET');
 
 INSERT INTO contribution (expense_id, roommate_id, status) VALUES
-  (1, 1, TRUE),
-  (1, 2, TRUE),
-  (1, 3, FALSE),
-  (2, 1, FALSE),
-  (2, 2, FALSE),
-  (2, 3, TRUE);
+                                                               (1, 1, TRUE),
+                                                               (1, 2, TRUE),
+                                                               (1, 3, FALSE),
+                                                               (2, 1, FALSE),
+                                                               (2, 2, FALSE),
+                                                               (2, 3, TRUE);
+
+INSERT INTO reimbursement (shared_house_id, payer_id, receiver_id, amount, method, reimbursement_date) VALUES
+    (1, 2, 1, 20.00, 'VIREMENT', CURRENT_DATE - 1);
+
+INSERT INTO pot (shared_house_id, created_by, name, type, target_amount, deadline) VALUES
+                                                                                       (1, 1, 'Machine à café',   'MATERIEL', 90.00,  NULL),
+                                                                                       (1, 1, 'Aspirateur robot', 'MATERIEL', 300.00, CURRENT_DATE + 30);
+
+INSERT INTO pot_participant (pot_id, roommate_id) VALUES
+                                                      (1, 1), (1, 2), (1, 3),
+                                                      (2, 1), (2, 2), (2, 3);
+
+INSERT INTO pot_payment (pot_id, roommate_id, amount, method, payment_date) VALUES
+                                                                                (1, 1, 30.00,  'VIREMENT',    CURRENT_DATE - 6),
+                                                                                (1, 2, 30.00,  'ESPECES',     CURRENT_DATE - 5),
+                                                                                (1, 3, 30.00,  'VIREMENT',    CURRENT_DATE - 4),
+                                                                                (2, 1, 100.00, 'VIREMENT',    CURRENT_DATE - 3),
+                                                                                (2, 2, 20.00,  'PAYPAL_WERO', CURRENT_DATE - 1);
 
 INSERT INTO note (shared_house_id, author_id, content, type, vote_end_date) VALUES
-  (1, 1, 'Le proprio passe jeudi pour le chauffe-eau !', 'AFFICHAGE', NULL),
-  (1, 2, 'On achète un lave-vaisselle ? Environ 120 € chacun', 'VOTE', NOW() + INTERVAL '7 days'),
-  (1, 3, 'Quel soir pour la soirée coloc ?', 'VOTE', NOW() + INTERVAL '3 days');
+                                                                                (1, 1, 'Le proprio passe jeudi pour le chauffe-eau !', 'AFFICHAGE', NULL),
+                                                                                (1, 2, 'On achète un lave-vaisselle ? Environ 120 € chacun', 'VOTE', NOW() + INTERVAL '7 days'),
+                                                                                (1, 3, 'Quel soir pour la soirée coloc ?', 'VOTE', NOW() + INTERVAL '3 days');
 
 INSERT INTO choice (note_id, choice_option) VALUES
-  (2, 'Oui'), (2, 'Non'), (2, 'Plus tard'),
-  (3, 'Vendredi'), (3, 'Samedi');
+                                                (2, 'Oui'), (2, 'Non'), (2, 'Plus tard'),
+                                                (3, 'Vendredi'), (3, 'Samedi');
 
 INSERT INTO vote (roommate_id, choice_id) VALUES
-  (1, 1), (3, 1), (2, 2), 
-  (1, 5), (2, 5);
+                                              (1, 1), (3, 1), (2, 2),
+                                              (1, 5), (2, 5);
 
 INSERT INTO article (shared_house_id, owner_id, name, bought) VALUES
-  (1, NULL, 'Papier toilette',   FALSE),
-  (1, NULL, 'Liquide vaisselle', TRUE),
-  (1, NULL, 'Éponges',           FALSE),
-  (1, 2,    'Céréales',          FALSE),
-  (1, 2,    'Lait d''avoine',    FALSE),
-  (1, 3,    'Pommes',            TRUE);
+                                                                  (1, NULL, 'Papier toilette',   FALSE),
+                                                                  (1, NULL, 'Liquide vaisselle', TRUE),
+                                                                  (1, NULL, 'Éponges',           FALSE),
+                                                                  (1, 2,    'Céréales',          FALSE),
+                                                                  (1, 2,    'Lait d''avoine',    FALSE),
+                                                                  (1, 3,    'Pommes',            TRUE);
 
-INSERT INTO event (shared_house_id, creator_id, title, description, start_date, end_date, all_day, start_time, end_time) VALUES
-  (1,3,'Soirée coloc','Soirée organisée avec les colocataires',CURRENT_DATE + 5,CURRENT_DATE + 5,FALSE,'19:00','23:00'),
-  (1,1,'Visite du propriétaire','Visite du propriétaire de la maison',CURRENT_DATE + 3,CURRENT_DATE + 3,FALSE,'14:00','15:00'),
-  (1,2,'Grand ménage mensuel','Grand ménage de la colocation',CURRENT_DATE + 10,CURRENT_DATE + 10,FALSE,'10:00','13:00'),
-  (1,3,'Week-end en famille','Absence de la colocataire',CURRENT_DATE + 15,CURRENT_DATE + 17,TRUE,NULL,NULL);
+INSERT INTO event (shared_house_id, creator_id, title, start_date, end_date) VALUES
+                                                                                 (1, 3, 'Soirée coloc',          NOW() + INTERVAL '5 days',  NOW() + INTERVAL '5 days 4 hours'),
+                                                                                 (1, 1, 'Visite du proprio',     NOW() + INTERVAL '3 days',  NOW() + INTERVAL '3 days 1 hour'),
+                                                                                 (1, 2, 'Grand ménage mensuel',  NOW() + INTERVAL '10 days', NOW() + INTERVAL '10 days 3 hours');
 
 INSERT INTO monthly_score (shared_house_id, roommate_id, month_start, points) VALUES
-  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 480),
-  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 370),
-  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 290),
-  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 410),
-  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 150),
-  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 95);
+                                                                                  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 480),
+                                                                                  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 370),
+                                                                                  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')::date, 290),
+                                                                                  (1, 1, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 410),
+                                                                                  (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 150),
+                                                                                  (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 95);
