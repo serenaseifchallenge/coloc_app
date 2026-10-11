@@ -310,8 +310,8 @@
 }
 
 .week-day.today .week-day-number {
-  background: #e5f0f5;
-  color: #52728a;
+  background: #e5e8f5;
+  color: #5869a9;
 }
 
 .week-day.selected .week-day-number {
