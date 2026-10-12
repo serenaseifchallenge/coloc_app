@@ -8,7 +8,12 @@
   <!-- Profil -->
   @if (user(); as me) {
     <section class="card profile" aria-label="Mon profil">
-      <app-roommate-avatar [roommate]="me" size="large" />
+      <button type="button" class="avatar-btn" (click)="editing.set('avatar')" aria-label="Changer ma photo de profil">
+        <app-roommate-avatar [roommate]="me" size="large" />
+        <span class="avatar-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="13" height="13"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" /></svg>
+        </span>
+      </button>
       <div class="profile-info">
         <h2>{{ me.name }} {{ me.surname.toUpperCase() }}</h2>
         <p class="email">{{ me.email }}</p>
@@ -27,6 +32,9 @@
 
     @if (editing() === 'profile') {
       <app-edit-profile-dialog [roommate]="me" (closed)="editing.set(null)" />
+    }
+    @if (editing() === 'avatar') {
+      <app-edit-avatar-dialog [roommate]="me" (closed)="editing.set(null)" />
     }
   }
 

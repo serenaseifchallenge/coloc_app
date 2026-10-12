@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { EMPTY, Observable, catchError, firstValueFrom, tap } from 'rxjs';
 import { Roommate } from '../../shared/models/roommate.model';
-import { AuthResponse, LoginRequest, RegisterRequest, UpdateCredentialsRequest } from './auth.model';
+import { AuthResponse, LoginRequest, RegisterRequest, UpdateAvatarRequest, UpdateCredentialsRequest } from './auth.model';
 import { SharedHouseService } from '../shared-house/shared-house.service';
 
 @Injectable({ providedIn: 'root' })
@@ -48,6 +48,10 @@ export class AuthService {
       tap((me) => this.user.set(me)),
       catchError(() => EMPTY),
     );
+  }
+
+  updateAvatar(body: UpdateAvatarRequest): Observable<Roommate> {
+    return this.http.patch<Roommate>('/api/me/avatar', body).pipe(tap((me) => this.user.set(me)));
   }
 
   updateCredentials(body: UpdateCredentialsRequest): Observable<Roommate> {

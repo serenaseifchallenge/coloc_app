@@ -18,7 +18,9 @@ CREATE TABLE roommate (
                           password        VARCHAR(255) NOT NULL,
                           points          INTEGER,
                           creation_date   TIMESTAMP NOT NULL DEFAULT NOW(),
-                          birthday        TIMESTAMP NOT NULL DEFAULT NOW()
+                          birthday        TIMESTAMP NOT NULL DEFAULT NOW(),
+                          avatar_color    VARCHAR(7),
+                          avatar_image    TEXT
 );
 
 CREATE TABLE task (

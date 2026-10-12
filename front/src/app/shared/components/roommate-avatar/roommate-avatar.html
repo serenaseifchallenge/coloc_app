@@ -1,1 +1,5 @@
-{{ initials() }}
+@if (image(); as src) {
+  <img [src]="src" alt="" />
+} @else {
+  {{ initials() }}
+}

@@ -2,6 +2,7 @@ package com.coloc.back.controller;
 
 import com.coloc.back.dto.RoommateResponse;
 import com.coloc.back.dto.RoommateSummaryResponse;
+import com.coloc.back.dto.UpdateAvatarRequest;
 import com.coloc.back.dto.UpdateCredentialsRequest;
 import com.coloc.back.dto.UpdateProfileRequest;
 import com.coloc.back.service.RoommateService;
@@ -32,6 +33,11 @@ public class RoommateController {
     @PatchMapping("/credentials")
     public RoommateResponse updateCredentials(@Valid @RequestBody UpdateCredentialsRequest request) {
         return roommateService.updateCredentials(request);
+    }
+
+    @PatchMapping("/avatar")
+    public RoommateResponse updateAvatar(@Valid @RequestBody UpdateAvatarRequest request) {
+        return roommateService.updateAvatar(request);
     }
 
     @DeleteMapping

@@ -4,6 +4,7 @@ import com.coloc.back.dto.RoommateResponse;
 import com.coloc.back.dto.RoommateSummaryResponse;
 import com.coloc.back.dto.UpdateCredentialsRequest;
 import com.coloc.back.dto.UpdateProfileRequest;
+import com.coloc.back.dto.UpdateAvatarRequest;
 import com.coloc.back.entity.Roommate;
 import com.coloc.back.repository.RoommateRepository;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,15 @@ public class RoommateService {
         if (request.newPassword() != null && !request.newPassword().isBlank()) {
             me.setPassword(passwordEncoder.encode(request.newPassword()));
         }
+        return RoommateResponse.from(roommateRepository.save(me));
+    }
+
+    /** Pop-up « Photo de profil » : couleur et/ou photo de l'avatar. */
+    @Transactional
+    public RoommateResponse updateAvatar(UpdateAvatarRequest request) {
+        Roommate me = currentUserService.getCurrentRoommate();
+        me.setAvatarColor(request.color() == null ? null : request.color().toLowerCase());
+        me.setAvatarImage(request.image());
         return RoommateResponse.from(roommateRepository.save(me));
     }
 

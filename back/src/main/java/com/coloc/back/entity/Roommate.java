@@ -43,4 +43,12 @@ public class Roommate {
 
     @Column(nullable = false)
     private LocalDateTime birthday;
+
+    /** Couleur choisie pour l'avatar (ex. « #6c63ff »). null = couleur par défaut. */
+    @Column(name = "avatar_color", length = 7)
+    private String avatarColor;
+
+    /** Photo de profil en data URL (data:image/jpeg;base64,...). null = initiales. */
+    @Column(name = "avatar_image", columnDefinition = "TEXT")
+    private String avatarImage;
 }

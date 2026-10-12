@@ -1,0 +1,81 @@
+<app-modal heading="Photo de profil" (closed)="closed.emit()">
+  @if (crop(); as c) {
+    <!-- Étape recadrage : on déplace la photo et on zoome avant de la garder -->
+    <p class="crop-hint">Faites glisser la photo pour la placer, et zoomez si besoin.</p>
+    <div
+      class="crop-area"
+      (pointerdown)="startDrag($event)"
+      (pointermove)="moveDrag($event)"
+      (pointerup)="endDrag()"
+      (pointercancel)="endDrag()"
+      (wheel)="onWheel($event)"
+    >
+      @if (cropStyle(); as s) {
+        <img
+          [src]="c.url"
+          alt=""
+          draggable="false"
+          [style.width]="s.width"
+          [style.height]="s.height"
+          [style.transform]="s.transform"
+        />
+      }
+    </div>
+
+    <label class="zoom">
+      <span aria-hidden="true">−</span>
+      <input
+        type="range"
+        min="1"
+        [max]="maxZoom"
+        step="0.01"
+        [value]="c.zoom"
+        (input)="setZoom($any($event.target).value)"
+        aria-label="Zoom"
+      />
+      <span aria-hidden="true">+</span>
+    </label>
+
+    <div class="dialog-actions crop-actions">
+      <button type="button" class="link-btn" (click)="cancelCrop()">Annuler</button>
+      <button type="button" class="btn btn-primary" (click)="applyCrop()">Utiliser cette photo</button>
+    </div>
+  } @else {
+    <div class="preview">
+      <app-roommate-avatar [roommate]="preview()" size="large" />
+    </div>
+
+    <h3 class="section-title">Couleur</h3>
+    <div class="swatches" role="radiogroup" aria-label="Couleur de l'avatar">
+      @for (c of colors; track c; let i = $index) {
+        <button
+          type="button"
+          class="swatch"
+          role="radio"
+          [style.background-color]="c"
+          [class.selected]="!image() && currentColor() === c"
+          [attr.aria-checked]="!image() && currentColor() === c"
+          [attr.aria-label]="'Couleur ' + (i + 1)"
+          (click)="pickColor(c)"
+        ></button>
+      }
+    </div>
+
+    <h3 class="section-title">Photo</h3>
+    <div class="photo-actions">
+      <button type="button" class="btn btn-primary" (click)="fileInput.click()">Choisir une photo</button>
+      @if (image()) {
+        <button type="button" class="link-btn danger" (click)="removePhoto()">Retirer la photo</button>
+      }
+      <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+    </div>
+
+    @if (error()) {
+      <p class="form-alert" role="alert">{{ error() }}</p>
+    }
+
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-salmon" [disabled]="saving()" (click)="save()">Valider</button>
+    </div>
+  }
+</app-modal>

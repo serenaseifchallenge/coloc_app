@@ -11,7 +11,9 @@ public record RoommateResponse(
         String email,
         Integer points,
         LocalDate birthday,
-        Long sharedHouseId
+        Long sharedHouseId,
+        String avatarColor,
+        String avatarImage
 ) {
     public static RoommateResponse from(Roommate r) {
         return new RoommateResponse(
@@ -21,7 +23,9 @@ public record RoommateResponse(
                 r.getEmail(),
                 r.getPoints(),
                 r.getBirthday().toLocalDate(),
-                r.getSharedHouse() != null ? r.getSharedHouse().getId() : null
+                r.getSharedHouse() != null ? r.getSharedHouse().getId() : null,
+                r.getAvatarColor(),
+                r.getAvatarImage()
         );
     }
 }

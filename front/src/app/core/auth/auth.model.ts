@@ -22,3 +22,8 @@ export interface UpdateCredentialsRequest {
   email: string;
   newPassword: string | null; // null = mot de passe inchangé
 }
+
+export interface UpdateAvatarRequest {
+  color: string | null; // null = couleur par défaut
+  image: string | null; // data URL, null = initiales
+}

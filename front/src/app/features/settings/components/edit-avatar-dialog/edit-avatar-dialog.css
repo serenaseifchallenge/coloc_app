@@ -1,0 +1,55 @@
+.preview { display: flex; justify-content: center; margin-bottom: 18px; }
+.preview app-roommate-avatar { width: 96px; height: 96px; font-size: 2.2rem; }
+
+.section-title { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.swatch {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 2px #fff;
+}
+.swatch.selected { border-color: var(--text); }
+.swatch:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.photo-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 20px; }
+
+.link-btn { padding: 0; border: none; background: none; color: var(--muted); font-size: 14px; cursor: pointer; }
+.link-btn:hover { text-decoration: underline; }
+.link-btn.danger { color: var(--danger); }
+
+/* ---------- Recadrage ---------- */
+.crop-hint { margin: 0 0 14px; color: var(--muted); font-size: 14px; text-align: center; }
+
+/* Le cercle de 220 px (même valeur que CROP_SIZE dans le .ts) */
+.crop-area {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin: 0 auto 16px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--border);
+  cursor: grab;
+  touch-action: none; /* sur téléphone : le doigt déplace la photo au lieu de faire défiler la page */
+}
+.crop-area:active { cursor: grabbing; }
+.crop-area img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  margin: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.zoom { display: flex; align-items: center; gap: 10px; margin: 0 auto 20px; max-width: 260px; color: var(--muted); }
+.zoom input { flex: 1; accent-color: var(--primary); }
+
+.crop-actions { gap: 16px; align-items: center; }

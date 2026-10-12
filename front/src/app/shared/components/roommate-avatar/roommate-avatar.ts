@@ -1,7 +1,8 @@
 import { Component, computed, input } from '@angular/core';
 import { RoommateSummary } from '../../models/roommate-summary.model';
 
-const AVATAR_COLORS = ['#6c63ff', '#c400e8', '#1e6b12', '#e8261e', '#e07a00', '#0077b6'];
+/** Couleurs proposées pour l'avatar (et utilisées par défaut, selon l'id). */
+export const AVATAR_COLORS = ['#6c63ff', '#c400e8', '#1e6b12', '#e8261e', '#e07a00', '#0077b6', '#ff7a59', '#1a1a2e'];
 
 @Component({
   selector: 'app-roommate-avatar',
@@ -20,5 +21,8 @@ export class RoommateAvatar {
 
   readonly initials = computed(() => `${this.roommate().name[0]}${this.roommate().surname[0]}`.toUpperCase());
   readonly fullName = computed(() => `${this.roommate().name} ${this.roommate().surname}`);
-  readonly color = computed(() => AVATAR_COLORS[this.roommate().id % AVATAR_COLORS.length]);
+  readonly image = computed(() => this.roommate().avatarImage ?? null);
+  readonly color = computed(
+    () => this.roommate().avatarColor ?? AVATAR_COLORS[this.roommate().id % AVATAR_COLORS.length],
+  );
 }

@@ -6,12 +6,13 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { apiErrorMessage } from '../../../../core/http/api-error';
 import { SharedHouseService } from '../../../../core/shared-house/shared-house.service';
 import { RoommateAvatar } from '../../../../shared/components/roommate-avatar/roommate-avatar';
+import { EditAvatarDialog } from '../../components/edit-avatar-dialog/edit-avatar-dialog';
 import { EditHouseDialog } from '../../components/edit-house-dialog/edit-house-dialog';
 import { EditProfileDialog } from '../../components/edit-profile-dialog/edit-profile-dialog';
 
 @Component({
   selector: 'app-settings-page',
-  imports: [DatePipe, RoommateAvatar, EditProfileDialog, EditHouseDialog],
+  imports: [DatePipe, RoommateAvatar, EditProfileDialog, EditHouseDialog, EditAvatarDialog],
   templateUrl: './settings-page.html',
   styleUrl: './settings-page.css',
 })
@@ -24,7 +25,7 @@ export class SettingsPage implements OnInit {
   protected readonly user = this.auth.user;
   protected readonly house = this.houses.house;
 
-  protected readonly editing = signal<'profile' | 'house' | null>(null);
+  protected readonly editing = signal<'profile' | 'house' | 'avatar' | null>(null);
   protected readonly error = signal<string | null>(null);
   protected readonly copied = signal(false);
 
