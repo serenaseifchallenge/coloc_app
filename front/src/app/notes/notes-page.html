@@ -52,8 +52,8 @@
           </button>
         }
 
-        <div class="note-author" [attr.title]="note.author">
-          {{ note.initials }}
+        <div class="note-author">
+          <app-roommate-avatar [roommate]="note.roommate" size="small"/>
         </div>
 
         @if (note.type === 'ANNONCE') {

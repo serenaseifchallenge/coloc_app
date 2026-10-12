@@ -103,23 +103,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: #7968fa;
-  color: white;
-  font-size: 13px;
-  font-weight: 600;
 }
 
-.note-card:nth-child(3n + 2) .note-author {
-  background: #d94fe6;
-}
-
-.note-card:nth-child(3n) .note-author {
-  background: #e85652;
-}
 
 .announcement-content {
   display: flex;
