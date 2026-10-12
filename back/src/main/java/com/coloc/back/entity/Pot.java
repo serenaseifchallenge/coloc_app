@@ -39,6 +39,10 @@ public class Pot {
 
     private LocalDate deadline;
 
+    /** Indique, une fois la cagnotte complète, que l'achat a bien été effectué. */
+    @Column(nullable = false)
+    private boolean purchased;
+
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "pot_participant", joinColumns = @JoinColumn(name = "pot_id"))
     @Column(name = "roommate_id", nullable = false)

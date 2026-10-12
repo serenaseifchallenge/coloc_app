@@ -10,6 +10,7 @@ public record PotPaymentResponse(
         RoommateSummaryResponse roommate,
         BigDecimal amount,
         PaymentMethod method,
-        LocalDate paymentDate
+        LocalDate paymentDate,
+        boolean canWithdraw
 ) {
 }

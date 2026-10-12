@@ -21,6 +21,9 @@ public record PotResponse(
         BigDecimal myShare,
         BigDecimal myPaid,
         boolean canEdit,
+        boolean complete,
+        boolean purchased,
+        boolean canMarkPurchased,
         List<Long> participantIds,
         List<PotParticipantResponse> participants,
         List<PotPaymentResponse> payments

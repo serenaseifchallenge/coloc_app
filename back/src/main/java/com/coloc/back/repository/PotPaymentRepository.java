@@ -6,11 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface PotPaymentRepository extends JpaRepository<PotPayment, Long> {
 
     @EntityGraph(attributePaths = "roommate")
     List<PotPayment> findByPotIdInOrderByPaymentDateDescIdDesc(Collection<Long> potIds);
+
+    @EntityGraph(attributePaths = "roommate")
+    Optional<PotPayment> findByIdAndPotId(Long id, Long potId);
 
     void deleteByPotId(Long potId);
 }

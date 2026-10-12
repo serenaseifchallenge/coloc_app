@@ -101,6 +101,9 @@ public class PotService {
         if (request.targetAmount().compareTo(collected) < 0) {
             throw badRequest("L'objectif ne peut pas être inférieur au montant déjà récolté (" + collected + " €)");
         }
+        if (pot.isPurchased() && request.targetAmount().compareTo(pot.getTargetAmount()) != 0) {
+            throw badRequest("L'objectif ne peut plus changer : l'achat est déjà marqué comme effectué");
+        }
         Set<Long> payers = payments.stream().map(payment -> payment.getRoommate().getId()).collect(Collectors.toSet());
         if (!request.participantIds().containsAll(payers)) {
             throw badRequest("Impossible de retirer un participant qui a déjà versé de l'argent");
@@ -133,6 +136,10 @@ public class PotService {
             throw badRequest("Le montant est trop élevé");
         }
 
+        if (pot.isPurchased()) {
+            throw badRequest("L'achat a déjà été effectué : la cagnotte est close");
+        }
+
         BigDecimal remaining = pot.getTargetAmount().subtract(sum(paymentsOf(pot)));
         if (request.amount().compareTo(remaining) > 0) {
             throw badRequest("Il ne reste que " + remaining.max(BigDecimal.ZERO) + " € à collecter");
@@ -147,6 +154,46 @@ public class PotService {
         potPaymentRepository.save(payment);
 
         return toResponse(pot, paymentsOf(pot), membersOf(houseId), meId);
+    }
+
+    /** Retire un versement : seul celui qui l'a effectué peut le faire, tant que l'achat n'est pas fait. */
+    @Transactional
+    public PotResponse withdrawPayment(Long potId, Long paymentId) {
+        Long houseId = currentUserService.getCurrentSharedHouse().getId();
+        Long meId = currentUserService.getCurrentRoommateId();
+        Pot pot = potRepository.findForUpdateByIdAndSharedHouseId(potId, houseId).orElseThrow(this::notFound);
+
+        PotPayment payment = potPaymentRepository.findByIdAndPotId(paymentId, pot.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Versement introuvable"));
+        if (!payment.getRoommate().getId().equals(meId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous ne pouvez retirer que vos propres versements");
+        }
+        if (pot.isPurchased()) {
+            throw badRequest("L'achat a déjà été effectué : décochez-le d'abord pour retirer un versement");
+        }
+
+        potPaymentRepository.delete(payment);
+        return toResponse(pot, paymentsOf(pot), membersOf(houseId), meId);
+    }
+
+    /** Indique si l'achat a été fait. Ouvert au créateur et aux participants, seulement quand la cagnotte est complète. */
+    @Transactional
+    public PotResponse setPurchased(Long potId, boolean purchased) {
+        Long houseId = currentUserService.getCurrentSharedHouse().getId();
+        Long meId = currentUserService.getCurrentRoommateId();
+        Pot pot = potRepository.findForUpdateByIdAndSharedHouseId(potId, houseId).orElseThrow(this::notFound);
+        if (!pot.getCreatedById().equals(meId) && !pot.getParticipantIds().contains(meId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Seuls le créateur et les participants peuvent indiquer si l'achat a été fait");
+        }
+
+        List<PotPayment> payments = paymentsOf(pot);
+        if (purchased && sum(payments).compareTo(pot.getTargetAmount()) < 0) {
+            throw badRequest("La cagnotte n'est pas encore complète");
+        }
+
+        pot.setPurchased(purchased);
+        return toResponse(pot, payments, membersOf(houseId), meId);
     }
 
     private List<PotPayment> paymentsOf(Pot pot) {
@@ -226,7 +273,8 @@ public class PotService {
                         RoommateSummaryResponse.from(payment.getRoommate()),
                         payment.getAmount(),
                         payment.getMethod(),
-                        payment.getPaymentDate()))
+                        payment.getPaymentDate(),
+                        !pot.isPurchased() && payment.getRoommate().getId().equals(meId)))
                 .toList();
 
         boolean participant = ids.contains(meId);
@@ -245,6 +293,9 @@ public class PotService {
                 participant ? shares.get(meId) : null,
                 paidBy.getOrDefault(meId, BigDecimal.ZERO),
                 pot.getCreatedById().equals(meId),
+                collected.compareTo(target) >= 0,
+                pot.isPurchased(),
+                participant || pot.getCreatedById().equals(meId),
                 ids,
                 participants,
                 paymentResponses

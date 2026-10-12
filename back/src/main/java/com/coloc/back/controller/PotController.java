@@ -1,6 +1,7 @@
 package com.coloc.back.controller;
 
 import com.coloc.back.dto.PotPaymentRequest;
+import com.coloc.back.dto.PotPurchaseRequest;
 import com.coloc.back.dto.PotRequest;
 import com.coloc.back.dto.PotResponse;
 import com.coloc.back.service.PotService;
@@ -51,6 +52,16 @@ public class PotController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePot(@PathVariable Long id) {
         potService.deletePot(id);
+    }
+
+    @DeleteMapping("/{id}/payments/{paymentId}")
+    public PotResponse withdrawPayment(@PathVariable Long id, @PathVariable Long paymentId) {
+        return potService.withdrawPayment(id, paymentId);
+    }
+
+    @PutMapping("/{id}/purchased")
+    public PotResponse setPurchased(@PathVariable Long id, @Valid @RequestBody PotPurchaseRequest request) {
+        return potService.setPurchased(id, request.purchased());
     }
 
     @PostMapping("/{id}/payments")

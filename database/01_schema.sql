@@ -71,6 +71,7 @@ CREATE TABLE pot (
                          CHECK (type IN ('VOYAGE', 'CADEAU', 'EVENEMENT', 'MATERIEL', 'AUTRE')),
                      target_amount   NUMERIC(10,2) NOT NULL CHECK (target_amount > 0),
                      deadline        DATE,
+                     purchased       BOOLEAN NOT NULL DEFAULT FALSE,
                      creation_date   TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
