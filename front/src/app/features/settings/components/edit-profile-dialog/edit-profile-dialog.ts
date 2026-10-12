@@ -5,11 +5,12 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { apiErrorMessage } from '../../../../core/http/api-error';
 import { Modal } from '../../../../shared/components/modal/modal';
 import { Roommate } from '../../../../shared/models/roommate.model';
+import { PasswordField } from '../../../../shared/components/password-field/password-field';
 
 /** Pop-up « Editer profil » : changer d'email et/ou de mot de passe. */
 @Component({
   selector: 'app-edit-profile-dialog',
-  imports: [ReactiveFormsModule, Modal],
+  imports: [ReactiveFormsModule, Modal, PasswordField],
   templateUrl: './edit-profile-dialog.html',
 })
 export class EditProfileDialog implements OnInit {

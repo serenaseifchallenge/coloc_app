@@ -45,22 +45,6 @@ export class SettingsPage implements OnInit {
     }
   }
 
-  protected logout(): void {
-    this.auth.logout();
-    this.router.navigateByUrl('/login');
-  }
-
-  protected deleteAccount(): void {
-    if (!confirm('Supprimer définitivement votre compte ? Cette action est irréversible.')) return;
-    this.auth
-      .deleteAccount()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => this.router.navigateByUrl('/register'),
-        error: (err) => this.error.set(apiErrorMessage(err)),
-      });
-  }
-
   protected leaveHouse(): void {
     const name = this.house()?.name ?? 'la colocation';
     if (!confirm(`Quitter ${name} ? Si vous êtes le dernier membre, la coloc sera supprimée.`)) return;

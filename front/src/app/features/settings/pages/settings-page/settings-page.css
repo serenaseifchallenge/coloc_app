@@ -9,8 +9,6 @@ h1 { margin: 0 0 24px; font-size: 1.9rem; font-weight: 700; letter-spacing: -0.0
   background: var(--salmon); fill: var(--text);
 }
 .edit-btn:hover { background: var(--salmon-hover); }
-.danger-link { border: none; background: none; padding: 0; color: var(--danger); font-size: 13px; }
-.danger-link:hover { text-decoration: underline; }
 
 /* Profil */
 .profile { display: flex; align-items: center; gap: 24px; padding: 14px 14px 20px; }
@@ -18,8 +16,7 @@ h1 { margin: 0 0 24px; font-size: 1.9rem; font-weight: 700; letter-spacing: -0.0
 .profile-info h2 { margin: 0 0 4px; font-size: 16px; font-weight: 700; }
 .email { margin: 0 0 14px; color: var(--muted); font-size: 13px; font-weight: 500; }
 .meta { margin: 0; display: flex; flex-wrap: wrap; gap: 0 22px; font-size: 13px; }
-.profile-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; align-self: stretch; }
-.profile-actions .edit-btn { margin-bottom: auto; }
+.profile-actions { align-self: flex-start; }
 
 /* Coloc */
 .house { display: grid; grid-template-columns: 1.6fr 1fr; padding: 20px 0; }

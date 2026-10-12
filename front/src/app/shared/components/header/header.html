@@ -10,11 +10,28 @@
       </nav>
     }
     @if (auth.user(); as user) {
-      <a routerLink="/settings" class="avatar-link" aria-label="Paramètres du compte">
-        <app-roommate-avatar [roommate]="user" size="small" />
-      </a>
+      <!-- Le menu s'ouvre au survol de l'avatar (ou au clavier avec Tab) ; un clic sur l'avatar mène au profil -->
+      <div class="account">
+        <a routerLink="/settings" class="avatar-link" aria-label="Mon profil" aria-haspopup="true" (click)="closeMenu()">
+          <app-roommate-avatar [roommate]="user" size="small" />
+        </a>
+        <div class="menu">
+          <ul class="menu-list">
+            <li><a routerLink="/settings" (click)="closeMenu()">Profil</a></li>
+            <li><button type="button" (click)="logout()">Se déconnecter</button></li>
+            <li><button type="button" class="danger" (click)="deleteAccount()">Supprimer le compte</button></li>
+          </ul>
+        </div>
+      </div>
     }
   } @else {
     <a routerLink="/login" class="btn btn-primary header-btn">Connexion</a>
   }
 </header>
+
+@if (error(); as message) {
+  <div class="header-alert" role="alert">
+    <p>{{ message }}</p>
+    <button type="button" (click)="error.set(null)" aria-label="Fermer le message">✕</button>
+  </div>
+}

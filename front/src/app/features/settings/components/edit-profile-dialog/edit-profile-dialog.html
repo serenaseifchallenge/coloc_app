@@ -12,7 +12,9 @@
     </div>
     <div class="form-field">
       <label for="edit-password">Mot de passe</label>
-      <input id="edit-password" type="password" formControlName="newPassword" placeholder="Laisser vide pour le garder" autocomplete="new-password" />
+      <app-password-field>
+        <input id="edit-password" type="password" formControlName="newPassword" placeholder="Laisser vide pour le garder" autocomplete="new-password" />
+      </app-password-field>
       @if (form.controls.newPassword.touched && form.controls.newPassword.invalid) {
         <span class="form-field-error">8 caractères minimum.</span>
       }
