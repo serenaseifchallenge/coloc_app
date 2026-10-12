@@ -9,7 +9,7 @@
       </span>
       <strong>{{ pot.collected | eur:'short' }} / {{ pot.targetAmount | eur:'short' }}</strong>
       @if (pot.complete) {
-        <span class="exp-muted">⏳ Complète · achat à faire</span>
+        <span class="exp-muted"> Complète  achat à faire</span>
       }
       @if (pot.participant) {
         <span class="exp-muted">Ta cotisation : {{ pot.myPaid | eur:'short' }} / {{ pot.myShare | eur:'short' }}</span>
@@ -28,7 +28,7 @@
     <div class="exp-pots-grid">
       @for (pot of historyPots(); track pot.id) {
         <button type="button" class="exp-card exp-pot-card exp-pot-done" (click)="open.emit(pot)">
-          <span class="exp-muted">{{ typeLabel(pot) }} · ✅ Achat effectué</span>
+          <span class="exp-muted">{{ typeLabel(pot) }} Achat effectué</span>
           <strong class="exp-pot-name">{{ pot.name }}</strong>
           <span class="exp-muted">{{ pot.collected | eur:'short' }} récoltés</span>
         </button>
