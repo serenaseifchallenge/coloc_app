@@ -17,4 +17,8 @@ public interface PotPaymentRepository extends JpaRepository<PotPayment, Long> {
     Optional<PotPayment> findByIdAndPotId(Long id, Long potId);
 
     void deleteByPotId(Long potId);
+
+    /** Versements d'un coloc dans les cagnottes de la coloc dont l'achat n'est pas encore fait. */
+    @EntityGraph(attributePaths = "pot")
+    List<PotPayment> findByRoommateIdAndPotSharedHouseIdAndPotPurchasedFalse(Long roommateId, Long sharedHouseId);
 }
