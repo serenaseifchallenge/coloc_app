@@ -11,10 +11,10 @@ import java.util.Optional;
 
 public interface PotRepository extends JpaRepository<Pot, Long> {
 
-    @EntityGraph(attributePaths = "participantIds")
+    @EntityGraph(attributePaths = {"participantIds", "hiddenFromIds"})
     List<Pot> findBySharedHouseIdOrderByIdDesc(Long sharedHouseId);
 
-    @EntityGraph(attributePaths = "participantIds")
+    @EntityGraph(attributePaths = {"participantIds", "hiddenFromIds"})
     Optional<Pot> findByIdAndSharedHouseId(Long id, Long sharedHouseId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

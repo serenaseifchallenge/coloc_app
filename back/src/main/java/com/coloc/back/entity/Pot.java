@@ -47,4 +47,10 @@ public class Pot {
     @CollectionTable(name = "pot_participant", joinColumns = @JoinColumn(name = "pot_id"))
     @Column(name = "roommate_id", nullable = false)
     private Set<Long> participantIds = new HashSet<>();
+
+    /** Colocataires à qui la cagnotte est cachée (cadeau surprise) : ils ne la voient pas du tout. */
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "pot_hidden_member", joinColumns = @JoinColumn(name = "pot_id"))
+    @Column(name = "roommate_id", nullable = false)
+    private Set<Long> hiddenFromIds = new HashSet<>();
 }

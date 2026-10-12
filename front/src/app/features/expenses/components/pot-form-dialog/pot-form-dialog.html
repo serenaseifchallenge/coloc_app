@@ -35,7 +35,12 @@
     <div class="exp-participants">
       @for (roommate of roommates(); track roommate.id) {
         <label class="exp-participant">
-          <input type="checkbox" [checked]="selected().has(roommate.id)" (change)="toggle(roommate.id)" />
+          <input
+            type="checkbox"
+            [checked]="selected().has(roommate.id)"
+            [disabled]="hidden().has(roommate.id)"
+            (change)="toggle(roommate.id)"
+          />
           <app-roommate-avatar [roommate]="roommate" size="small" />
           <span class="exp-participant-name">{{ roommate.name }} {{ roommate.surname }}</span>
         </label>
@@ -47,6 +52,22 @@
       <p class="exp-info">{{ count() }} participant{{ count() > 1 ? 's' : '' }} · {{ perPerson() | eur:'short' }} chacun pour atteindre l'objectif.</p>
     } @else {
       <p class="exp-info">Par défaut tout le monde cotise. Le montant par personne se calcule avec l'objectif total.</p>
+    }
+
+    @if (hideableRoommates().length > 0) {
+      <div class="exp-participants-head"><span>🤫 Cacher la cagnotte à <span class="exp-optional">(surprise, facultatif)</span></span></div>
+      <div class="exp-participants">
+        @for (roommate of hideableRoommates(); track roommate.id) {
+          <label class="exp-participant">
+            <input type="checkbox" [checked]="hidden().has(roommate.id)" (change)="toggleHidden(roommate.id)" />
+            <app-roommate-avatar [roommate]="roommate" size="small" />
+            <span class="exp-participant-name">{{ roommate.name }} {{ roommate.surname }}</span>
+          </label>
+        }
+      </div>
+      @if (hidden().size > 0) {
+        <p class="exp-info">Les personnes cochées ne verront pas du tout cette cagnotte et ne cotiseront pas. Tu peux changer ça plus tard.</p>
+      }
     }
 
     @if (errorMessage(); as message) {

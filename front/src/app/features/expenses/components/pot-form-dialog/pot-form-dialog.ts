@@ -23,6 +23,8 @@ export class PotFormDialog implements OnInit {
 
   readonly pot = input<Pot | null>(null);
   readonly roommates = input.required<RoommateSummary[]>();
+  /** Identifiant de l'utilisateur connecté : on ne peut pas se cacher sa propre cagnotte. */
+  readonly meId = input.required<number>();
   readonly saved = output<void>();
   readonly deleted = output<void>();
   readonly closed = output<void>();
@@ -31,6 +33,11 @@ export class PotFormDialog implements OnInit {
   readonly submitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly selected = signal<ReadonlySet<number>>(new Set());
+  /** Colocataires à qui la cagnotte est cachée (cadeau surprise). */
+  readonly hidden = signal<ReadonlySet<number>>(new Set());
+  readonly hideableRoommates = computed(() =>
+    this.roommates().filter((roommate) => roommate.id !== this.meId()),
+  );
 
   readonly form = this.formBuilder.group({
     name: ['', [Validators.required, Validators.maxLength(150), Validators.pattern(/\S/)]],
@@ -64,6 +71,7 @@ export class PotFormDialog implements OnInit {
         deadline: pot.deadline ?? '',
       });
       this.selected.set(new Set(pot.participantIds));
+      this.hidden.set(new Set(pot.hiddenFromIds));
     } else {
       this.selected.set(new Set(this.roommates().map((roommate) => roommate.id)));
     }
@@ -73,6 +81,29 @@ export class PotFormDialog implements OnInit {
     this.selected.update((current) => {
       const next = new Set(current);
       if (next.has(roommateId)) {
+        next.delete(roommateId);
+      } else {
+        next.add(roommateId);
+      }
+      return next;
+    });
+  }
+
+  /** Cache (ou ré-affiche) la cagnotte à une personne ; une personne cachée ne cotise pas. */
+  toggleHidden(roommateId: number): void {
+    const willHide = !this.hidden().has(roommateId);
+    this.hidden.update((current) => {
+      const next = new Set(current);
+      if (willHide) {
+        next.add(roommateId);
+      } else {
+        next.delete(roommateId);
+      }
+      return next;
+    });
+    this.selected.update((current) => {
+      const next = new Set(current);
+      if (willHide) {
         next.delete(roommateId);
       } else {
         next.add(roommateId);
@@ -102,6 +133,7 @@ export class PotFormDialog implements OnInit {
       targetAmount: Math.round((value.targetAmount ?? 0) * 100) / 100,
       deadline: value.deadline || null,
       participantIds: [...this.selected()],
+      hiddenFromIds: [...this.hidden()],
     };
 
     this.submitting.set(true);

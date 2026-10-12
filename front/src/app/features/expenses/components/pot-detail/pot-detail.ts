@@ -3,6 +3,7 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 import { Observable } from 'rxjs';
 import { apiErrorMessage } from '../../../../core/http/api-error';
 import { RoommateAvatar } from '../../../../shared/components/roommate-avatar/roommate-avatar';
+import { RoommateSummary } from '../../../../shared/models/roommate-summary.model';
 import { Pot, PotPayment } from '../../models/expense.models';
 import { PotService } from '../../services/pot.service';
 import { EurPipe } from '../../utils/eur.pipe';
@@ -17,6 +18,7 @@ export class PotDetail {
   private readonly potService = inject(PotService);
 
   readonly pot = input.required<Pot>();
+  readonly roommates = input<RoommateSummary[]>([]);
 
   readonly back = output<void>();
   readonly edit = output<void>();
@@ -26,6 +28,14 @@ export class PotDetail {
 
   readonly busy = signal(false);
   readonly errorMessage = signal<string | null>(null);
+
+  /** Prénoms des colocataires à qui la cagnotte est cachée (visible par ceux qui la voient). */
+  readonly hiddenFromNames = computed(() =>
+    this.roommates()
+      .filter((roommate) => this.pot().hiddenFromIds.includes(roommate.id))
+      .map((roommate) => roommate.name)
+      .join(', '),
+  );
 
   readonly canPay = computed(
     () => this.pot().participant && this.pot().remaining > 0 && !this.pot().purchased,

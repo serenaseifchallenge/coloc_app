@@ -33,6 +33,10 @@
   </div>
 </div>
 
+@if (pot().hiddenFromIds.length > 0) {
+  <p class="exp-info">🤫 Cagnotte secrète : cachée à {{ hiddenFromNames() || 'certains colocataires' }}. Chut !</p>
+}
+
 @if (errorMessage(); as message) {
   <p class="exp-error" role="alert">{{ message }}</p>
 }

@@ -17,6 +17,8 @@ public record PotRequest(
         @NotNull PotType type,
         @NotNull @DecimalMin("0.01") @Digits(integer = 8, fraction = 2) BigDecimal targetAmount,
         LocalDate deadline,
-        @NotEmpty List<@NotNull Long> participantIds
+        @NotEmpty List<@NotNull Long> participantIds,
+        /** Colocataires à qui la cagnotte est cachée (facultatif). */
+        List<@NotNull Long> hiddenFromIds
 ) {
 }
