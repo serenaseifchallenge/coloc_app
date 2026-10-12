@@ -1,7 +1,7 @@
 <div class="exp-pots-grid">
   @for (pot of activePots(); track pot.id) {
     <button type="button" class="exp-card exp-pot-card" (click)="open.emit(pot)">
-      <span class="exp-muted">{{ typeLabel(pot) }}</span>
+      <span class="exp-muted">{{ typeLabel(pot) }}@if (pot.hiddenFromIds.length > 0) { · 🤫 Secrète }</span>
       <strong class="exp-pot-name">{{ pot.name }}</strong>
       <span class="exp-pot-progress">
         <span class="exp-bar"><span class="exp-bar-fill" [class.exp-bar-done]="pot.percent >= 100" [style.width.%]="pot.percent"></span></span>

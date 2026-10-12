@@ -171,6 +171,67 @@ class ColocApiIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void secretPotIsInvisibleToTheRoommateItIsHiddenFrom() throws Exception {
+        User alice = register("Alice");
+        String code = createHouse(alice);
+        User bob = register("Bob");
+        join(bob, code);
+        User carol = register("Carol");
+        join(carol, code);
+
+        // Alice et Bob organisent un cadeau pour Carol : la cagnotte lui est cachée
+        String body = """
+                {"name":"Cadeau surprise","type":"CADEAU","targetAmount":60.00,"deadline":null,
+                 "participantIds":[%d,%d],"hiddenFromIds":[%d]}
+                """.formatted(alice.id(), bob.id(), carol.id());
+        String created = mockMvc.perform(authed(post("/api/pots"), alice).content(body))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.hiddenFromIds[0]").value((int) carol.id()))
+                .andReturn().getResponse().getContentAsString();
+        int potId = JsonPath.read(created, "$.id");
+
+        // Bob la voit et peut cotiser
+        mockMvc.perform(authed(get("/api/pots"), bob))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)));
+        mockMvc.perform(authed(post("/api/pots/" + potId + "/payments"), bob).content(payment(10.00)))
+                .andExpect(status().isCreated());
+
+        // Carol ne la voit nulle part : liste vide, détail, versement et modification donnent 404
+        mockMvc.perform(authed(get("/api/pots"), carol))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+        mockMvc.perform(authed(get("/api/pots/" + potId), carol)).andExpect(status().isNotFound());
+        mockMvc.perform(authed(post("/api/pots/" + potId + "/payments"), carol).content(payment(5.00)))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(authed(delete("/api/pots/" + potId), carol)).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void invalidHiddenListIsRejected() throws Exception {
+        User alice = register("Alice");
+        String code = createHouse(alice);
+        User bob = register("Bob");
+        join(bob, code);
+
+        // Le créateur ne peut pas se cacher sa propre cagnotte
+        String hideCreator = """
+                {"name":"Test","type":"AUTRE","targetAmount":20.00,"deadline":null,
+                 "participantIds":[%d],"hiddenFromIds":[%d]}
+                """.formatted(bob.id(), alice.id());
+        mockMvc.perform(authed(post("/api/pots"), alice).content(hideCreator))
+                .andExpect(status().isBadRequest());
+
+        // Une personne à qui la cagnotte est cachée ne peut pas y participer
+        String hideParticipant = """
+                {"name":"Test","type":"AUTRE","targetAmount":20.00,"deadline":null,
+                 "participantIds":[%d,%d],"hiddenFromIds":[%d]}
+                """.formatted(alice.id(), bob.id(), bob.id());
+        mockMvc.perform(authed(post("/api/pots"), alice).content(hideParticipant))
+                .andExpect(status().isBadRequest());
+    }
+
     // ---------------------------------------------------------------- utilitaires
 
     private User register(String firstName) throws Exception {

@@ -45,6 +45,7 @@
       @if (selectedPot(); as pot) {
         <app-pot-detail
           [pot]="pot"
+          [roommates]="members()"
           (back)="selectedPotId.set(null)"
           (edit)="potDialog.set({ pot: pot })"
           (pay)="paymentPotId.set(pot.id)"
@@ -80,6 +81,7 @@
     <app-pot-form-dialog
       [pot]="dialog.pot"
       [roommates]="members()"
+      [meId]="meId()"
       (saved)="refresh()"
       (deleted)="onPotDeleted()"
       (closed)="potDialog.set(null)"

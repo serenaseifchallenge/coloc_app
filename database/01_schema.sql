@@ -83,6 +83,12 @@ CREATE TABLE pot_participant (
                                  PRIMARY KEY (pot_id, roommate_id)
 );
 
+CREATE TABLE pot_hidden_member (
+                                 pot_id      BIGINT NOT NULL REFERENCES pot(id) ON DELETE CASCADE,
+                                 roommate_id BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,
+                                 PRIMARY KEY (pot_id, roommate_id)
+);
+
 CREATE TABLE pot_payment (
                              id           BIGSERIAL PRIMARY KEY,
                              pot_id       BIGINT NOT NULL REFERENCES pot(id) ON DELETE CASCADE,

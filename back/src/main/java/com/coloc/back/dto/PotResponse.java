@@ -25,6 +25,7 @@ public record PotResponse(
         boolean purchased,
         boolean canMarkPurchased,
         List<Long> participantIds,
+        List<Long> hiddenFromIds,
         List<PotParticipantResponse> participants,
         List<PotPaymentResponse> payments
 ) {

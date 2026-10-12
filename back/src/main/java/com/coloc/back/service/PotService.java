@@ -47,7 +47,9 @@ public class PotService {
         Long houseId = currentUserService.getCurrentSharedHouse().getId();
         Long meId = currentUserService.getCurrentRoommateId();
 
-        List<Pot> pots = potRepository.findBySharedHouseIdOrderByIdDesc(houseId);
+        List<Pot> pots = potRepository.findBySharedHouseIdOrderByIdDesc(houseId).stream()
+                .filter(pot -> !pot.getHiddenFromIds().contains(meId))
+                .toList();
         if (pots.isEmpty()) {
             return List.of();
         }
@@ -66,8 +68,10 @@ public class PotService {
     @Transactional(readOnly = true)
     public PotResponse getPot(Long id) {
         Long houseId = currentUserService.getCurrentSharedHouse().getId();
+        Long meId = currentUserService.getCurrentRoommateId();
         Pot pot = potRepository.findByIdAndSharedHouseId(id, houseId).orElseThrow(this::notFound);
-        return toResponse(pot, paymentsOf(pot), membersOf(houseId), currentUserService.getCurrentRoommateId());
+        requireVisible(pot, meId);
+        return toResponse(pot, paymentsOf(pot), membersOf(houseId), meId);
     }
 
     @Transactional
@@ -75,7 +79,7 @@ public class PotService {
         Long houseId = currentUserService.getCurrentSharedHouse().getId();
         Long meId = currentUserService.getCurrentRoommateId();
         Map<Long, Roommate> members = membersOf(houseId);
-        validate(request, members);
+        validate(request, members, meId);
 
         Pot pot = new Pot();
         pot.setSharedHouseId(houseId);
@@ -91,10 +95,11 @@ public class PotService {
         Long houseId = currentUserService.getCurrentSharedHouse().getId();
         Long meId = currentUserService.getCurrentRoommateId();
         Pot pot = potRepository.findForUpdateByIdAndSharedHouseId(id, houseId).orElseThrow(this::notFound);
+        requireVisible(pot, meId);
         requireCreator(pot, meId);
 
         Map<Long, Roommate> members = membersOf(houseId);
-        validate(request, members);
+        validate(request, members, meId);
 
         List<PotPayment> payments = paymentsOf(pot);
         BigDecimal collected = sum(payments);
@@ -108,6 +113,9 @@ public class PotService {
         if (!request.participantIds().containsAll(payers)) {
             throw badRequest("Impossible de retirer un participant qui a déjà versé de l'argent");
         }
+        if (request.hiddenFromIds() != null && request.hiddenFromIds().stream().anyMatch(payers::contains)) {
+            throw badRequest("Impossible de cacher la cagnotte à quelqu'un qui a déjà versé de l'argent");
+        }
 
         apply(pot, request);
         return toResponse(pot, payments, members, meId);
@@ -116,8 +124,10 @@ public class PotService {
     @Transactional
     public void deletePot(Long id) {
         Long houseId = currentUserService.getCurrentSharedHouse().getId();
+        Long meId = currentUserService.getCurrentRoommateId();
         Pot pot = potRepository.findForUpdateByIdAndSharedHouseId(id, houseId).orElseThrow(this::notFound);
-        requireCreator(pot, currentUserService.getCurrentRoommateId());
+        requireVisible(pot, meId);
+        requireCreator(pot, meId);
 
         potPaymentRepository.deleteByPotId(pot.getId());
         potRepository.delete(pot);
@@ -128,6 +138,7 @@ public class PotService {
         Long houseId = currentUserService.getCurrentSharedHouse().getId();
         Long meId = currentUserService.getCurrentRoommateId();
         Pot pot = potRepository.findForUpdateByIdAndSharedHouseId(id, houseId).orElseThrow(this::notFound);
+        requireVisible(pot, meId);
 
         if (!pot.getParticipantIds().contains(meId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous ne participez pas à cette cagnotte");
@@ -162,6 +173,7 @@ public class PotService {
         Long houseId = currentUserService.getCurrentSharedHouse().getId();
         Long meId = currentUserService.getCurrentRoommateId();
         Pot pot = potRepository.findForUpdateByIdAndSharedHouseId(potId, houseId).orElseThrow(this::notFound);
+        requireVisible(pot, meId);
 
         PotPayment payment = potPaymentRepository.findByIdAndPotId(paymentId, pot.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Versement introuvable"));
@@ -182,6 +194,7 @@ public class PotService {
         Long houseId = currentUserService.getCurrentSharedHouse().getId();
         Long meId = currentUserService.getCurrentRoommateId();
         Pot pot = potRepository.findForUpdateByIdAndSharedHouseId(potId, houseId).orElseThrow(this::notFound);
+        requireVisible(pot, meId);
         if (!pot.getCreatedById().equals(meId) && !pot.getParticipantIds().contains(meId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Seuls le créateur et les participants peuvent indiquer si l'achat a été fait");
@@ -205,7 +218,7 @@ public class PotService {
                 .collect(Collectors.toMap(Roommate::getId, Function.identity()));
     }
 
-    private void validate(PotRequest request, Map<Long, Roommate> members) {
+    private void validate(PotRequest request, Map<Long, Roommate> members, Long creatorId) {
         if (request.targetAmount().compareTo(MAX_AMOUNT) > 0) {
             throw badRequest("L'objectif est trop élevé");
         }
@@ -216,6 +229,21 @@ public class PotService {
         if (!members.keySet().containsAll(unique)) {
             throw badRequest("Un participant ne fait pas partie de votre colocation");
         }
+
+        Set<Long> hidden = hiddenOf(request);
+        if (!members.keySet().containsAll(hidden)) {
+            throw badRequest("Une personne à qui cacher la cagnotte ne fait pas partie de votre colocation");
+        }
+        if (hidden.contains(creatorId)) {
+            throw badRequest("Vous ne pouvez pas cacher la cagnotte à son créateur");
+        }
+        if (hidden.stream().anyMatch(unique::contains)) {
+            throw badRequest("Une personne à qui la cagnotte est cachée ne peut pas y participer");
+        }
+    }
+
+    private Set<Long> hiddenOf(PotRequest request) {
+        return request.hiddenFromIds() == null ? Set.of() : new HashSet<>(request.hiddenFromIds());
     }
 
     private void apply(Pot pot, PotRequest request) {
@@ -225,6 +253,15 @@ public class PotService {
         pot.setDeadline(request.deadline());
         pot.getParticipantIds().clear();
         pot.getParticipantIds().addAll(request.participantIds());
+        pot.getHiddenFromIds().clear();
+        pot.getHiddenFromIds().addAll(hiddenOf(request));
+    }
+
+    /** Une cagnotte cachée à l'utilisateur est traitée comme si elle n'existait pas (404). */
+    private void requireVisible(Pot pot, Long meId) {
+        if (pot.getHiddenFromIds().contains(meId)) {
+            throw notFound();
+        }
     }
 
     private void requireCreator(Pot pot, Long meId) {
@@ -297,6 +334,7 @@ public class PotService {
                 pot.isPurchased(),
                 participant || pot.getCreatedById().equals(meId),
                 ids,
+                pot.getHiddenFromIds().stream().sorted().toList(),
                 participants,
                 paymentResponses
         );

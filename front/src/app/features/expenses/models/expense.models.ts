@@ -131,6 +131,7 @@ export interface Pot {
   purchased: boolean;
   canMarkPurchased: boolean;
   participantIds: number[];
+  hiddenFromIds: number[];
   participants: PotParticipant[];
   payments: PotPayment[];
 }
@@ -141,6 +142,7 @@ export interface PotRequest {
   targetAmount: number;
   deadline: string | null;
   participantIds: number[];
+  hiddenFromIds: number[];
 }
 
 export interface PotPaymentRequest {
