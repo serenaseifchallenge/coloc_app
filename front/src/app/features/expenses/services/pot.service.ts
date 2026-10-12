@@ -23,6 +23,14 @@ export class PotService {
     return this.http.delete<void>(`/api/pots/${id}`);
   }
 
+  withdrawPayment(id: number, paymentId: number): Observable<Pot> {
+    return this.http.delete<Pot>(`/api/pots/${id}/payments/${paymentId}`);
+  }
+
+  setPurchased(id: number, purchased: boolean): Observable<Pot> {
+    return this.http.put<Pot>(`/api/pots/${id}/purchased`, { purchased });
+  }
+
   addPayment(id: number, request: PotPaymentRequest): Observable<Pot> {
     return this.http.post<Pot>(`/api/pots/${id}/payments`, request);
   }

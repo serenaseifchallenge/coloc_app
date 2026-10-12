@@ -11,14 +11,31 @@
     </p>
   </div>
   <div class="exp-detail-actions">
-    @if (pot().canEdit) {
-      <button type="button" class="btn btn-primary" (click)="edit.emit()">Modifier</button>
-    }
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="!pot().canEdit"
+      [attr.title]="pot().canEdit ? 'Modifier ou supprimer la cagnotte' : 'Seul le créateur de la cagnotte peut la modifier'"
+      (click)="edit.emit()"
+    >
+      Modifier
+    </button>
     @if (canPay()) {
       <button type="button" class="btn btn-salmon" (click)="pay.emit()">+ Verser ma cotisation</button>
     }
+    @if (pot().complete && pot().canMarkPurchased) {
+      @if (pot().purchased) {
+        <button type="button" class="btn exp-btn-grey" [disabled]="busy()" (click)="setPurchased(false)">Annuler « achat effectué »</button>
+      } @else {
+        <button type="button" class="btn btn-primary" [disabled]="busy()" (click)="setPurchased(true)">✓ Marquer l'achat comme effectué</button>
+      }
+    }
   </div>
 </div>
+
+@if (errorMessage(); as message) {
+  <p class="exp-error" role="alert">{{ message }}</p>
+}
 
 <div class="exp-columns">
   <div class="exp-stack">
@@ -33,6 +50,21 @@
         <p class="exp-positive">🎉 Objectif atteint !</p>
       }
     </section>
+
+    @if (pot().complete) {
+      <section class="exp-card">
+        <h2 class="exp-card-title">Achat</h2>
+        @if (pot().purchased) {
+          <p class="exp-positive">✅ L'achat a été effectué.</p>
+          <p class="exp-muted">La cagnotte est close : les versements ne peuvent plus être retirés.</p>
+        } @else {
+          <p class="exp-muted">⏳ Objectif atteint : l'achat n'a pas encore été fait.</p>
+          @if (pot().canMarkPurchased) {
+            <p class="exp-muted">Une fois l'achat fait, utilise le bouton « Marquer l'achat comme effectué » en haut de la page.</p>
+          }
+        }
+      </section>
+    }
 
     <section class="exp-card">
       <h2 class="exp-card-title">Cotisations de chacun</h2>
@@ -64,6 +96,11 @@
             <span class="exp-muted">{{ toDate(payment.paymentDate) | date: 'd MMM y' }}</span>
           </span>
           <strong class="exp-positive">+ {{ payment.amount | eur:'short' }}</strong>
+          @if (payment.canWithdraw) {
+            <button type="button" class="exp-btn exp-btn-danger exp-btn-small" [disabled]="busy()" (click)="withdraw(payment)">
+              Retirer
+            </button>
+          }
         </li>
       }
     </ul>

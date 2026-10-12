@@ -109,6 +109,7 @@ export interface PotPayment {
   amount: number;
   method: PaymentMethod;
   paymentDate: string;
+  canWithdraw: boolean;
 }
 
 export interface Pot {
@@ -126,6 +127,9 @@ export interface Pot {
   myShare: number | null;
   myPaid: number;
   canEdit: boolean;
+  complete: boolean;
+  purchased: boolean;
+  canMarkPurchased: boolean;
   participantIds: number[];
   participants: PotParticipant[];
   payments: PotPayment[];

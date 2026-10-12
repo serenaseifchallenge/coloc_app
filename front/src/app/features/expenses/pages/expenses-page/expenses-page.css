@@ -421,6 +421,40 @@
 .exp-btn-grey {
   background: #ececf3;
 }
+.exp-pot-history {
+  margin-top: 32px;
+}
+.exp-pot-history summary {
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+.exp-pot-done {
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.exp-pot-done:hover,
+.exp-pot-done:focus-visible {
+  opacity: 1;
+}
+.exp-btn-small {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+.exp-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.exp-check input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
 .exp-btn-danger {
   border-color: var(--color-late);
   background: #fff;

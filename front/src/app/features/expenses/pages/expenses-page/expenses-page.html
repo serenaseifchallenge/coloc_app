@@ -48,6 +48,7 @@
           (back)="selectedPotId.set(null)"
           (edit)="potDialog.set({ pot: pot })"
           (pay)="paymentPotId.set(pot.id)"
+          (changed)="refresh()"
         />
       } @else {
         <app-pots-tab [pots]="pots()" (open)="selectedPotId.set($event.id)" (create)="openPotCreation()" />
