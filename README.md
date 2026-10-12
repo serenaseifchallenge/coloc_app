@@ -123,7 +123,17 @@ L'accès à l'API repose sur des jetons JWT : à la connexion, le serveur remet 
 
 ## Tests
 
-Les tests du back-end se lancent depuis le dossier `back/` avec `./mvnw test`, et ceux du front-end depuis le dossier `front/` avec `ng test`.
+Les tests du back-end se lancent depuis le dossier `back/`, et ceux du front-end depuis le dossier `front/` :
+
+```bash
+cd back && ./mvnw test      # Windows : .\mvnw.cmd test
+cd front && ng test
+```
+
+Le back-end contient deux familles de tests :
+
+- **Tests unitaires** (`back/src/test/java/com/coloc/back/util/`) : ils vérifient les calculs seuls, sans base de données ni serveur, par exemple la répartition d'une dépense en centimes ou la simplification des dettes.
+- **Tests d'intégration** (`back/src/test/java/com/coloc/back/integration/`) : ils envoient de vraies requêtes HTTP à l'API et font traverser toutes les couches (sécurité JWT, contrôleur, service, repository) jusqu'à la base. Ils vérifient par exemple qu'une dépense partagée produit les bons soldes, qu'une colocation ne voit pas les données d'une autre, ou qu'un versement de cagnotte ne peut être retiré que par son auteur. La base Docker doit donc être lancée (`docker compose up -d`). Chaque test est annulé à la fin : aucune donnée n'est conservée.
 
 ## Structure du projet
 
@@ -151,6 +161,15 @@ L'IA n'a jamais défini à notre place la direction du projet. L'architecture, l
 
 Un code généré peut sembler correct sans l'être, nous avons donc multiplié les vérifications. Les calculs sensibles sont couverts par des tests unitaires. Chaque parcours a été testé à la main dans l'application complète, avec la base, le back et le front en fonctionnement. Le travail est ensuite relu par un autre membre de l'équipe lors de la pull request, avant d'être fusionné dans la branche principale. Nous avons enfin contrôlé les points de sécurité : isolation des données entre colocations, droits de modification et validation des données côté serveur.
 
+### Notre skill
+
+Pour cadrer le travail de l'IA, nous avons écrit un skill dans le dépôt : `.claude/skills/create-endpoint/`. Un skill est un dossier de consignes réutilisables que l'assistant charge quand la demande correspond. Le nôtre concerne le back-end et guide l'ajout d'une fonctionnalité d'API en respectant nos conventions. Il suit la structure vue en cours :
+
+- `SKILL.md` : nom, description, déclencheurs, procédure en étapes, gestion des erreurs et exemple ;
+- `references/` : nos conventions REST et de sécurité, et une checklist finale ;
+- `assets/` : des squelettes de code (entité, repository, DTO, service, contrôleur, test) ;
+- `scripts/check-layers.sh` : un script qui vérifie automatiquement l'architecture 3-tiers (par exemple qu'aucun contrôleur n'appelle un repository).
+
 ### Nos règles d'usage
 
 Pour garder la maîtrise de notre projet, nous nous sommes fixé trois règles :
@@ -158,6 +177,29 @@ Pour garder la maîtrise de notre projet, nous nous sommes fixé trois règles :
 - **Aucun secret transmis** : le fichier `.env`, les mots de passe et la clé JWT ne sont jamais partagés avec un outil d'IA.
 - **Un code compris par son auteur** : chaque membre doit être capable d'expliquer le code de sa partie, qu'il l'ait écrit seul ou avec de l'aide, et de le modifier sans l'outil.
 - **Un esprit critique** : quand l'IA proposait quelque chose de faux ou d'inadapté, nous l'avons corrigé ou écarté plutôt que de l'accepter tel quel.
+
+### Contributions individuelles
+
+Au-delà des règles communes, chaque membre décrit ci-dessous son usage personnel de l'IA sur sa propre partie.
+
+#### Sonja Dia — module Dépenses (dépenses, soldes, remboursements, cagnottes)
+
+- **Outil** : un assistant d'IA générative conversationnel.
+- **Usage** : l'IA a généré l'essentiel du code du module à partir de ma description du besoin et de la structure du projet. Côté back : entités, repositories, services, contrôleurs, DTO, algorithmes de répartition en centimes et de simplification des dettes, tests unitaires. Côté front : la page à trois onglets (Dépenses, Soldes, Cagnottes), les formulaires et les services HTTP. Je l'ai aussi utilisée pour comprendre des erreurs de lancement (conflit de port avec PostgreSQL), découper mon travail en commits cohérents et rédiger des textes de pull request.
+- **Ce que j'ai fait moi-même** : définir le contenu du module (écrans, règles de calcul, droits de chacun), puis ses évolutions (retrait d'un versement, indication que l'achat est effectué, historique des cagnottes terminées), intégrer le code au projet, lancer l'application, tester chaque parcours à la main, corriger les problèmes rencontrés et faire relire le tout par l'équipe via pull request.
+- **Vérification** : tests unitaires sur les calculs, tests manuels des trois onglets, relecture par l'équipe.
+
+#### Emma Lehec
+
+*À compléter par Emma : outil utilisé (ou aucun), pour quelles parties, et comment le code a été vérifié.*
+
+#### Serena Seif
+
+*À compléter par Serena : outil utilisé (ou aucun), pour quelles parties, et comment le code a été vérifié.*
+
+#### Mila Ambrosi
+
+*À compléter par Mila : outil utilisé (ou aucun), pour quelles parties, et comment le code a été vérifié.*
 
 ### Limites et enseignements
 
