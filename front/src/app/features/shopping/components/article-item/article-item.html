@@ -1,10 +1,12 @@
 <input
   type="checkbox"
   class="checkbox"
-  [checked]="buying()"
-  [disabled]="buying() || deleting() || editing()"
-  [attr.aria-label]="'Marquer « ' + article().name + ' » comme acheté'"
-  (change)="buyRequested.emit(article())"
+  [checked]="checked()"
+  [disabled]="toggling() || deleting() || editing()"
+  [attr.aria-label]="
+    checked() ? 'Marquer « ' + article().name + ' » comme non acheté' : 'Marquer « ' + article().name + ' » comme acheté'
+  "
+  (change)="boughtToggleRequested.emit(article())"
 />
 
 @if (editing()) {
@@ -24,25 +26,27 @@
 } @else {
   <span class="name">{{ article().name }}</span>
   <div class="actions">
-    <button
-      type="button"
-      class="icon-button edit"
-      title="Modifier"
-      [attr.aria-label]="'Modifier « ' + article().name + ' »'"
-      [disabled]="buying() || deleting()"
-      (click)="editRequested.emit(article())"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 20h4L19 9l-4-4L4 16v4z" />
-        <path d="M13.5 6.5l4 4" />
-      </svg>
-    </button>
+    @if (!article().bought) {
+      <button
+        type="button"
+        class="icon-button edit"
+        title="Modifier"
+        [attr.aria-label]="'Modifier « ' + article().name + ' »'"
+        [disabled]="toggling() || deleting()"
+        (click)="editRequested.emit(article())"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 20h4L19 9l-4-4L4 16v4z" />
+          <path d="M13.5 6.5l4 4" />
+        </svg>
+      </button>
+    }
     <button
       type="button"
       class="icon-button delete"
       title="Supprimer"
       [attr.aria-label]="'Supprimer « ' + article().name + ' »'"
-      [disabled]="buying() || deleting()"
+      [disabled]="toggling() || deleting()"
       (click)="deleteRequested.emit(article())"
     >
       <svg viewBox="0 0 24 24" aria-hidden="true">
