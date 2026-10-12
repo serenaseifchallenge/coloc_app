@@ -71,13 +71,13 @@ INSERT INTO monthly_score (shared_house_id, roommate_id, month_start, points) VA
                                                                                   (1, 2, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 150),
                                                                                   (1, 3, DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 months')::date, 95);
 
-INSERT INTO note(shared_house_id, creator_id, content, type, multiple_answers) VALUES
+INSERT INTO note(shared_house_id, creator_id, content, type, multiple_answers, poll_ends_at) VALUES
     (1, 1, 'Le propriétaire passe jeudi pour le chauffe-eau !',
-     'ANNONCE', FALSE),
+     'ANNONCE', FALSE, NULL),
     (1, 2, 'On achète un lave-vaisselle ? Environ 120 € chacun',
-     'SONDAGE', FALSE),
+     'SONDAGE', NOW() + INTERVAL '7 days'),
     (1, 3, 'Quel soir pour la soirée coloc ?',
-     'SONDAGE', FALSE);
+     'SONDAGE', FALSE, NOW() + INTERVAL '3 days');
 
 INSERT INTO poll_option (note_id, label) VALUES
     (2, 'Oui'),

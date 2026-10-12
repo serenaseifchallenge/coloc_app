@@ -44,7 +44,7 @@ public class NoteService {
         this.roommateRepository = roommateRepository;
     }
 
-    //Récupère le colocataire authentifié grâce au JWT.
+    // Récupère le colocataire authentifié grâce au JWT.
     private Roommate getCurrentRoommate() {
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -62,7 +62,7 @@ public class NoteService {
                         "Colocataire introuvable."));
     }
 
-    //Récupère la colocation de l'utilisateur connecté
+    // Récupère la colocation de l'utilisateur connecté.
     private SharedHouse getCurrentHouse(Roommate roommate) {
         if (roommate.getSharedHouse() == null
                 || roommate.getSharedHouse().getId() == null) {
@@ -74,7 +74,7 @@ public class NoteService {
         return roommate.getSharedHouse();
     }
 
-    //Vérifie qu'une note appartient à la colocation de l'utilisateur
+    // Vérifie qu'une note appartient à la colocation de l'utilisateur.
     private Note getNoteInCurrentHouse(Long noteId, SharedHouse house) {
         Note note = noteRepository.findById(noteId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -83,7 +83,6 @@ public class NoteService {
 
         if (note.getSharedHouse() == null
                 || !house.getId().equals(note.getSharedHouse().getId())) {
-            // Ne révèle pas l'existence d'une note d'une autre colocation.
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     "Note introuvable.");
@@ -129,8 +128,10 @@ public class NoteService {
 
         if (dto.getType() == NoteType.SONDAGE) {
             note.setMultipleAnswers(dto.isMultipleAnswers());
+            note.setPollEndsAt(dto.getPollEndsAt());
         } else {
             note.setMultipleAnswers(false);
+            note.setPollEndsAt(null);
         }
 
         Note savedNote = noteRepository.save(note);
@@ -182,6 +183,18 @@ public class NoteService {
         }
 
         if (dto.getType() == NoteType.SONDAGE) {
+            if (dto.getPollEndsAt() == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "La date de fin du sondage est obligatoire.");
+            }
+
+            if (!dto.getPollEndsAt().isAfter(LocalDateTime.now())) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "La date de fin doit être dans le futur.");
+            }
+
             if (dto.getOptions() == null || dto.getOptions().size() < 2) {
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
@@ -210,10 +223,14 @@ public class NoteService {
 
     private NoteDTO toDTO(Note note, Long currentRoommateId) {
         NoteDTO dto = new NoteDTO();
+
         dto.setId(note.getId());
         dto.setType(note.getType());
         dto.setContent(note.getContent());
         dto.setCreatedAt(note.getCreatedAt());
+
+        // Date de fin : null pour une annonce.
+        dto.setPollEndsAt(note.getPollEndsAt());
 
         Roommate creator = note.getCreator();
 

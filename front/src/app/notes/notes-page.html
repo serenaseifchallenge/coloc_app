@@ -1,4 +1,5 @@
 <div class="notes-page">
+
   <div class="notes-toolbar">
     <h1>Tableau de notes</h1>
 
@@ -38,6 +39,7 @@
   <div class="notes-grid">
     @for (note of filteredNotes; track note.id) {
       <article class="note-card">
+
         @if (note.canDelete) {
           <button
             type="button"
@@ -62,6 +64,17 @@
           <div class="poll-content">
             <p class="poll-question">{{ note.content }}</p>
 
+            <div class="poll-deadline">
+              @if (isPollClosed(note)) {
+                <span class="poll-closed">Sondage terminé</span>
+              } @else if (note.pollEndsAt) {
+                <span>
+                  <!--modifier le format -->
+                  Termine le {{ formatPollEndDate(note.pollEndsAt) }} 
+                </span> 
+              }
+            </div>
+
             <div class="poll-options">
               @for (option of note.options; track option.id) {
                 <button
@@ -69,7 +82,10 @@
                   class="poll-option"
                   [class.option-selected]="option.selected"
                   [attr.aria-pressed]="option.selected"
-                  [disabled]="pendingVotes.has(note.id)"
+                  [disabled]="
+                    isPollClosed(note) ||
+                    pendingVotes.has(note.id)
+                  "
                   (click)="toggleVote(note, option)"
                 >
                   <span
@@ -140,6 +156,7 @@
       </header>
 
       <form (ngSubmit)="createNote()">
+
         <div class="form-group">
           <label for="note-type">Type de note</label>
 
@@ -181,6 +198,19 @@
               required
               placeholder="Écrire une question à poser"
               [(ngModel)]="question"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="pollEndsAt">Date et heure de fin *</label>
+
+            <input
+              id="pollEndsAt"
+              name="pollEndsAt"
+              type="datetime-local"
+              required
+              [min]="minPollEndDate"
+              [(ngModel)]="pollEndsAt"
             >
           </div>
 
@@ -245,14 +275,14 @@
           <button
             type="submit"
             class="submit-button"
-            [disabled]="
+              [disabled]="
               !noteType ||
               (noteType === 'ANNONCE' && !description.trim()) ||
-              (
-                noteType === 'SONDAGE' &&
-                (!question.trim() || validOptionCount < 2)
-              )
-            "
+              (noteType === 'SONDAGE' &&
+              (!question.trim() ||
+              isPollEndInvalid ||
+              validOptionCount < 2))
+              "
           >
             Valider
           </button>

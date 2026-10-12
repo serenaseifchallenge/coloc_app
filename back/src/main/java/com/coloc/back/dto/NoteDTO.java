@@ -29,4 +29,6 @@ public class NoteDTO {
     private List<PollOptionDTO> options = new ArrayList<>();
 
     private boolean canDelete;
+    
+    private LocalDateTime pollEndsAt;
 }

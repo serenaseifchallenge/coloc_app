@@ -168,7 +168,7 @@ export class HomePage {
   private readonly notes = toSignal(
     toObservable(this.noteIds).pipe(
       filter((ids) => ids !== null),
-      switchMap((ids) => this.notesService.getNotes(ids.houseId, ids.userId).pipe(catchError(() => of(null)))),
+      switchMap((ids) => this.notesService.getNotes().pipe(catchError(() => of(null)))),
     ),
   );
 

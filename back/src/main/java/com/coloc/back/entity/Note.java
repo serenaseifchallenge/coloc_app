@@ -49,4 +49,7 @@ public class Note {
     @OrderBy("id ASC")
     private List<PollOption> options = new ArrayList<>();
 
+    @Column(name = "poll_ends_at")
+    private LocalDateTime pollEndsAt;
+
 }

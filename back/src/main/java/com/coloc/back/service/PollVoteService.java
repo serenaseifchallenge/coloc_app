@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +48,7 @@ public class PollVoteService {
         this.noteService = noteService;
     }
 
+    // Récupère le colocataire authentifié grâce au JWT.
     private Roommate getCurrentRoommate() {
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -105,6 +107,15 @@ public class PollVoteService {
                     "Il est impossible de voter sur une annonce.");
         }
 
+        // Vérifier la clôture avant toute modification des votes.
+        LocalDateTime pollEndsAt = note.getPollEndsAt();
+
+        if (pollEndsAt == null || !pollEndsAt.isAfter(LocalDateTime.now())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Ce sondage est terminé. Les votes ne sont plus acceptés.");
+        }
+
         List<Long> optionIds = voteDTO.getOptionIds();
         Set<Long> uniqueOptionIds = new HashSet<>(optionIds);
 
@@ -154,7 +165,7 @@ public class PollVoteService {
 
         pollVoteRepository.flush();
 
-        // Retourner les compteurs et les sélections recalculés par le serveur.
+        // Retourner les compteurs et les sélections actualisés.
         return noteService.getNoteById(noteId);
     }
 }

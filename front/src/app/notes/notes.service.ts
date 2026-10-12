@@ -23,6 +23,7 @@ export interface NoteDTO {
   multipleAnswers: boolean;
   options: PollOptionDTO[];
   canDelete: boolean;
+  pollEndsAt: string| null;
 }
 
 export interface CreateNoteDTO {
@@ -30,6 +31,7 @@ export interface CreateNoteDTO {
   content: string;
   multipleAnswers: boolean;
   options: string[];
+  pollEndsAt: string| null;
 }
 
 export interface VoteDTO {

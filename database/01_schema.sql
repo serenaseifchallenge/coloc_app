@@ -150,7 +150,8 @@ CREATE TABLE note (
     type VARCHAR(20) NOT NULL
         CHECK (type IN ('ANNONCE', 'SONDAGE')),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    multiple_answers BOOLEAN NOT NULL DEFAULT FALSE
+    multiple_answers BOOLEAN NOT NULL DEFAULT FALSE,
+    poll_ends_at TIMESTAMP NULL
 );
 
 CREATE TABLE poll_option (

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,4 +18,5 @@ public class CreateNoteDTO {
     private String content;
     private boolean multipleAnswers;
     private List<String> options = new ArrayList<>();
+    private LocalDateTime pollEndsAt;
 }
