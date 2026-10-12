@@ -28,9 +28,9 @@ public class ArticleService {
         Long sharedHouseId = currentUserService.getCurrentSharedHouse().getId();
 
         List<Article> articles = switch (listType) {
-            case PERSONAL -> articleRepository.findBySharedHouseIdAndOwnerIdAndBoughtFalseOrderByIdAsc(
+            case PERSONAL -> articleRepository.findBySharedHouseIdAndOwnerIdOrderByIdAsc(
                     sharedHouseId, currentUserService.getCurrentRoommateId());
-            case SHARED -> articleRepository.findBySharedHouseIdAndOwnerIsNullAndBoughtFalseOrderByIdAsc(sharedHouseId);
+            case SHARED -> articleRepository.findBySharedHouseIdAndOwnerIsNullOrderByIdAsc(sharedHouseId);
         };
 
         return articles.stream()
@@ -69,6 +69,12 @@ public class ArticleService {
     public void buyArticle(Long articleId) {
         Article article = findAccessibleArticle(articleId);
         article.setBought(true);
+    }
+
+    @Transactional
+    public void unbuyArticle(Long articleId) {
+        Article article = findAccessibleArticle(articleId);
+        article.setBought(false);
     }
 
     @Transactional
