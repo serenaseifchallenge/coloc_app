@@ -19,7 +19,7 @@ L'application propose les fonctionnalités suivantes, accessibles depuis le menu
 - **Tâches ménagères** : les tâches sont créées, assignées à un colocataire, dotées d'une échéance et d'un nombre de points, et peuvent se répéter automatiquement. Les tâches terminées sont nettoyées au bout d'un certain temps.
 - **Points et classement** : accomplir une tâche rapporte des points. Un classement mensuel et le podium du mois précédent récompensent les plus investis, avec une clôture automatique à chaque fin de mois.
 - **Courses** : une liste partagée où chacun ajoute, modifie ou supprime des articles ; les articles achetés disparaissent automatiquement.
-- **Dépenses partagées** : les dépenses communes sont réparties entre les participants, les soldes de chacun sont calculés et l'application propose le plus petit nombre de remboursements pour équilibrer les comptes. Elle gère aussi des cagnottes collectives.
+- **Dépenses partagées** : les dépenses communes sont réparties entre les participants, les soldes de chacun sont calculés et l'application propose le plus petit nombre de remboursements pour équilibrer les comptes. Elle gère aussi des cagnottes collectives, qui peuvent être cachées à certains colocataires pour préparer un cadeau surprise.
 - **Calendrier** : un agenda commun, en vue mensuelle ou hebdomadaire, pour les événements de la maison.
 - **Notes et sondages** : des notes partagées et des sondages à choix multiples pour décider ensemble.
 
@@ -186,7 +186,7 @@ Au-delà des règles communes, chaque membre décrit ci-dessous son usage person
 
 - **Outil** : un assistant d'IA générative conversationnel.
 - **Usage** : l'IA a généré l'essentiel du code du module à partir de ma description du besoin et de la structure du projet. Côté back : entités, repositories, services, contrôleurs, DTO, algorithmes de répartition en centimes et de simplification des dettes, tests unitaires. Côté front : la page à trois onglets (Dépenses, Soldes, Cagnottes), les formulaires et les services HTTP. Je l'ai aussi utilisée pour comprendre des erreurs de lancement (conflit de port avec PostgreSQL), découper mon travail en commits cohérents et rédiger des textes de pull request.
-- **Ce que j'ai fait moi-même** : définir le contenu du module (écrans, règles de calcul, droits de chacun), puis ses évolutions (retrait d'un versement, indication que l'achat est effectué, historique des cagnottes terminées), intégrer le code au projet, lancer l'application, tester chaque parcours à la main, corriger les problèmes rencontrés et faire relire le tout par l'équipe via pull request.
+- **Ce que j'ai fait moi-même** : définir le contenu du module (écrans, règles de calcul, droits de chacun), puis ses évolutions (retrait d'un versement, indication que l'achat est effectué, historique des cagnottes terminées, cagnotte secrète cachée à certains colocataires), intégrer le code au projet, lancer l'application, tester chaque parcours à la main, corriger les problèmes rencontrés et faire relire le tout par l'équipe via pull request.
 - **Vérification** : tests unitaires sur les calculs, tests manuels des trois onglets, relecture par l'équipe.
 
 #### Emma Lehec
