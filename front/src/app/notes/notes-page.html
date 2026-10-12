@@ -145,9 +145,10 @@
 </div>
 
 @if (showModal) {
-  <div
+    <div
     class="modal-overlay"
-    (click)="closeModal()"
+    appBackdropClick
+    (backdropClick)="closeModal()"
   >
     <section
       class="note-modal"

@@ -1,4 +1,4 @@
-<dialog #dialog [attr.aria-labelledby]="headingId" (close)="closed.emit()" (click)="onDialogClick($event)">
+<dialog #dialog [attr.aria-labelledby]="headingId" (close)="closed.emit()" appBackdropClick (backdropClick)="close()">
   <div class="content">
     <header>
       <h2 [id]="headingId">{{ heading() }}</h2>

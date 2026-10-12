@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
+import { BackdropClick } from '../shared/directives/backdrop-click';
 import { CalendarService } from './calendar.service';
 import {
   CalendarEvent,
@@ -13,7 +13,7 @@ type CalendarView = 'month' | 'week';
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, BackdropClick],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })

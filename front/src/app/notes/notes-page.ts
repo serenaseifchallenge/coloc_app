@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { RoommateAvatar } from '../shared/components/roommate-avatar/roommate-avatar';
 import { RoommateSummary } from '../shared/models/roommate-summary.model';
-
+import { BackdropClick } from '../shared/directives/backdrop-click';
 import {
   NotesService,
   NoteDTO,
@@ -39,7 +39,7 @@ interface Note {
 @Component({
   selector: 'app-notes-page',
   standalone: true,
-  imports: [FormsModule, RoommateAvatar],
+  imports: [FormsModule, RoommateAvatar, BackdropClick],
   templateUrl: './notes-page.html',
   styleUrl: './notes-page.css'
 })

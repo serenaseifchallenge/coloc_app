@@ -1,9 +1,11 @@
 import { afterNextRender, Component, ElementRef, input, output, viewChild } from '@angular/core';
+import { BackdropClick } from '../../directives/backdrop-click';
 
 let nextModalId = 0;
 
 @Component({
   selector: 'app-modal',
+  imports: [BackdropClick],
   templateUrl: './modal.html',
   styleUrl: './modal.css',
 })
@@ -20,11 +22,5 @@ export class Modal {
 
   close(): void {
     this.dialog().nativeElement.close();
-  }
-
-  onDialogClick(event: MouseEvent): void {
-    if (event.target === this.dialog().nativeElement) {
-      this.close();
-    }
   }
 }

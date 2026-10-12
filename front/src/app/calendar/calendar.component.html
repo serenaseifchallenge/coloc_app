@@ -403,9 +403,10 @@
 
   @if (showEventForm) {
 
-    <div
+      <div
       class="modal-overlay"
-      (click)="closeEventForm()">
+      appBackdropClick
+      (backdropClick)="closeEventForm()">
 
       <div
         class="event-modal"
