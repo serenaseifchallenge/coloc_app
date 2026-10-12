@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { AutoFocus } from '../../../../shared/directives/auto-focus';
 import { Article } from '../../models/article.model';
 
@@ -8,20 +8,22 @@ import { Article } from '../../models/article.model';
   templateUrl: './article-item.html',
   styleUrl: './article-item.css',
   host: {
-    '[class.buying]': 'buying()',
+    '[class.bought]': 'checked()',
     '[class.deleting]': 'deleting()',
   },
 })
 export class ArticleItem {
   readonly article = input.required<Article>();
-  readonly buying = input(false);
+  readonly toggling = input(false);
   readonly deleting = input(false);
   readonly editing = input(false);
   readonly saving = input(false);
 
-  readonly buyRequested = output<Article>();
+  readonly boughtToggleRequested = output<Article>();
   readonly deleteRequested = output<Article>();
   readonly editRequested = output<Article>();
   readonly renameRequested = output<string>();
   readonly editCancelled = output<void>();
+
+  readonly checked = computed(() => (this.toggling() ? !this.article().bought : this.article().bought));
 }

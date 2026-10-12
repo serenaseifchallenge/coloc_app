@@ -1,42 +1,39 @@
-<header class="list-header">
-  <ng-content select="[listIcon]" />
-  <div>
-    <h2>{{ heading() }}</h2>
-    @if (description()) {
-      <p class="description">{{ description() }}</p>
-    }
-  </div>
-</header>
+<section class="shopping-list">
+  <header class="list-header">
+    <ng-content select="[listIcon]" />
+    <h2 class="list-title">{{ heading() }}</h2>
+  </header>
 
-<div class="list-body">
-  @if (errorMessage(); as message) {
-    <p class="error">{{ message }}</p>
-  } @else if (loading()) {
-    <p class="info">Chargement…</p>
-  } @else {
-    @if (articles().length === 0 && !adding()) {
-      <p class="info">Aucun article pour le moment.</p>
+  <div class="list-body">
+    @if (loadError()) {
+      <p class="error">{{ loadError() }}</p>
+    } @else if (loading()) {
+      <p class="muted">Chargement…</p>
+    } @else if (articles().length === 0 && !adding()) {
+      <p class="muted empty">Aucun article pour l'instant.</p>
     }
 
     <ul class="articles">
-      @for (article of articles(); track article.id) {
-        <li>
-          <app-article-item
-            [article]="article"
-            [buying]="buyingIds().has(article.id)"
-            [deleting]="deletingIds().has(article.id)"
-            [editing]="editingId() === article.id"
-            [saving]="renamingId() === article.id"
-            (buyRequested)="buyArticle($event)"
-            (deleteRequested)="deleteArticle($event)"
-            (editRequested)="startEditing($event)"
-            (renameRequested)="renameArticle(article, $event)"
-            (editCancelled)="cancelEditing()"
-          />
-        </li>
+      @if (!loading()) {
+        @for (article of articles(); track article.id) {
+          <li>
+            <app-article-item
+              [article]="article"
+              [toggling]="togglingIds().has(article.id)"
+              [deleting]="deletingIds().has(article.id)"
+              [editing]="editingId() === article.id"
+              [saving]="renamingId() === article.id"
+              (boughtToggleRequested)="toggleBought(article)"
+              (deleteRequested)="deleteArticle(article)"
+              (editRequested)="startEditing(article.id)"
+              (renameRequested)="renameArticle(article, $event)"
+              (editCancelled)="cancelEditing()"
+            />
+          </li>
+        }
       }
 
-      @for (draft of drafts(); track draft.id) {
+      @if (adding()) {
         <li class="draft">
           <span class="checkbox" aria-hidden="true"></span>
           <input
@@ -45,27 +42,27 @@
             class="draft-input"
             type="text"
             maxlength="100"
-            placeholder="…"
+            placeholder="Nouvel article…"
             aria-label="Nouvel article"
-            [value]="draft.name"
-            (input)="updateDraft(draft.id, draftInput.value)"
-            (keydown.enter)="onDraftEnter(draft.id)"
+            [value]="draftName()"
+            (input)="draftName.set(draftInput.value)"
+            (keydown.enter)="onDraftEnter($event)"
             (keydown.escape)="cancelAdding()"
           />
         </li>
       }
     </ul>
-  }
-</div>
+  </div>
 
-<footer class="list-footer">
-  @if (actionError(); as message) {
-    <p class="error">{{ message }}</p>
-  }
-  @if (adding()) {
-    <p class="hint">Entrée pour ajouter une ligne · Échap pour annuler</p>
-  }
-  <button type="button" class="footer-button" [disabled]="saving() || loading()" (click)="onFooterButtonClick()">
-    {{ adding() ? (saving() ? 'Enregistrement…' : 'Valider') : 'Ajouter' }}
-  </button>
-</footer>
+  <footer class="list-footer">
+    @if (actionError()) {
+      <p class="error">{{ actionError() }}</p>
+    }
+    @if (adding()) {
+      <p class="hint">Entrée pour ajouter · Entrée sur une ligne vide pour terminer · Échap pour fermer</p>
+    }
+    <button type="button" class="btn" [disabled]="loading()" (click)="onFooterButtonClick()">
+      {{ adding() ? 'Valider' : 'Ajouter' }}
+    </button>
+  </footer>
+</section>

@@ -132,8 +132,8 @@ export class HomePage {
     if (shared === undefined || personal === undefined) return ['…'];
     if (shared === null || personal === null) return ['Courses indisponibles'];
     return [
-      `${count(shared.length, 'article')} pour ${this.house()?.name ?? 'la coloc'}`,
-      `${count(personal.length, 'article')} pour vous`,
+      `${count(shared.filter((article) => !article.bought).length, 'article')} pour ${this.house()?.name ?? 'la coloc'}`,
+      `${count(personal.filter((article) => !article.bought).length, 'article')} pour vous`,
     ];
   });
 
