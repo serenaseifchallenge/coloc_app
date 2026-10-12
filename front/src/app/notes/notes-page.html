@@ -1,5 +1,4 @@
 <div class="notes-page">
-
   <div class="notes-toolbar">
     <h1>Tableau de notes</h1>
 
@@ -32,10 +31,6 @@
     <p role="alert">{{ errorMessage }}</p>
   }
 
-  @if (successMessage) {
-    <p role="status">{{ successMessage }}</p>
-  }
-
   <div class="notes-grid">
     @for (note of filteredNotes; track note.id) {
       <article class="note-card">
@@ -53,7 +48,10 @@
         }
 
         <div class="note-author">
-          <app-roommate-avatar [roommate]="note.roommate" size="small"/>
+          <app-roommate-avatar
+            [roommate]="note.roommate"
+            size="small"
+          />
         </div>
 
         @if (note.type === 'ANNONCE') {
@@ -62,18 +60,15 @@
           </div>
         } @else {
           <div class="poll-content">
-            <p class="poll-question">{{ note.content }}</p>
+            <p class="poll-question">
+              {{ note.content }}
+            </p>
 
-            <div class="poll-deadline">
-              @if (isPollClosed(note)) {
-                <span class="poll-closed">Sondage terminé</span>
-              } @else if (note.pollEndsAt) {
-                <span>
-                  <!--modifier le format -->
-                  Termine le {{ formatPollEndDate(note.pollEndsAt) }} 
-                </span> 
-              }
-            </div>
+            @if (note.multipleAnswers) {
+              <p class="poll-hint">
+                Plusieurs réponses possibles
+              </p>
+            }
 
             <div class="poll-options">
               @for (option of note.options; track option.id) {
@@ -111,22 +106,38 @@
                 </button>
               }
             </div>
-
-            @if (note.multipleAnswers) {
-              <p class="poll-hint">Plusieurs réponses possibles</p>
-            }
           </div>
         }
 
-        <div class="note-date">
-          {{ formatCreatedAt(note.createdAt) }}
+        <div class="note-footer">
+          @if (note.type === 'ANNONCE') {
+            <span class="note-date">
+              {{ formatCreatedAt(note.createdAt) }}
+            </span>
+          }
+
+          @if (note.type === 'SONDAGE' && note.pollEndsAt) {
+            <span
+              class="poll-deadline"
+              [class.poll-closed]="isPollClosed(note)"
+            >
+              @if (isPollClosed(note)) {
+                Sondage terminé
+              } @else {
+                Termine le {{ formatPollEndDate(note.pollEndsAt) }}
+              }
+            </span>
+          }
         </div>
+
       </article>
     } @empty {
       @if (!loading) {
         <div class="empty-notes">
           <h2>Aucune note trouvée</h2>
-          <p>Essayez une autre recherche ou ajoutez une note.</p>
+          <p>
+            Essayez une autre recherche ou ajoutez une note.
+          </p>
         </div>
       }
     }
@@ -134,7 +145,10 @@
 </div>
 
 @if (showModal) {
-  <div class="modal-overlay" (click)="closeModal()">
+  <div
+    class="modal-overlay"
+    (click)="closeModal()"
+  >
     <section
       class="note-modal"
       role="dialog"
@@ -156,7 +170,6 @@
       </header>
 
       <form (ngSubmit)="createNote()">
-
         <div class="form-group">
           <label for="note-type">Type de note</label>
 
@@ -166,7 +179,9 @@
             required
             [(ngModel)]="noteType"
           >
-            <option value="" disabled>Sélectionner un type</option>
+            <option value="" disabled>
+              Sélectionner un type
+            </option>
             <option value="ANNONCE">Annonce</option>
             <option value="SONDAGE">Sondage</option>
           </select>
@@ -275,14 +290,14 @@
           <button
             type="submit"
             class="submit-button"
-              [disabled]="
+            [disabled]="
               !noteType ||
               (noteType === 'ANNONCE' && !description.trim()) ||
               (noteType === 'SONDAGE' &&
-              (!question.trim() ||
-              isPollEndInvalid ||
-              validOptionCount < 2))
-              "
+                (!question.trim() ||
+                 isPollEndInvalid ||
+                 validOptionCount < 2))
+            "
           >
             Valider
           </button>
