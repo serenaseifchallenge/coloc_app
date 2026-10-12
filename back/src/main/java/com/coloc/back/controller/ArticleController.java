@@ -50,6 +50,12 @@ public class ArticleController {
         articleService.buyArticle(id);
     }
 
+    @PatchMapping("/{id}/unbuy")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void unbuyArticle(@PathVariable Long id) {
+        articleService.unbuyArticle(id);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteArticle(@PathVariable Long id) {

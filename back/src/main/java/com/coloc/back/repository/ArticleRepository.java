@@ -11,9 +11,9 @@ import java.util.Optional;
 
 public interface ArticleRepository extends JpaRepository<Article, Long> {
 
-    List<Article> findBySharedHouseIdAndOwnerIdAndBoughtFalseOrderByIdAsc(Long sharedHouseId, Long ownerId);
+    List<Article> findBySharedHouseIdAndOwnerIdOrderByIdAsc(Long sharedHouseId, Long ownerId);
 
-    List<Article> findBySharedHouseIdAndOwnerIsNullAndBoughtFalseOrderByIdAsc(Long sharedHouseId);
+    List<Article> findBySharedHouseIdAndOwnerIsNullOrderByIdAsc(Long sharedHouseId);
 
     Optional<Article> findByIdAndSharedHouseId(Long id, Long sharedHouseId);
 
