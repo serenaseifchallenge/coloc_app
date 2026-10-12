@@ -161,6 +161,15 @@ L'IA n'a jamais défini à notre place la direction du projet. L'architecture, l
 
 Un code généré peut sembler correct sans l'être, nous avons donc multiplié les vérifications. Les calculs sensibles sont couverts par des tests unitaires. Chaque parcours a été testé à la main dans l'application complète, avec la base, le back et le front en fonctionnement. Le travail est ensuite relu par un autre membre de l'équipe lors de la pull request, avant d'être fusionné dans la branche principale. Nous avons enfin contrôlé les points de sécurité : isolation des données entre colocations, droits de modification et validation des données côté serveur.
 
+### Notre skill
+
+Pour cadrer le travail de l'IA, nous avons écrit un skill dans le dépôt : `.claude/skills/create-endpoint/`. Un skill est un dossier de consignes réutilisables que l'assistant charge quand la demande correspond. Le nôtre concerne le back-end et guide l'ajout d'une fonctionnalité d'API en respectant nos conventions. Il suit la structure vue en cours :
+
+- `SKILL.md` : nom, description, déclencheurs, procédure en étapes, gestion des erreurs et exemple ;
+- `references/` : nos conventions REST et de sécurité, et une checklist finale ;
+- `assets/` : des squelettes de code (entité, repository, DTO, service, contrôleur, test) ;
+- `scripts/check-layers.sh` : un script qui vérifie automatiquement l'architecture 3-tiers (par exemple qu'aucun contrôleur n'appelle un repository).
+
 ### Nos règles d'usage
 
 Pour garder la maîtrise de notre projet, nous nous sommes fixé trois règles :
