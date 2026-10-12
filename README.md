@@ -123,7 +123,17 @@ L'accès à l'API repose sur des jetons JWT : à la connexion, le serveur remet 
 
 ## Tests
 
-Les tests du back-end se lancent depuis le dossier `back/` avec `./mvnw test`, et ceux du front-end depuis le dossier `front/` avec `ng test`.
+Les tests du back-end se lancent depuis le dossier `back/`, et ceux du front-end depuis le dossier `front/` :
+
+```bash
+cd back && ./mvnw test      # Windows : .\mvnw.cmd test
+cd front && ng test
+```
+
+Le back-end contient deux familles de tests :
+
+- **Tests unitaires** (`back/src/test/java/com/coloc/back/util/`) : ils vérifient les calculs seuls, sans base de données ni serveur, par exemple la répartition d'une dépense en centimes ou la simplification des dettes.
+- **Tests d'intégration** (`back/src/test/java/com/coloc/back/integration/`) : ils envoient de vraies requêtes HTTP à l'API et font traverser toutes les couches (sécurité JWT, contrôleur, service, repository) jusqu'à la base. Ils vérifient par exemple qu'une dépense partagée produit les bons soldes, qu'une colocation ne voit pas les données d'une autre, ou qu'un versement de cagnotte ne peut être retiré que par son auteur. La base Docker doit donc être lancée (`docker compose up -d`). Chaque test est annulé à la fin : aucune donnée n'est conservée.
 
 ## Structure du projet
 
