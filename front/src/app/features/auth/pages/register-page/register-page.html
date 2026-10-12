@@ -38,12 +38,16 @@
       <div class="form-row">
         <div class="form-field">
           <label for="password">Mot de passe</label>
-          <input id="password" type="password" formControlName="password" placeholder="exemple2mdp" autocomplete="new-password" />
+          <app-password-field>
+            <input id="password" type="password" formControlName="password" placeholder="exemple2mdp" autocomplete="new-password" />
+          </app-password-field>
           @if (invalid('password')) { <span class="form-field-error">8 caractères minimum.</span> }
         </div>
         <div class="form-field">
           <label for="confirm">Confirmer le mot de passe</label>
-          <input id="confirm" type="password" formControlName="confirm" placeholder="exemple2mdp" autocomplete="new-password" />
+          <app-password-field>
+            <input id="confirm" type="password" formControlName="confirm" placeholder="exemple2mdp" autocomplete="new-password" />
+          </app-password-field>
           @if (form.controls.confirm.touched && form.hasError('passwordsMismatch')) {
             <span class="form-field-error">Les mots de passe sont différents.</span>
           }

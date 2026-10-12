@@ -20,7 +20,9 @@
 
       <div class="form-field">
         <label for="password">Mot de passe</label>
-        <input id="password" type="password" formControlName="password" placeholder="exemple" autocomplete="current-password" />
+        <app-password-field>
+          <input id="password" type="password" formControlName="password" placeholder="exemple" autocomplete="current-password" />
+        </app-password-field>
         @if (form.controls.password.touched && form.controls.password.invalid) {
           <span class="form-field-error">Entrez votre mot de passe.</span>
         }

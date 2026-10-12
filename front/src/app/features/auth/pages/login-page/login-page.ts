@@ -6,10 +6,11 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { apiErrorMessage } from '../../../../core/http/api-error';
 import { AuthWaves } from '../../components/auth-waves/auth-waves';
 import { HouseIllustration } from '../../../../shared/components/house-illustration/house-illustration';
+import { PasswordField } from '../../../../shared/components/password-field/password-field';
 
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule, RouterLink, AuthWaves, HouseIllustration],
+  imports: [ReactiveFormsModule, RouterLink, AuthWaves, HouseIllustration, PasswordField],
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
 })

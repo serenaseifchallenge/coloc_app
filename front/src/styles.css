@@ -174,3 +174,6 @@ app-modal .form-field textarea { max-width: none; }
 @media (prefers-reduced-motion: reduce) {
   .btn { transition: none; }
 }
+
+/* Place pour le bouton œil des champs mot de passe */
+app-password-field input { padding-right: 42px; }

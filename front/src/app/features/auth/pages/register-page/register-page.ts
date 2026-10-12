@@ -6,6 +6,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { apiErrorMessage } from '../../../../core/http/api-error';
 import { AuthWaves } from '../../components/auth-waves/auth-waves';
 import { HouseIllustration } from '../../../../shared/components/house-illustration/house-illustration';
+import { PasswordField } from '../../../../shared/components/password-field/password-field';
 
 type RegisterField = 'email' | 'name' | 'surname' | 'birthday' | 'password';
 
@@ -18,7 +19,7 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
 
 @Component({
   selector: 'app-register-page',
-  imports: [ReactiveFormsModule, RouterLink, AuthWaves, HouseIllustration],
+  imports: [ReactiveFormsModule, RouterLink, AuthWaves, HouseIllustration, PasswordField],
   templateUrl: './register-page.html',
   styleUrl: './register-page.css',
 })
