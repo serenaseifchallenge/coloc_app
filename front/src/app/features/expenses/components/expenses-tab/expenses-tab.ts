@@ -25,7 +25,7 @@ export class ExpensesTab {
   readonly openPot = output<Pot>();
 
   readonly monthDate = computed(() => parseIsoDate(`${this.month()}-01`));
-  readonly previewPots = computed(() => this.pots().slice(0, 2));
+  readonly previewPots = computed(() => this.pots().filter((pot) => !pot.purchased).slice(0, 2));
   readonly balanceItems = computed<BalanceItem[]>(() => this.balances()?.balances ?? []);
 
   toDate(iso: string): Date {
