@@ -55,7 +55,7 @@ export class HomePage {
   protected readonly house = this.houses.house;
 
   protected readonly members = computed(() =>
-    (this.house()?.members ?? []).map((m) => ({ ...m, title: titleFor(m.points).toLowerCase() })),
+    (this.house()?.members ?? []).map((m) => ({ ...m, title: titleFor(m.points) })),
   );
 
   constructor() {
@@ -196,7 +196,7 @@ export class HomePage {
         title: 'Points',
         route: '/points',
         color: 'purple',
-        lines: [`-- ${titleFor(me?.points)}`, `${me?.points ?? 0} pts ce mois-ci`],
+        lines: [`${titleFor(me?.points)}`, `${me?.points ?? 0} pts ce mois-ci`],
       },
     ];
   });
