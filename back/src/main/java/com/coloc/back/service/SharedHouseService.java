@@ -7,6 +7,10 @@ import com.coloc.back.entity.Roommate;
 import com.coloc.back.entity.SharedHouse;
 import com.coloc.back.repository.RoommateRepository;
 import com.coloc.back.repository.SharedHouseRepository;
+import com.coloc.back.entity.Pot;
+import com.coloc.back.entity.PotPayment;
+import com.coloc.back.repository.PotPaymentRepository;
+import com.coloc.back.repository.PotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,6 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.SecureRandom;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +39,9 @@ public class SharedHouseService {
     private final CurrentUserService currentUserService;
     private final TaskService taskService;
     private final ArticleService articleService;
+    private final BalanceService balanceService;
+    private final PotRepository potRepository;
+    private final PotPaymentRepository potPaymentRepository;
 
     @Transactional(readOnly = true)
     public SharedHouseResponse getMine() {
@@ -86,6 +99,11 @@ public class SharedHouseService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Vous n'êtes dans aucune colocation");
         }
 
+        boolean lastMember = roommateRepository.findBySharedHouseId(house.getId()).size() <= 1;
+        if (!lastMember) {
+            checkCanLeave(me, house.getId());
+            handOverPots(me.getId(), house.getId());
+        }
         taskService.unassignToDoTasksOf(house.getId(), me.getId());
         articleService.deletePersonalArticlesOf(house.getId(), me.getId());
 
@@ -96,6 +114,71 @@ public class SharedHouseService {
         if (roommateRepository.findBySharedHouseId(house.getId()).isEmpty()) {
             sharedHouseRepository.delete(house);
         }
+    }
+
+        /**
+     * On ne peut partir que si on est quitte : solde des dépenses à 0
+     * et plus d'argent dans une cagnotte dont l'achat n'est pas encore fait.
+     */
+    private void checkCanLeave(Roommate me, Long houseId) {
+        List<String> todo = new ArrayList<>();
+
+        BigDecimal balance = balanceService.computeBalances(houseId).getOrDefault(me.getId(), BigDecimal.ZERO);
+        if (balance.signum() < 0) {
+            todo.add("remboursez les " + euros(balance.negate()) + " que vous devez");
+        } else if (balance.signum() > 0) {
+            todo.add("faites-vous rembourser les " + euros(balance) + " qu'on vous doit");
+        }
+
+        Map<String, BigDecimal> paidByPot = new LinkedHashMap<>();
+        for (PotPayment payment : potPaymentRepository
+                .findByRoommateIdAndPotSharedHouseIdAndPotPurchasedFalse(me.getId(), houseId)) {
+            paidByPot.merge(payment.getPot().getName(), payment.getAmount(), BigDecimal::add);
+        }
+        if (!paidByPot.isEmpty()) {
+            List<String> pots = paidByPot.entrySet().stream()
+                    .map(entry -> "« " + entry.getKey() + " » (" + euros(entry.getValue()) + ")")
+                    .toList();
+            todo.add("récupérez votre argent " + (pots.size() == 1 ? "de la cagnotte " : "des cagnottes ")
+                    + String.join(", ", pots) + " ou attendez que l'achat soit fait");
+        }
+
+        if (!todo.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Avant de quitter la colocation, " + String.join(" et ", todo) + ".");
+        }
+    }
+
+    /**
+     * Cagnottes au départ d'un coloc :
+     * - il est retiré des cagnottes en cours (les parts sont recalculées entre ceux qui restent) ;
+     * - celles qu'il a créées passent à un autre participant (sinon à un autre membre de la coloc),
+     *   pour qu'il reste quelqu'un capable de les modifier ou de les supprimer.
+     */
+    private void handOverPots(Long roommateId, Long houseId) {
+        List<Long> others = roommateRepository.findBySharedHouseId(houseId).stream()
+                .map(Roommate::getId)
+                .filter(id -> !id.equals(roommateId))
+                .sorted()
+                .toList();
+
+        for (Pot pot : potRepository.findBySharedHouseIdOrderByIdDesc(houseId)) {
+            if (!pot.isPurchased()) {
+                pot.getParticipantIds().remove(roommateId);
+            }
+            if (pot.getCreatedById().equals(roommateId)) {
+                Long newOwner = pot.getParticipantIds().stream()
+                        .filter(others::contains)
+                        .sorted()
+                        .findFirst()
+                        .orElse(others.get(0));
+                pot.setCreatedById(newOwner);
+            }
+        }
+    }
+
+    private static String euros(BigDecimal amount) {
+        return String.format(Locale.FRANCE, "%.2f €", amount);
     }
 
     private void checkHasNoHouse(Roommate roommate) {

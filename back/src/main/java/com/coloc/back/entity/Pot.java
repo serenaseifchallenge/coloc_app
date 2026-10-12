@@ -24,7 +24,7 @@ public class Pot {
     @Column(name = "shared_house_id", nullable = false, updatable = false)
     private Long sharedHouseId;
 
-    @Column(name = "created_by", nullable = false, updatable = false)
+    @Column(name = "created_by", nullable = false)
     private Long createdById;
 
     @Column(nullable = false, length = 150)
