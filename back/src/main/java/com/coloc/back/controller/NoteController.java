@@ -21,28 +21,19 @@ public class NoteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<NoteDTO>> getNotes(
-            @RequestParam Long sharedHouseId,
-            @RequestParam(required = false) Long currentRoommateId) {
-
-        return ResponseEntity.ok(
-                noteService.getNotesBySharedHouse(
-                        sharedHouseId, currentRoommateId));
+    public ResponseEntity<List<NoteDTO>> getNotes() {
+        return ResponseEntity.ok(noteService.getNotes());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<NoteDTO> getNoteById(
-            @PathVariable Long id,
-            @RequestParam(required = false) Long currentRoommateId) {
-
-        return ResponseEntity.ok(
-                noteService.getNoteById(id, currentRoommateId));
+            @PathVariable Long id) {
+        return ResponseEntity.ok(noteService.getNoteById(id));
     }
 
     @PostMapping
     public ResponseEntity<NoteDTO> createNote(
             @RequestBody CreateNoteDTO dto) {
-
         NoteDTO createdNote = noteService.createNote(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -51,11 +42,8 @@ public class NoteController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNote(
-            @PathVariable Long id,
-            @RequestParam Long currentRoommateId) {
-
-        noteService.deleteNote(id, currentRoommateId);
-
+            @PathVariable Long id) {
+        noteService.deleteNote(id);
         return ResponseEntity.noContent().build();
     }
 }

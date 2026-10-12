@@ -15,11 +15,6 @@ public class CreateNoteDTO {
 
     private NoteType type;
     private String content;
-
-    private Long creatorId;
-    private Long sharedHouseId;
-
     private boolean multipleAnswers;
-
     private List<String> options = new ArrayList<>();
 }

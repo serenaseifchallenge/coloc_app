@@ -2,9 +2,15 @@ import { Component, DestroyRef, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import {NotesService,NoteDTO,NoteType,PollOptionDTO,CreateNoteDTO} from './notes.service';
+import {
+  NotesService,
+  NoteDTO,
+  NoteType,
+  PollOptionDTO,
+  CreateNoteDTO
+} from './notes.service';
+
 import { AuthService } from '../core/auth/auth.service';
-import { SharedHouseService } from '../core/shared-house/shared-house.service';
 
 interface PollOption {
   id: number;
@@ -32,11 +38,9 @@ interface Note {
   templateUrl: './notes-page.html',
   styleUrl: './notes-page.css'
 })
-
 export class NotesPage {
   private readonly notesService = inject(NotesService);
   private readonly auth = inject(AuthService);
-  private readonly houseService = inject(SharedHouseService);
   private readonly destroyRef = inject(DestroyRef);
 
   searchText = '';
@@ -54,42 +58,34 @@ export class NotesPage {
   successMessage = '';
 
   currentRoommateId: number | null = null;
-  sharedHouseId: number | null = null;
 
   readonly pendingVotes = new Set<number>();
 
   private loadedRoommateId: number | null = null;
-  private loadedHouseId: number | null = null;
 
   constructor() {
     effect(() => {
       const user = this.auth.user();
-      const house = this.houseService.house();
 
-      if (!user || !house || user.id == null || house.id == null) {
+      if (!user || user.id == null) {
+        this.currentRoommateId = null;
+        this.notes = [];
+        this.loadedRoommateId = null;
         return;
       }
 
       const roommateId = user.id;
-      const houseId = house.id;
+      this.currentRoommateId = roommateId;
 
-      if (
-        this.loadedRoommateId === roommateId &&
-        this.loadedHouseId === houseId
-      ) {
+      if (this.loadedRoommateId === roommateId) {
         return;
       }
 
-      this.currentRoommateId = roommateId;
-      this.sharedHouseId = houseId;
       this.loadedRoommateId = roommateId;
-      this.loadedHouseId = houseId;
-
       this.loadNotes();
     });
 
-    this.auth.loadUser();
-    this.houseService.load();
+    void this.auth.loadUser();
   }
 
   get filteredNotes(): Note[] {
@@ -113,7 +109,7 @@ export class NotesPage {
   }
 
   private loadNotes(): void {
-    if (this.sharedHouseId == null || this.currentRoommateId == null) {
+    if (this.currentRoommateId == null) {
       return;
     }
 
@@ -121,7 +117,7 @@ export class NotesPage {
     this.errorMessage = '';
 
     this.notesService
-      .getNotes(this.sharedHouseId, this.currentRoommateId)
+      .getNotes()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: dtos => {
@@ -180,12 +176,13 @@ export class NotesPage {
   }
 
   createNote(): void {
-    if (
-      this.currentRoommateId == null ||
-      this.sharedHouseId == null ||
-      !this.noteType
-    ) {
-      this.errorMessage = 'Compte utilisateur ou colocation introuvable.';
+    if (this.currentRoommateId == null) {
+      this.errorMessage = 'Veuillez vous connecter pour créer une note.';
+      return;
+    }
+
+    if (!this.noteType) {
+      this.errorMessage = 'Veuillez choisir un type de note.';
       return;
     }
 
@@ -215,13 +212,16 @@ export class NotesPage {
         this.errorMessage = 'Un sondage doit avoir au moins deux options.';
         return;
       }
+
+      if (new Set(validOptions).size !== validOptions.length) {
+        this.errorMessage = 'Les options du sondage doivent être différentes.';
+        return;
+      }
     }
 
     const dto: CreateNoteDTO = {
       type: this.noteType,
       content,
-      creatorId: this.currentRoommateId,
-      sharedHouseId: this.sharedHouseId,
       multipleAnswers:
         this.noteType === 'SONDAGE' && this.multipleAnswers,
       options: this.noteType === 'SONDAGE' ? validOptions : []
@@ -235,7 +235,11 @@ export class NotesPage {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: createdNote => {
-          this.notes = [this.mapNote(createdNote), ...this.notes];
+          this.notes = [
+            this.mapNote(createdNote),
+            ...this.notes
+          ];
+
           this.closeModal();
           this.successMessage = 'Note créée.';
         },
@@ -264,7 +268,7 @@ export class NotesPage {
     this.successMessage = '';
 
     this.notesService
-      .deleteNote(noteId, this.currentRoommateId)
+      .deleteNote(noteId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -286,7 +290,6 @@ export class NotesPage {
       return;
     }
 
-    // Garder une copie des données pour restaurer l'état si nécessaire.
     const previousOptions = note.options.map(item => ({
       id: item.id,
       selected: item.selected,
@@ -295,7 +298,7 @@ export class NotesPage {
 
     const wasSelected = option.selected;
 
-    // Mettre à jour immédiatement le bouton.
+    // Mise à jour optimiste de la sélection.
     if (note.multipleAnswers) {
       option.selected = !wasSelected;
     } else {
@@ -306,7 +309,7 @@ export class NotesPage {
       option.selected = !wasSelected;
     }
 
-    // Mettre à jour les compteurs et les barres immédiatement.
+    // Mise à jour optimiste des compteurs.
     note.options.forEach(item => {
       const previous = previousOptions.find(old => old.id === item.id);
 
@@ -332,16 +335,11 @@ export class NotesPage {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Envoyer la sélection complète sans recharger toutes les notes
     this.notesService
-      .vote(note.id, {
-        roommateId: this.currentRoommateId,
-        optionIds
-      })
+      .vote(note.id, { optionIds })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (updatedDto: NoteDTO) => {
-          // Mettre à jour uniquement les données du sondage concerné.
           note.options = (updatedDto.options ?? []).map(item => ({
             id: item.id,
             label: item.label,
@@ -353,7 +351,7 @@ export class NotesPage {
           this.pendingVotes.delete(note.id);
         },
         error: () => {
-          // Restaurer les compteurs et les sélections précédentes.
+          // Restaurer les données précédentes si le serveur refuse le vote.
           note.options.forEach(item => {
             const previous = previousOptions.find(old => old.id === item.id);
 

@@ -1,19 +1,24 @@
-
 package com.coloc.back.service;
 
+import com.coloc.back.dto.NoteDTO;
 import com.coloc.back.dto.VoteDTO;
 import com.coloc.back.entity.Note;
 import com.coloc.back.entity.NoteType;
 import com.coloc.back.entity.PollOption;
 import com.coloc.back.entity.PollVote;
 import com.coloc.back.entity.Roommate;
+import com.coloc.back.entity.SharedHouse;
 import com.coloc.back.repository.NoteRepository;
 import com.coloc.back.repository.PollOptionRepository;
 import com.coloc.back.repository.PollVoteRepository;
 import com.coloc.back.repository.RoommateRepository;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -26,114 +31,130 @@ public class PollVoteService {
     private final PollOptionRepository pollOptionRepository;
     private final PollVoteRepository pollVoteRepository;
     private final RoommateRepository roommateRepository;
+    private final NoteService noteService;
 
     public PollVoteService(
             NoteRepository noteRepository,
             PollOptionRepository pollOptionRepository,
             PollVoteRepository pollVoteRepository,
-            RoommateRepository roommateRepository) {
+            RoommateRepository roommateRepository,
+            NoteService noteService) {
 
         this.noteRepository = noteRepository;
         this.pollOptionRepository = pollOptionRepository;
         this.pollVoteRepository = pollVoteRepository;
         this.roommateRepository = roommateRepository;
+        this.noteService = noteService;
+    }
+
+    private Roommate getCurrentRoommate() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null
+                || !(authentication.getPrincipal() instanceof Long roommateId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Utilisateur non authentifié.");
+        }
+
+        return roommateRepository.findById(roommateId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Colocataire introuvable."));
     }
 
     @Transactional
-    public void vote(Long noteId, VoteDTO voteDTO) {
-
-        //Vérifier la requête.
+    public NoteDTO vote(Long noteId, VoteDTO voteDTO) {
         if (noteId == null) {
-            throw new IllegalArgumentException(
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     "L'identifiant du sondage est obligatoire.");
         }
 
-        if (voteDTO == null || voteDTO.getRoommateId() == null) {
-            throw new IllegalArgumentException(
-                    "L'identifiant du colocataire est obligatoire.");
-        }
-
-        if (voteDTO.getOptionIds() == null) {
-            throw new IllegalArgumentException(
+        if (voteDTO == null || voteDTO.getOptionIds() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     "La liste des options est obligatoire.");
         }
 
-        //Charger le sondage
+        Roommate roommate = getCurrentRoommate();
+        SharedHouse house = roommate.getSharedHouse();
+
+        if (house == null || house.getId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Vous n'appartenez à aucune colocation.");
+        }
+
         Note note = noteRepository.findById(noteId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Note introuvable."));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Sondage introuvable."));
+
+        if (note.getSharedHouse() == null
+                || !house.getId().equals(note.getSharedHouse().getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Sondage introuvable.");
+        }
 
         if (note.getType() != NoteType.SONDAGE) {
-            throw new IllegalArgumentException(
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     "Il est impossible de voter sur une annonce.");
         }
 
-        //Vérifier le colocataire
-        Roommate roommate = roommateRepository
-                .findById(voteDTO.getRoommateId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Colocataire introuvable."));
-
-        if (note.getSharedHouse() == null
-                || roommate.getSharedHouse() == null
-                || !note.getSharedHouse().getId()
-                        .equals(roommate.getSharedHouse().getId())) {
-            throw new IllegalArgumentException(
-                    "Ce colocataire n'appartient pas à cette colocation.");
-        }
-
-        // Éliminer les identifiants dupliqués et vérifier la sélection
         List<Long> optionIds = voteDTO.getOptionIds();
         Set<Long> uniqueOptionIds = new HashSet<>(optionIds);
 
         if (uniqueOptionIds.size() != optionIds.size()) {
-            throw new IllegalArgumentException(
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     "Une option ne peut pas être sélectionnée plusieurs fois.");
         }
 
         if (!note.isMultipleAnswers() && uniqueOptionIds.size() > 1) {
-            throw new IllegalArgumentException(
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     "Ce sondage autorise une seule réponse.");
         }
 
-        //Charger et valider toutes les options avant toute suppression.
         List<PollOption> options =
                 pollOptionRepository.findAllById(uniqueOptionIds);
 
         if (options.size() != uniqueOptionIds.size()) {
-            throw new IllegalArgumentException(
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     "Une ou plusieurs options sont introuvables.");
         }
 
-        boolean invalidOption = options.stream()
-                .anyMatch(option ->
-                        option.getNote() == null
-                                || !noteId.equals(option.getNote().getId()));
+        boolean invalidOption = options.stream().anyMatch(option ->
+                option.getNote() == null
+                        || !noteId.equals(option.getNote().getId()));
 
         if (invalidOption) {
-            throw new IllegalArgumentException(
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     "Une option n'appartient pas à ce sondage.");
         }
 
-        // Remplacer les votes existants pour le sondage actuel
+        // Remplacer les votes existants de l'utilisateur authentifié.
         pollVoteRepository.deleteByRoommate_IdAndOption_Note_Id(
-                roommate.getId(),
-                note.getId()
-        );
+                roommate.getId(), note.getId());
 
-        // Exécuter les suppressions avant les insertions.
         pollVoteRepository.flush();
 
-        //Enregistrer chaque option choisie.
         for (PollOption option : options) {
             PollVote newVote = new PollVote();
             newVote.setOption(option);
             newVote.setRoommate(roommate);
-
             pollVoteRepository.save(newVote);
         }
 
-        // Forcer l'exécution des insertions dans la transaction
         pollVoteRepository.flush();
+
+        // Retourner les compteurs et les sélections recalculés par le serveur.
+        return noteService.getNoteById(noteId);
     }
 }

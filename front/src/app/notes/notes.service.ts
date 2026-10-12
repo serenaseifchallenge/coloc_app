@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export type NoteType = 'ANNONCE' | 'SONDAGE';
@@ -28,14 +28,11 @@ export interface NoteDTO {
 export interface CreateNoteDTO {
   type: NoteType;
   content: string;
-  creatorId: number;
-  sharedHouseId: number;
   multipleAnswers: boolean;
   options: string[];
 }
 
 export interface VoteDTO {
-  roommateId: number;
   optionIds: number[];
 }
 
@@ -46,32 +43,20 @@ export class NotesService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = '/api/notes';
 
-  getNotes(
-    sharedHouseId: number,
-    currentRoommateId: number
-  ): Observable<NoteDTO[]> {
-    const params = new HttpParams()
-      .set('sharedHouseId', sharedHouseId)
-      .set('currentRoommateId', currentRoommateId);
+  getNotes(): Observable<NoteDTO[]> {
+    return this.http.get<NoteDTO[]>(this.apiUrl);
+  }
 
-    return this.http.get<NoteDTO[]>(this.apiUrl, { params });
+  getNote(noteId: number): Observable<NoteDTO> {
+    return this.http.get<NoteDTO>(`${this.apiUrl}/${noteId}`);
   }
 
   createNote(dto: CreateNoteDTO): Observable<NoteDTO> {
     return this.http.post<NoteDTO>(this.apiUrl, dto);
   }
 
-  deleteNote(
-    noteId: number,
-    currentRoommateId: number
-  ): Observable<void> {
-    const params = new HttpParams()
-      .set('currentRoommateId', currentRoommateId);
-
-    return this.http.delete<void>(
-      `${this.apiUrl}/${noteId}`,
-      { params }
-    );
+  deleteNote(noteId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${noteId}`);
   }
 
   vote(noteId: number, dto: VoteDTO): Observable<NoteDTO> {

@@ -1,5 +1,6 @@
 package com.coloc.back.controller;
 
+import com.coloc.back.dto.NoteDTO;
 import com.coloc.back.dto.VoteDTO;
 import com.coloc.back.service.PollVoteService;
 
@@ -17,12 +18,11 @@ public class PollVoteController {
     }
 
     @PutMapping("/{noteId}/vote")
-    public ResponseEntity<Void> vote(
+    public ResponseEntity<NoteDTO> vote(
             @PathVariable Long noteId,
             @RequestBody VoteDTO voteDTO) {
 
-        pollVoteService.vote(noteId, voteDTO);
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                pollVoteService.vote(noteId, voteDTO));
     }
 }

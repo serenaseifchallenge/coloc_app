@@ -12,10 +12,13 @@ import com.coloc.back.repository.NoteRepository;
 import com.coloc.back.repository.PollOptionRepository;
 import com.coloc.back.repository.PollVoteRepository;
 import com.coloc.back.repository.RoommateRepository;
-import com.coloc.back.repository.SharedHouseRepository;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,77 +31,101 @@ public class NoteService {
     private final PollOptionRepository pollOptionRepository;
     private final PollVoteRepository pollVoteRepository;
     private final RoommateRepository roommateRepository;
-    private final SharedHouseRepository sharedHouseRepository;
 
     public NoteService(
             NoteRepository noteRepository,
             PollOptionRepository pollOptionRepository,
             PollVoteRepository pollVoteRepository,
-            RoommateRepository roommateRepository,
-            SharedHouseRepository sharedHouseRepository) {
+            RoommateRepository roommateRepository) {
 
         this.noteRepository = noteRepository;
         this.pollOptionRepository = pollOptionRepository;
         this.pollVoteRepository = pollVoteRepository;
         this.roommateRepository = roommateRepository;
-        this.sharedHouseRepository = sharedHouseRepository;
     }
 
-    //Récupère les notes d'une colocation
-    @Transactional(readOnly = true)
-    public List<NoteDTO> getNotesBySharedHouse(Long sharedHouseId,
-                                               Long currentRoommateId) {
+    //Récupère le colocataire authentifié grâce au JWT.
+    private Roommate getCurrentRoommate() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
-        if (!sharedHouseRepository.existsById(sharedHouseId)) {
-            throw new IllegalArgumentException("Colocation introuvable.");
+        if (authentication == null
+                || !(authentication.getPrincipal() instanceof Long roommateId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Utilisateur non authentifié.");
         }
 
+        return roommateRepository.findById(roommateId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Colocataire introuvable."));
+    }
+
+    //Récupère la colocation de l'utilisateur connecté
+    private SharedHouse getCurrentHouse(Roommate roommate) {
+        if (roommate.getSharedHouse() == null
+                || roommate.getSharedHouse().getId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Vous n'appartenez à aucune colocation.");
+        }
+
+        return roommate.getSharedHouse();
+    }
+
+    //Vérifie qu'une note appartient à la colocation de l'utilisateur
+    private Note getNoteInCurrentHouse(Long noteId, SharedHouse house) {
+        Note note = noteRepository.findById(noteId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Note introuvable."));
+
+        if (note.getSharedHouse() == null
+                || !house.getId().equals(note.getSharedHouse().getId())) {
+            // Ne révèle pas l'existence d'une note d'une autre colocation.
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Note introuvable.");
+        }
+
+        return note;
+    }
+
+    @Transactional(readOnly = true)
+    public List<NoteDTO> getNotes() {
+        Roommate roommate = getCurrentRoommate();
+        SharedHouse house = getCurrentHouse(roommate);
+
         return noteRepository
-                .findBySharedHouse_IdOrderByCreatedAtDesc(sharedHouseId)
+                .findBySharedHouse_IdOrderByCreatedAtDesc(house.getId())
                 .stream()
-                .map(note -> toDTO(note, currentRoommateId))
+                .map(note -> toDTO(note, roommate.getId()))
                 .toList();
     }
 
-    //Récupère une note par son identifiant
     @Transactional(readOnly = true)
-    public NoteDTO getNoteById(Long noteId, Long currentRoommateId) {
+    public NoteDTO getNoteById(Long noteId) {
+        Roommate roommate = getCurrentRoommate();
+        SharedHouse house = getCurrentHouse(roommate);
 
-        Note note = noteRepository.findById(noteId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Note introuvable."));
-
-        return toDTO(note, currentRoommateId);
+        Note note = getNoteInCurrentHouse(noteId, house);
+        return toDTO(note, roommate.getId());
     }
 
-    //Crée une annonce ou un sondage
     @Transactional
     public NoteDTO createNote(CreateNoteDTO dto) {
-
         validateCreateNote(dto);
 
-        Roommate creator = roommateRepository.findById(dto.getCreatorId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Créateur introuvable."));
-
-        SharedHouse sharedHouse = sharedHouseRepository
-                .findById(dto.getSharedHouseId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Colocation introuvable."));
-
-        if (creator.getSharedHouse() == null
-                || !creator.getSharedHouse().getId()
-                        .equals(sharedHouse.getId())) {
-            throw new IllegalArgumentException(
-                    "Le créateur n'appartient pas à cette colocation.");
-        }
+        Roommate creator = getCurrentRoommate();
+        SharedHouse house = getCurrentHouse(creator);
 
         Note note = new Note();
         note.setType(dto.getType());
         note.setContent(dto.getContent().trim());
         note.setCreatedAt(LocalDateTime.now());
         note.setCreator(creator);
-        note.setSharedHouse(sharedHouse);
+        note.setSharedHouse(house);
 
         if (dto.getType() == NoteType.SONDAGE) {
             note.setMultipleAnswers(dto.isMultipleAnswers());
@@ -117,61 +144,56 @@ public class NoteService {
             }
         }
 
-        return toDTO(savedNote, dto.getCreatorId());
+        return toDTO(savedNote, creator.getId());
     }
 
-    // Supprime une note si le demandeur en est le créateur
     @Transactional
-    public void deleteNote(Long noteId, Long currentRoommateId) {
+    public void deleteNote(Long noteId) {
+        Roommate roommate = getCurrentRoommate();
+        SharedHouse house = getCurrentHouse(roommate);
+        Note note = getNoteInCurrentHouse(noteId, house);
 
-        Note note = noteRepository.findById(noteId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Note introuvable."));
-
-        if (currentRoommateId == null
-                || !note.getCreator().getId().equals(currentRoommateId)) {
-            throw new IllegalArgumentException(
+        if (!note.getCreator().getId().equals(roommate.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
                     "Seul le créateur peut supprimer cette note.");
         }
 
         noteRepository.delete(note);
     }
 
-    //Vérifie les données de création
     private void validateCreateNote(CreateNoteDTO dto) {
-
         if (dto == null) {
-            throw new IllegalArgumentException(
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     "Les données de la note sont obligatoires.");
         }
 
         if (dto.getType() == null) {
-            throw new IllegalArgumentException(
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     "Le type de note est obligatoire.");
         }
 
         if (dto.getContent() == null || dto.getContent().isBlank()) {
-            throw new IllegalArgumentException(
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
                     "Le contenu de la note est obligatoire.");
-        }
-
-        if (dto.getCreatorId() == null || dto.getSharedHouseId() == null) {
-            throw new IllegalArgumentException(
-                    "Le créateur et la colocation sont obligatoires.");
         }
 
         if (dto.getType() == NoteType.SONDAGE) {
             if (dto.getOptions() == null || dto.getOptions().size() < 2) {
-                throw new IllegalArgumentException(
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
                         "Un sondage doit avoir au moins deux options.");
             }
 
             boolean invalidOption = dto.getOptions().stream()
-                    .anyMatch(option ->
-                            option == null || option.isBlank());
+                    .anyMatch(option -> option == null || option.isBlank());
 
             if (invalidOption) {
-                throw new IllegalArgumentException(
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
                         "Les options ne peuvent pas être vides.");
             }
 
@@ -179,15 +201,14 @@ public class NoteService {
                     .map(String::trim)
                     .distinct()
                     .count() != dto.getOptions().size()) {
-                throw new IllegalArgumentException(
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
                         "Les options d'un sondage doivent être différentes.");
             }
         }
     }
 
-    // Convertit une entité Note en DTO pour Angular
     private NoteDTO toDTO(Note note, Long currentRoommateId) {
-
         NoteDTO dto = new NoteDTO();
         dto.setId(note.getId());
         dto.setType(note.getType());
@@ -197,22 +218,24 @@ public class NoteService {
         Roommate creator = note.getCreator();
 
         dto.setCreatorId(creator.getId());
-        dto.setCreatorName(creator.getName() + " " + creator.getSurname());
+        dto.setCreatorName(
+                creator.getName() + " " + creator.getSurname());
         dto.setCreatorInitials(
-                getInitial(creator.getName()) + getInitial(creator.getSurname()));
+                getInitial(creator.getName())
+                        + getInitial(creator.getSurname()));
 
         dto.setSharedHouseId(note.getSharedHouse().getId());
         dto.setMultipleAnswers(note.isMultipleAnswers());
-
         dto.setCanDelete(
                 currentRoommateId != null
-                && creator.getId().equals(currentRoommateId));
+                        && creator.getId().equals(currentRoommateId));
 
         List<PollOptionDTO> optionDTOs = new ArrayList<>();
 
         if (note.getType() == NoteType.SONDAGE) {
             List<PollOption> options =
-                    pollOptionRepository.findByNote_IdOrderByIdAsc(note.getId());
+                    pollOptionRepository
+                            .findByNote_IdOrderByIdAsc(note.getId());
 
             for (PollOption option : options) {
                 PollOptionDTO optionDTO = new PollOptionDTO();

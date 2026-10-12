@@ -12,6 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 public class VoteDTO {
 
-    private Long roommateId;
     private List<Long> optionIds = new ArrayList<>();
 }
