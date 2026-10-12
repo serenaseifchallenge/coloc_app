@@ -7,6 +7,7 @@ import com.coloc.back.entity.Roommate;
 import com.coloc.back.entity.SharedHouse;
 import com.coloc.back.repository.RoommateRepository;
 import com.coloc.back.repository.SharedHouseRepository;
+import com.coloc.back.repository.NoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class SharedHouseService {
     private final CurrentUserService currentUserService;
     private final TaskService taskService;
     private final ArticleService articleService;
+    private final NoteRepository noteRepository;
 
     @Transactional(readOnly = true)
     public SharedHouseResponse getMine() {
@@ -85,6 +87,11 @@ public class SharedHouseService {
         if (house == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Vous n'êtes dans aucune colocation");
         }
+        // Supprimer les notes créées par la personne qui quitte la coloc.
+        noteRepository.deleteAll(
+                noteRepository.findByCreator_Id(me.getId())
+        );
+        noteRepository.flush();
 
         taskService.unassignToDoTasksOf(house.getId(), me.getId());
         articleService.deletePersonalArticlesOf(house.getId(), me.getId());
