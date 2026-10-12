@@ -1,4 +1,4 @@
-# Coloc
+# Coloc — application web de gestion de colocation
 
 Coloc est une application web qui aide les colocataires à organiser leur vie commune. Elle réunit au même endroit ce qui, d'habitude, se perd dans les discussions de groupe : le partage des tâches ménagères, la liste de courses, les dépenses communes, le calendrier de la maison, les notes et les sondages. Un système de points récompense ceux qui s'investissent dans les tâches et alimente un classement mensuel, pour que l'organisation reste équitable et un peu ludique.
 
@@ -38,9 +38,27 @@ Avant de lancer le projet, assurez-vous d'avoir installé les outils suivants :
 - **Docker Desktop**, qui fournit la base de données PostgreSQL sans installation supplémentaire.
 - **Git**, pour récupérer le projet et suivre les modifications.
 
+Vous pouvez vérifier vos installations avec les commandes suivantes (versions testées : JDK 17 à 25, Node.js 20 ou plus, Docker 24 ou plus) :
+
+```bash
+java -version
+node -v
+npm -v
+ng version
+docker --version
+git --version
+```
+
 Le port 5432 doit également être libre. Si PostgreSQL est déjà installé directement sur votre machine, arrêtez ce service avant de commencer, sinon l'application se connectera à cette base locale plutôt qu'à celle de Docker et échouera au démarrage.
 
 ## Installation et lancement
+
+Récupérez d'abord le projet :
+
+```bash
+git clone https://github.com/serenaseifchallenge/coloc_app.git
+cd coloc_app
+```
 
 Commencez par créer votre fichier de configuration. À la racine du projet, copiez le modèle fourni puis remplissez-le avec vos propres valeurs.
 
@@ -78,9 +96,26 @@ ng serve
 
 L'application est alors accessible sur http://localhost:4200, où vous pouvez créer un compte et rejoindre ou créer une colocation. Si vous voulez repartir d'une base entièrement vide, par exemple après une modification du schéma, utilisez `docker compose down -v` puis `docker compose up -d`. Attention, cette commande supprime toutes les données existantes.
 
-## Premiers pas dans l'application
+## Exemple d'utilisation minimale
 
-Au premier lancement, la page de connexion s'affiche. Créez un compte avec votre prénom, votre nom, votre adresse e-mail et un mot de passe, puis connectez-vous. Vous arrivez alors sur un écran qui vous propose soit de créer une nouvelle colocation, soit d'en rejoindre une existante. Une fois dans une colocation, vous accédez à l'accueil et au menu principal qui donne accès à toutes les fonctionnalités. Pour tester le fonctionnement à plusieurs, créez un deuxième compte (dans une fenêtre de navigation privée par exemple) et faites-le rejoindre la même colocation : vous pourrez alors vous assigner des tâches, partager des dépenses et voter aux sondages comme le feraient de vrais colocataires.
+Une fois la base, le back et le front lancés, voici le parcours le plus court pour voir l'application fonctionner :
+
+1. Ouvrez http://localhost:4200 : la page de connexion s'affiche.
+2. Cliquez sur l'inscription et créez un compte (prénom, nom, adresse e-mail, mot de passe d'au moins 8 caractères et date de naissance), puis connectez-vous.
+3. Créez une colocation (nom, adresse, description) ou rejoignez-en une existante.
+4. Depuis l'accueil, ouvrez le menu **Dépenses**, ajoutez une dépense et choisissez les colocataires concernés : l'onglet **Soldes** indique aussitôt qui doit combien à qui.
+
+Pour tester à plusieurs, créez un second compte dans une fenêtre de navigation privée et faites-le rejoindre la même colocation.
+
+L'API peut aussi s'utiliser directement, par exemple pour créer un compte et récupérer un jeton d'authentification (commandes à lancer dans Git Bash ou tout terminal Linux/macOS) :
+
+```bash
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Alice","surname":"Martin","email":"alice@example.com","password":"motdepasse123","birthday":"2004-05-12"}'
+```
+
+La réponse contient un champ `token` (JWT) à envoyer ensuite dans l'en-tête `Authorization: Bearer <token>` pour appeler les autres routes de l'API.
 
 ## Sécurité
 
@@ -151,3 +186,9 @@ Voici les problèmes que nous avons le plus souvent rencontrés pendant le déve
 | **Conflit de merge** : `CONFLICT (content): Merge conflict in ...` | Deux personnes ont modifié les mêmes lignes d'un fichier, souvent `app.routes.ts`, `01_schema.sql` ou `02_data.sql`. | Mettre sa branche à jour avec `git fetch` puis `git merge origin/main`. Ouvrir chaque fichier en conflit, garder les deux versions quand ce sont des ajouts, supprimer les marqueurs `<<<<<<<`, `=======`, `>>>>>>>`, puis `git add <fichier>` et `git commit`. Pour tout annuler : `git merge --abort`. |
 | **Erreur de commit** : `Please tell me who you are`, ou fichier ajouté par erreur | L'identité Git n'est pas configurée, ou un fichier non voulu (`.env`, `.idea/`) a été ajouté à l'index. | Configurer son identité avec `git config --global user.name "Prénom Nom"` et `git config --global user.email "adresse@mail"`. Retirer un fichier de l'index avec `git restore --staged <fichier>`. Corriger le dernier message, s'il n'est pas poussé, avec `git commit --amend`. Vérifier avec `git status` avant chaque commit. |
 | **Erreur de push** : `rejected ... non-fast-forward` ou `failed to push some refs` | Le dépôt distant contient des commits absents en local, ou l'historique de la branche a été réécrit. | Récupérer les commits avec `git pull --rebase origin <branche>`, résoudre les conflits éventuels, puis `git push`. Si Git indique `no upstream branch` : `git push -u origin <branche>`. Après un `--amend` ou un rebase volontaire : `git push --force-with-lease`, jamais sur `main`. |
+
+## Auteurs
+
+Projet réalisé par Emma Lehec, Serena Seif, Mila Ambrosi et Sonja Dia, dans le cadre du cours de Java de l'EPF (2026).
+
+Dépôt du projet : https://github.com/serenaseifchallenge/coloc_app
