@@ -159,6 +159,29 @@ Pour garder la maîtrise de notre projet, nous nous sommes fixé trois règles :
 - **Un code compris par son auteur** : chaque membre doit être capable d'expliquer le code de sa partie, qu'il l'ait écrit seul ou avec de l'aide, et de le modifier sans l'outil.
 - **Un esprit critique** : quand l'IA proposait quelque chose de faux ou d'inadapté, nous l'avons corrigé ou écarté plutôt que de l'accepter tel quel.
 
+### Contributions individuelles
+
+Au-delà des règles communes, chaque membre décrit ci-dessous son usage personnel de l'IA sur sa propre partie.
+
+#### Sonja Dia — module Dépenses (dépenses, soldes, remboursements, cagnottes)
+
+- **Outil** : un assistant d'IA générative conversationnel.
+- **Usage** : l'IA a généré l'essentiel du code du module à partir de ma description du besoin et de la structure du projet. Côté back : entités, repositories, services, contrôleurs, DTO, algorithmes de répartition en centimes et de simplification des dettes, tests unitaires. Côté front : la page à trois onglets (Dépenses, Soldes, Cagnottes), les formulaires et les services HTTP. Je l'ai aussi utilisée pour comprendre des erreurs de lancement (conflit de port avec PostgreSQL), découper mon travail en commits cohérents et rédiger des textes de pull request.
+- **Ce que j'ai fait moi-même** : définir le contenu du module (écrans, règles de calcul, droits de chacun), puis ses évolutions (retrait d'un versement, indication que l'achat est effectué, historique des cagnottes terminées), intégrer le code au projet, lancer l'application, tester chaque parcours à la main, corriger les problèmes rencontrés et faire relire le tout par l'équipe via pull request.
+- **Vérification** : tests unitaires sur les calculs, tests manuels des trois onglets, relecture par l'équipe.
+
+#### Emma Lehec
+
+*À compléter par Emma : outil utilisé (ou aucun), pour quelles parties, et comment le code a été vérifié.*
+
+#### Serena Seif
+
+*À compléter par Serena : outil utilisé (ou aucun), pour quelles parties, et comment le code a été vérifié.*
+
+#### Mila Ambrosi
+
+*À compléter par Mila : outil utilisé (ou aucun), pour quelles parties, et comment le code a été vérifié.*
+
 ### Limites et enseignements
 
 L'IA accélère nettement l'écriture du code répétitif et aide à débloquer des situations, mais elle ne connaît pas notre projet par elle-même : elle a besoin d'un cadre précis et de consignes claires. Ses résultats doivent toujours être testés et relus. Dans notre expérience, c'est ce travail de vérification qui garantit la qualité du résultat, et non l'outil seul.
