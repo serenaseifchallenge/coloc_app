@@ -10,6 +10,7 @@ export interface CalendarEvent {
   creatorId: number;
   creatorName: string;
   creatorInitials: string;
+  creatorAvatarColor: string | null;
   sharedHouseId: number;
 }
 

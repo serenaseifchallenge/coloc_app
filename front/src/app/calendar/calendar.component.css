@@ -214,20 +214,23 @@
   gap: 5px;
   padding: 4px 5px;
   border-radius: 4px;
-  background: #f3f1ff;
+  background-color: color-mix(
+    in srgb,
+    var(--event-color, #6c63ff) 12%,
+    white
+  );
+  /*border-left: 3px solid var(--event-color, #6c63ff);*/
   text-align: left;
   cursor: pointer;
 }
 
-/*
-.event-dot {
+/*.event-dot {
   flex-shrink: 0;
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #6569b5;
-}
-*/
+  background-color: var(--event-color, #6c63ff);
+}*/
 
 .event-mini-title {
   flex: 1;
@@ -248,7 +251,6 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #6c70c0;
   color: white;
   font-size: 8px;
   font-weight: 700;
@@ -334,7 +336,12 @@
   width: 100%;
   padding: 9px;
   border-radius: 7px;
-  background: #f2f0ff;
+  background-color: color-mix(
+    in srgb,
+    var(--event-color, #6c63ff) 12%,
+    white
+  );
+  border-left: 3px solid var(--event-color, #6c63ff);
   text-align: left;
   cursor: pointer;
 }
@@ -369,7 +376,6 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #6c70c0;
   color: white;
   font-size: 9px;
   font-weight: 700;
@@ -437,7 +443,6 @@
   align-self: stretch;
   min-height: 60px;
   border-radius: 5px;
-  background: #686ab7;
 }
 
 .event-information {
@@ -490,7 +495,6 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #6c70c0;
   color: white;
   font-size: 11px;
   font-weight: 700;

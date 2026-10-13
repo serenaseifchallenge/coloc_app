@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BackdropClick } from '../shared/directives/backdrop-click';
 import { CalendarService } from './calendar.service';
+import { AVATAR_COLORS } from '../shared/components/roommate-avatar/roommate-avatar';
 import {
   CalendarEvent,
   CalendarEventRequest
@@ -199,6 +200,11 @@ export class CalendarComponent implements OnInit {
 
       return a.startTime.localeCompare(b.startTime);
     });
+  }
+
+  getCreatorAvatarColor(event: CalendarEvent): string {
+    return event.creatorAvatarColor
+      ?? AVATAR_COLORS[event.creatorId % AVATAR_COLORS.length];
   }
 
   getEventsForDate(date: Date): CalendarEvent[] {

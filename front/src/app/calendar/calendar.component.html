@@ -2,19 +2,15 @@
 
   <!-- HEADER -->
   <div class="calendar-header">
-
     <div>
       <h1>Calendrier des événements</h1>
-
       <p class="calendar-subtitle">
         Retrouvez les événements de votre colocation.
       </p>
     </div>
 
     <div class="header-actions">
-
       <div class="view-switcher">
-
         <button
           [class.active]="view === 'week'"
           (click)="setView('week')">
@@ -26,7 +22,6 @@
           (click)="setView('month')">
           Mois
         </button>
-
       </div>
 
       <button
@@ -34,17 +29,12 @@
         (click)="openEventForm()">
         + événement
       </button>
-
     </div>
-
   </div>
-
 
   <!-- CALENDRIER -->
   <div class="calendar-card">
-
     <div class="calendar-navigation">
-
       <button
         class="today-button"
         (click)="goToToday()">
@@ -56,7 +46,6 @@
       </div>
 
       <div class="navigation-buttons">
-
         <button
           aria-label="Période précédente"
           (click)="view === 'month' ? previousMonth() : previousWeek()">
@@ -68,29 +57,19 @@
           (click)="view === 'month' ? nextMonth() : nextWeek()">
           ›
         </button>
-
       </div>
-
     </div>
 
-
     <!-- VUE MOIS -->
-
     @if (view === 'month') {
-
       <div class="calendar-grid">
-
         @for (day of weekDays; track day) {
-
           <div class="weekday">
             {{ day }}
           </div>
-
         }
 
-
         @for (date of calendarDays; track $index) {
-
           <button
             class="calendar-day"
             [class.other-month]="!isCurrentMonth(date)"
@@ -98,22 +77,18 @@
             [class.today]="isToday(date)"
             (click)="selectDate(date)">
 
-            <!-- NUMERO DU JOUR -->
             <span class="day-number">
               {{ formatDayNumber(date) }}
             </span>
 
-
-            <!-- EVENEMENTS -->
             <div class="day-events">
-
               @for (
                 event of getEventsForDate(date).slice(0, 2);
                 track event.id
               ) {
-
                 <div
                   class="calendar-event-mini"
+                  [style.--event-color]="getCreatorAvatarColor(event)"
                   (click)="
                     $event.stopPropagation();
                     openEditEvent(event)
@@ -125,42 +100,29 @@
                     {{ event.title }}
                   </span>
 
-                  <!-- AVATAR DU CREATEUR -->
-                  <span class="creator-avatar-mini">
+                  <span
+                    class="creator-avatar-mini"
+                    [style.background-color]="getCreatorAvatarColor(event)">
                     {{ event.creatorInitials }}
                   </span>
-
                 </div>
-
               }
 
               @if (getEventsForDate(date).length > 2) {
-
                 <span class="more-events">
                   +{{ getEventsForDate(date).length - 2 }}
                 </span>
-
               }
-
             </div>
-
           </button>
-
         }
-
       </div>
-
     }
 
-
     <!-- VUE SEMAINE -->
-
     @if (view === 'week') {
-
       <div class="week-view">
-
         @for (date of weekDaysDates; track $index) {
-
           <button
             class="week-day"
             [class.selected]="isSelected(date)"
@@ -176,166 +138,112 @@
             </span>
 
             <div class="week-events">
-
               @for (
                 event of getEventsForDate(date);
                 track event.id
               ) {
-
                 <div
                   class="week-event"
+                  [style.--event-color]="getCreatorAvatarColor(event)"
                   (click)="
                     $event.stopPropagation();
                     openEditEvent(event)
                   ">
 
-                  <!-- INFORMATIONS -->
                   <div class="week-event-information">
-
                     <strong>
                       {{ event.title }}
                     </strong>
 
                     @if (event.allDay) {
-
-                      <span>
-                        Toute la journée
-                      </span>
-
+                      <span>Toute la journée</span>
                     } @else {
-
                       <span>
                         {{ formatTime(event.startTime) }}
                         -
                         {{ formatTime(event.endTime) }}
                       </span>
-
                     }
-
                   </div>
 
-                  <!-- AVATAR DU CREATEUR -->
-                  <span class="creator-avatar-week">
+                  <span
+                    class="creator-avatar-week"
+                    [style.background-color]="getCreatorAvatarColor(event)">
                     {{ event.creatorInitials }}
                   </span>
-
                 </div>
-
               }
 
               @if (getEventsForDate(date).length === 0) {
-
                 <span class="no-week-event">
                   Aucun événement
                 </span>
-
               }
-
             </div>
-
           </button>
-
         }
-
       </div>
-
     }
-
   </div>
 
-
   <!-- EVENEMENTS DU JOUR -->
-
   <section class="selected-day-section">
-
     <div class="selected-day-header">
-
-      <h2>
-        {{ selectedDateLabel }}
-      </h2>
-
+      <h2>{{ selectedDateLabel }}</h2>
     </div>
 
-
     @if (selectedDayEvents.length === 0) {
-
       <div class="empty-events">
         <span>Aucun événement de prévu</span>
       </div>
-
     } @else {
-
       <div class="events-list">
-
         @for (event of selectedDayEvents; track event.id) {
-
           <article
             class="event-card"
             (click)="openEditEvent(event)">
 
-            <div class="event-color"></div>
+            <div
+              class="event-color"
+              [style.background-color]="getCreatorAvatarColor(event)">
+            </div>
 
             <div class="event-information">
-
-              <h3>
-                {{ event.title }}
-              </h3>
-
+              <h3>{{ event.title }}</h3>
 
               @if (event.description) {
-
-                <p>
-                  {{ event.description }}
-                </p>
-
+                <p>{{ event.description }}</p>
               }
 
-
               <div class="event-details">
-
                 @if (event.allDay) {
-
-                  <span>
-                    Toute la journée
-                  </span>
-
+                  <span>Toute la journée</span>
                 } @else {
-
                   <span>
                     {{ formatTime(event.startTime) }}
                     -
                     {{ formatTime(event.endTime) }}
                   </span>
-
                 }
-
 
                 @if (event.startDate !== event.endDate) {
-
-                  <span>
-                    {{ formatEventDate(event) }}
-                  </span>
-
+                  <span>{{ formatEventDate(event) }}</span>
                 }
-
               </div>
-
             </div>
-
 
             <!-- CREATEUR A DROITE -->
             <div class="event-creator-right">
-
-              <span class="creator-avatar">
+              <span
+                class="creator-avatar"
+                [style.background-color]="getCreatorAvatarColor(event)">
                 {{ event.creatorInitials }}
               </span>
 
               <span class="creator-name">
                 {{ event.creatorName }}
               </span>
-
             </div>
-
 
             <!-- POUBELLE -->
             <button
@@ -383,27 +291,17 @@
                   stroke-width="2"
                   stroke-linecap="round"
                 />
-
               </svg>
-
             </button>
-
           </article>
-
         }
-
       </div>
-
     }
-
   </section>
 
-
   <!-- MODALE CREATION / MODIFICATION -->
-
   @if (showEventForm) {
-
-      <div
+    <div
       class="modal-overlay"
       appBackdropClick
       (backdropClick)="closeEventForm()">
@@ -412,156 +310,93 @@
         class="event-modal"
         (click)="$event.stopPropagation()">
 
-        <!-- HEADER -->
         <div class="modal-header">
-
           <div>
-
-            <h2>
-              {{ modalTitle }}
-            </h2>
+            <h2>{{ modalTitle }}</h2>
 
             <p>
-
               @if (editingEventId === null) {
                 Ajoutez un événement à votre calendrier.
               } @else {
                 Modifiez les informations de votre événement.
               }
-
             </p>
-
           </div>
-
 
           <button
             class="close-button"
             (click)="closeEventForm()"
             aria-label="Fermer">
-
             ×
-
           </button>
-
         </div>
 
-
-        <!-- FORMULAIRE -->
         <div class="form-content">
-
-          <!-- TITRE -->
           <div class="form-group">
-
-            <label for="event-title">
-              Titre
-            </label>
+            <label for="event-title">Titre</label>
 
             <input
               id="event-title"
               type="text"
               placeholder="Ex : Anniversaire, rendez-vous, ..."
               [(ngModel)]="newEvent.title">
-
           </div>
 
-
-          <!-- TOUTE LA JOURNEE -->
           <div class="all-day-row">
-
-            <label for="all-day">
-              Toute la journée
-            </label>
+            <label for="all-day">Toute la journée</label>
 
             <label class="toggle">
-
               <input
                 id="all-day"
                 type="checkbox"
                 [(ngModel)]="newEvent.allDay">
 
               <span class="toggle-slider"></span>
-
             </label>
-
           </div>
 
-
-          <!-- DATE ET HEURE DE DEBUT -->
           <div class="date-time-row">
-
             <div class="date-time-group">
-
-              <label>
-                Début
-              </label>
+              <label>Début</label>
 
               <input
                 type="date"
                 [(ngModel)]="newEvent.startDate">
-
             </div>
 
-
             @if (!newEvent.allDay) {
-
               <div class="date-time-group">
-
-                <label>
-                  à
-                </label>
+                <label>à</label>
 
                 <input
                   type="time"
                   [(ngModel)]="newEvent.startTime">
-
               </div>
-
             }
-
           </div>
 
-
-          <!-- DATE ET HEURE DE FIN -->
           <div class="date-time-row">
-
             <div class="date-time-group">
-
-              <label>
-                Fin
-              </label>
+              <label>Fin</label>
 
               <input
                 type="date"
                 [(ngModel)]="newEvent.endDate">
-
             </div>
 
-
             @if (!newEvent.allDay) {
-
               <div class="date-time-group">
-
-                <label>
-                  à
-                </label>
+                <label>à</label>
 
                 <input
                   type="time"
                   [(ngModel)]="newEvent.endTime">
-
               </div>
-
             }
-
           </div>
 
-
-          <!-- NOTES -->
           <div class="form-group">
-
-            <label for="event-description">
-              Notes
-            </label>
+            <label for="event-description">Notes</label>
 
             <textarea
               id="event-description"
@@ -569,15 +404,10 @@
               placeholder="Ajouter une note..."
               [(ngModel)]="newEvent.description">
             </textarea>
-
           </div>
-
         </div>
 
-
-        <!-- ACTIONS -->
         <div class="modal-actions">
-
           <button
             class="cancel-button"
             (click)="closeEventForm()">
@@ -594,15 +424,9 @@
             } @else {
               Enregistrer
             }
-
           </button>
-
         </div>
-
       </div>
-
     </div>
-
   }
-
 </div>
