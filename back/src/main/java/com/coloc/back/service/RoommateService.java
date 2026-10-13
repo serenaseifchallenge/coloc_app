@@ -8,6 +8,7 @@ import com.coloc.back.dto.UpdateAvatarRequest;
 import com.coloc.back.entity.Roommate;
 import com.coloc.back.repository.NoteRepository;
 import com.coloc.back.repository.RoommateRepository;
+import com.coloc.back.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ public class RoommateService {
     private final SharedHouseService sharedHouseService;
     private final PasswordEncoder passwordEncoder;
     private final NoteRepository noteRepository;
+    private final EventRepository eventRepository;
 
     @Transactional(readOnly = true)
     public RoommateResponse getMe() {
@@ -74,9 +76,11 @@ public class RoommateService {
     @Transactional
     public void deleteMe() {
         Roommate me = currentUserService.getCurrentRoommate();
-        // Supprimer les notes créées par cette personne.
+        // Supprimer les notes et les évènements créés par cette personne.
         noteRepository.deleteAll(noteRepository.findByCreator_Id(me.getId()));
         noteRepository.flush();
+        eventRepository.deleteByCreator_Id(me.getId()); 
+        eventRepository.flush();
         if (me.getSharedHouse() != null) {
             sharedHouseService.leave(); // supprime aussi la coloc si c'était le dernier membre
         }

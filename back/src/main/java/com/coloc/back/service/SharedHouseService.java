@@ -12,6 +12,7 @@ import com.coloc.back.entity.Pot;
 import com.coloc.back.entity.PotPayment;
 import com.coloc.back.repository.PotPaymentRepository;
 import com.coloc.back.repository.PotRepository;
+import com.coloc.back.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,7 @@ public class SharedHouseService {
     private final BalanceService balanceService;
     private final PotRepository potRepository;
     private final PotPaymentRepository potPaymentRepository;
+    private final EventRepository eventRepository;
 
     @Transactional(readOnly = true)
     public SharedHouseResponse getMine() {
@@ -100,7 +102,11 @@ public class SharedHouseService {
         if (house == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Vous n'êtes dans aucune colocation");
         }
-        // Supprimer les notes créées par la personne qui quitte la coloc.
+        // Supprimer les notes et les évènements créés par la personne qui quitte la coloc
+        eventRepository.deleteByCreator_IdAndSharedHouse_Id(
+            me.getId(), house.getId() 
+        ); 
+        eventRepository.flush();
         noteRepository.deleteAll(
                 noteRepository.findByCreator_Id(me.getId())
         );
