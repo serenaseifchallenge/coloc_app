@@ -15,10 +15,10 @@ Nous avons aussi voulu que l'application soit équitable et motivante. Les tâch
 L'application propose les fonctionnalités suivantes, accessibles depuis le menu principal une fois connecté à une colocation :
 
 - **Compte et colocation** : chacun crée son compte, puis crée une colocation ou en rejoint une existante. Il peut modifier son profil, son adresse e-mail et son mot de passe, quitter la colocation ou supprimer son compte.
-- **Accueil** : une page de synthèse qui résume en un coup d'œil l'activité de la maison (points, courses à faire, dépenses du mois, prochains événements, dernières notes).
-- **Tâches ménagères** : les tâches sont créées, assignées à un colocataire, dotées d'une échéance et d'un nombre de points, et peuvent se répéter automatiquement. Les tâches terminées sont nettoyées au bout d'un certain temps.
+- **Accueil** : une page de synthèse qui résume en un coup d'œil l'activité de la maison (tâche à faire, courses à faire, dépenses du mois, prochains événements, dernières notes, points).
+- **Tâches ménagères** : les tâches sont créées, assignées à un colocataire, dotées d'une échéance et d'un nombre de points. Les tâches terminées sont nettoyées au bout de 2 semaines.
 - **Points et classement** : accomplir une tâche rapporte des points. Un classement mensuel et le podium du mois précédent récompensent les plus investis, avec une clôture automatique à chaque fin de mois.
-- **Courses** : une liste partagée où chacun ajoute, modifie ou supprime des articles ; les articles achetés disparaissent automatiquement.
+- **Courses** : une liste personnelle accessible à uniquement à l'utilisateur conneccté ainsi qu'une liste partagée à la colocation où chacun ajoute, modifie ou supprime des articles.
 - **Dépenses partagées** : les dépenses communes sont réparties entre les participants, les soldes de chacun sont calculés et l'application propose le plus petit nombre de remboursements pour équilibrer les comptes. Elle gère aussi des cagnottes collectives, qui peuvent être cachées à certains colocataires pour préparer un cadeau surprise.
 - **Calendrier** : un agenda commun, en vue mensuelle ou hebdomadaire, pour les événements de la maison.
 - **Notes et sondages** : des notes partagées et des sondages à choix multiples pour décider ensemble.
@@ -67,12 +67,14 @@ cp .env.example .env
 ```
 
 Le fichier `.env` contient le nom de la base, l'utilisateur et le mot de passe de la base de données ainsi que la clé secrète utilisée pour signer les jetons JWT. Cette clé doit être une longue chaîne aléatoire d'au moins 32 caractères. Ce fichier est personnel et ne doit jamais être envoyé sur Git.
+*Nb : Afin de générer votre JWT SECRET veuillez taper cette commande sur votre terminal :*  ``` openssl rand -base64 32 ```
 
 ```
 DATABASE_NAME=coloc
 DATABASE_USER=coloc_user
 DATABASE_PASSWORD=un_mot_de_passe
-JWT_SECRET=une_longue_chaine_aleatoire_d_au_moins_32_caracteres
+JWT_SECRET=une_longue_chaine_aleatoire_d_au_moins_32_caracteres  
+
 ```
 
 Démarrez ensuite la base de données depuis la racine du projet. Au tout premier lancement, Docker exécute automatiquement les scripts du dossier `database/` : il crée les tables, puis insère quelques données de démonstration.
