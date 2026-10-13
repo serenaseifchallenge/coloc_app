@@ -9,6 +9,7 @@ import com.coloc.back.entity.Pot;
 import com.coloc.back.entity.PotPayment;
 import com.coloc.back.entity.Roommate;
 import com.coloc.back.entity.SharedHouse;
+import com.coloc.back.repository.EventRepository;
 import com.coloc.back.repository.NoteRepository;
 import com.coloc.back.repository.PotPaymentRepository;
 import com.coloc.back.repository.PotRepository;
@@ -81,6 +82,9 @@ class SharedHouseServiceTest {
 
     @Mock
     private PotPaymentRepository potPaymentRepository;
+
+    @Mock
+    private EventRepository eventRepository;
 
     @InjectMocks
     private SharedHouseService sharedHouseService;
@@ -248,7 +252,9 @@ class SharedHouseServiceTest {
             List<Note> myNotes = List.of(new Note());
             when(currentUserService.getCurrentRoommate()).thenReturn(me);
             when(noteRepository.findByCreator_Id(ME_ID)).thenReturn(myNotes);
-            when(roommateRepository.findBySharedHouseId(HOUSE_ID)).thenReturn(List.of(me), List.of());
+            when(roommateRepository.findBySharedHouseId(HOUSE_ID))
+                    .thenReturn(List.of(me))
+                    .thenReturn(List.of());
 
             sharedHouseService.leave();
 
@@ -324,7 +330,9 @@ class SharedHouseServiceTest {
             when(currentUserService.getCurrentRoommate()).thenReturn(me);
             when(noteRepository.findByCreator_Id(ME_ID)).thenReturn(List.of());
             when(roommateRepository.findBySharedHouseId(HOUSE_ID))
-                    .thenReturn(List.of(me, lucas, ines), List.of(me, lucas, ines), List.of(lucas, ines));
+                    .thenReturn(List.of(me, lucas, ines))
+                    .thenReturn(List.of(me, lucas, ines))
+                    .thenReturn(List.of(lucas, ines));
             when(balanceService.computeBalances(HOUSE_ID))
                     .thenReturn(Map.of(ME_ID, BigDecimal.ZERO, LUCAS_ID, BigDecimal.ZERO, INES_ID, BigDecimal.ZERO));
             when(potPaymentRepository.findByRoommateIdAndPotSharedHouseIdAndPotPurchasedFalse(ME_ID, HOUSE_ID))

@@ -8,6 +8,7 @@ import com.coloc.back.dto.UpdateProfileRequest;
 import com.coloc.back.entity.Note;
 import com.coloc.back.entity.Roommate;
 import com.coloc.back.entity.SharedHouse;
+import com.coloc.back.repository.EventRepository;
 import com.coloc.back.repository.NoteRepository;
 import com.coloc.back.repository.RoommateRepository;
 import com.coloc.back.service.CurrentUserService;
@@ -59,6 +60,9 @@ class RoommateServiceTest {
 
     @Mock
     private NoteRepository noteRepository;
+
+    @Mock
+    private EventRepository eventRepository;
 
     @InjectMocks
     private RoommateService roommateService;
