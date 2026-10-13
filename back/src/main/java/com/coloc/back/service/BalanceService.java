@@ -6,11 +6,11 @@ import com.coloc.back.dto.TransferResponse;
 import com.coloc.back.entity.Expense;
 import com.coloc.back.entity.Reimbursement;
 import com.coloc.back.entity.Roommate;
+import com.coloc.back.entity.ExpenseShare;
 import com.coloc.back.repository.ExpenseRepository;
 import com.coloc.back.repository.ReimbursementRepository;
 import com.coloc.back.repository.RoommateRepository;
 import com.coloc.back.util.DebtSimplifier;
-import com.coloc.back.util.ExpenseSplitter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,21 +70,31 @@ public class BalanceService {
             balances.put(roommate.getId(), BigDecimal.ZERO.setScale(2));
         }
 
+        // Un compte supprimé vaut null : on ignore sa ligne, les montants des autres ne changent pas
+        // (il avait forcément un solde à 0 pour pouvoir partir).
         for (Expense expense : expenseRepository.findBySharedHouseIdOrderByExpenseDateDescIdDesc(houseId)) {
-            if (expense.getParticipantIds().isEmpty()) {
+            if (expense.getShares().isEmpty()) {
                 continue;
             }
-            balances.merge(expense.getPayer().getId(), expense.getAmount(), BigDecimal::add);
-            Map<Long, BigDecimal> shares = ExpenseSplitter.splitEqually(
-                    expense.getAmount(), new ArrayList<>(expense.getParticipantIds()));
-            shares.forEach((roommateId, share) -> balances.merge(roommateId, share.negate(), BigDecimal::add));
+            add(balances, expense.getPayer(), expense.getAmount());
+            for (ExpenseShare share : expense.getShares()) {
+                if (share.getRoommateId() != null) {
+                    balances.merge(share.getRoommateId(), share.getShare().negate(), BigDecimal::add);
+                }
+            }
         }
 
         for (Reimbursement reimbursement : reimbursementRepository
                 .findBySharedHouseIdOrderByReimbursementDateDescIdDesc(houseId)) {
-            balances.merge(reimbursement.getPayer().getId(), reimbursement.getAmount(), BigDecimal::add);
-            balances.merge(reimbursement.getReceiver().getId(), reimbursement.getAmount().negate(), BigDecimal::add);
+            add(balances, reimbursement.getPayer(), reimbursement.getAmount());
+            add(balances, reimbursement.getReceiver(), reimbursement.getAmount().negate());
         }
         return balances;
+    }
+
+    private static void add(Map<Long, BigDecimal> balances, Roommate roommate, BigDecimal amount) {
+        if (roommate != null) {
+            balances.merge(roommate.getId(), amount, BigDecimal::add);
+        }
     }
 }

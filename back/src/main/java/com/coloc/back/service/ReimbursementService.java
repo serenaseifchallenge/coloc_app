@@ -77,8 +77,8 @@ public class ReimbursementService {
     private ReimbursementResponse toResponse(Reimbursement reimbursement) {
         return new ReimbursementResponse(
                 reimbursement.getId(),
-                RoommateSummaryResponse.from(reimbursement.getPayer()),
-                RoommateSummaryResponse.from(reimbursement.getReceiver()),
+                RoommateSummaryResponse.fromNullable(reimbursement.getPayer()),
+                RoommateSummaryResponse.fromNullable(reimbursement.getReceiver()),
                 reimbursement.getAmount(),
                 reimbursement.getMethod(),
                 reimbursement.getReimbursementDate()

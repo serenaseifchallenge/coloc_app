@@ -7,8 +7,11 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "expense")
@@ -24,8 +27,9 @@ public class Expense {
     @Column(name = "shared_house_id", nullable = false, updatable = false)
     private Long sharedHouseId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "payer_id", nullable = false)
+    /** null = le payeur a supprimé son compte. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payer_id")
     private Roommate payer;
 
     @Column(nullable = false, length = 150)
@@ -41,9 +45,25 @@ public class Expense {
     @Column(nullable = false, length = 20)
     private ExpenseCategory category;
 
-    // Table "contribution" : une ligne par participant (la colonne status garde sa valeur par défaut)
+    // Table "contribution" : une ligne par participant avec sa part (la colonne status garde sa valeur par défaut)
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "contribution", joinColumns = @JoinColumn(name = "expense_id"))
-    @Column(name = "roommate_id", nullable = false)
-    private Set<Long> participantIds = new HashSet<>();
+    private List<ExpenseShare> shares = new ArrayList<>();
+
+    /** Participants qui ont encore un compte. */
+    public Set<Long> getParticipantIds() {
+        return shares.stream()
+                .map(ExpenseShare::getRoommateId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    /** Part d'un colocataire (0 s'il ne participe pas). */
+    public BigDecimal shareOf(Long roommateId) {
+        return shares.stream()
+                .filter(share -> roommateId != null && roommateId.equals(share.getRoommateId()))
+                .map(ExpenseShare::getShare)
+                .findFirst()
+                .orElse(BigDecimal.ZERO);
+    }
 }

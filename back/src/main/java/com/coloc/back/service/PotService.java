@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -109,7 +110,7 @@ public class PotService {
         if (pot.isPurchased() && request.targetAmount().compareTo(pot.getTargetAmount()) != 0) {
             throw badRequest("L'objectif ne peut plus changer : l'achat est déjà marqué comme effectué");
         }
-        Set<Long> payers = payments.stream().map(payment -> payment.getRoommate().getId()).collect(Collectors.toSet());
+        Set<Long> payers = payments.stream().map(PotService::payerId).filter(Objects::nonNull).collect(Collectors.toSet());
         if (!request.participantIds().containsAll(payers)) {
             throw badRequest("Impossible de retirer un participant qui a déjà versé de l'argent");
         }
@@ -177,7 +178,7 @@ public class PotService {
 
         PotPayment payment = potPaymentRepository.findByIdAndPotId(paymentId, pot.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Versement introuvable"));
-        if (!payment.getRoommate().getId().equals(meId)) {
+        if (!meId.equals(payerId(payment))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous ne pouvez retirer que vos propres versements");
         }
         if (pot.isPurchased()) {
@@ -283,7 +284,9 @@ public class PotService {
 
         Map<Long, BigDecimal> paidBy = new HashMap<>();
         for (PotPayment payment : payments) {
-            paidBy.merge(payment.getRoommate().getId(), payment.getAmount(), BigDecimal::add);
+            if (payerId(payment) != null) {
+                paidBy.merge(payerId(payment), payment.getAmount(), BigDecimal::add);
+            }
         }
 
         BigDecimal target = pot.getTargetAmount();
@@ -307,11 +310,11 @@ public class PotService {
         List<PotPaymentResponse> paymentResponses = payments.stream()
                 .map(payment -> new PotPaymentResponse(
                         payment.getId(),
-                        RoommateSummaryResponse.from(payment.getRoommate()),
+                        RoommateSummaryResponse.fromNullable(payment.getRoommate()),
                         payment.getAmount(),
                         payment.getMethod(),
                         payment.getPaymentDate(),
-                        !pot.isPurchased() && payment.getRoommate().getId().equals(meId)))
+                        !pot.isPurchased() && meId.equals(payerId(payment))))
                 .toList();
 
         boolean participant = ids.contains(meId);
@@ -338,6 +341,11 @@ public class PotService {
                 participants,
                 paymentResponses
         );
+    }
+
+    /** null si la personne a supprimé son compte. */
+    private static Long payerId(PotPayment payment) {
+        return payment.getRoommate() == null ? null : payment.getRoommate().getId();
     }
 
     private ResponseStatusException notFound() {

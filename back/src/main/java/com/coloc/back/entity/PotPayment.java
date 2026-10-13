@@ -23,8 +23,8 @@ public class PotPayment {
     @JoinColumn(name = "pot_id", nullable = false)
     private Pot pot;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "roommate_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "roommate_id")
     private Roommate roommate;
 
     @Column(nullable = false, precision = 10, scale = 2)

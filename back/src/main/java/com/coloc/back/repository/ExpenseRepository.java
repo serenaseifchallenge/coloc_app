@@ -10,13 +10,13 @@ import java.util.Optional;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
-    @EntityGraph(attributePaths = {"payer", "participantIds"})
+    @EntityGraph(attributePaths = {"payer", "shares"})
     List<Expense> findBySharedHouseIdOrderByExpenseDateDescIdDesc(Long sharedHouseId);
 
-    @EntityGraph(attributePaths = {"payer", "participantIds"})
+    @EntityGraph(attributePaths = {"payer", "shares"})
     List<Expense> findBySharedHouseIdAndExpenseDateBetweenOrderByExpenseDateDescIdDesc(
             Long sharedHouseId, LocalDate from, LocalDate to);
 
-    @EntityGraph(attributePaths = {"payer", "participantIds"})
+    @EntityGraph(attributePaths = {"payer", "shares"})
     Optional<Expense> findByIdAndSharedHouseId(Long id, Long sharedHouseId);
 }

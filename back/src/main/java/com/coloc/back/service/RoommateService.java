@@ -85,8 +85,7 @@ public class RoommateService {
             sharedHouseService.leave(); // supprime aussi la coloc si c'était le dernier membre
         }
         try {
-            roommateRepository.delete(me);
-            roommateRepository.flush(); // force la suppression maintenant pour attraper l'erreur ici
+        roommateRepository.deleteNow(me.getId());
         } catch (DataIntegrityViolationException e) {
             // Le compte est encore référencé (dépense payée, note, événement...) : on annule tout.
             throw new ResponseStatusException(HttpStatus.CONFLICT,

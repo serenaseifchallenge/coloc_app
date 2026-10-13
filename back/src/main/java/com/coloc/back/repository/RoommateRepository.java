@@ -27,4 +27,13 @@ public interface RoommateRepository extends JpaRepository<Roommate, Long> {
     @Modifying
     @Query("UPDATE Roommate roommate SET roommate.points = 0")
     void resetAllPoints();
+
+    /**
+     * Suppression directe en SQL (la base met à NULL ou supprime ce qui pointe vers lui).
+     * On passe par une requête, et pas par delete(), car Hibernate refuse de supprimer un objet
+     * encore référencé par des dépenses chargées en mémoire pendant la vérification du départ.
+     */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("DELETE FROM Roommate roommate WHERE roommate.id = :roommateId")
+    void deleteNow(@Param("roommateId") Long roommateId);
 }
