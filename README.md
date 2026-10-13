@@ -185,17 +185,20 @@ Au-delà des règles communes, chaque membre décrit ci-dessous son usage person
 #### Sonja Dia — module Dépenses (dépenses, soldes, remboursements, cagnottes)
 
 - **Outil** : un assistant d'IA générative conversationnel.
-- **Usage** : l'IA a généré l'essentiel du code du module à partir de ma description du besoin et de la structure du projet. Côté back : entités, repositories, services, contrôleurs, DTO, algorithmes de répartition en centimes et de simplification des dettes, tests unitaires. Côté front : la page à trois onglets (Dépenses, Soldes, Cagnottes), les formulaires et les services HTTP. Je l'ai aussi utilisée pour comprendre des erreurs de lancement (conflit de port avec PostgreSQL), découper mon travail en commits cohérents et rédiger des textes de pull request.
-- **Ce que j'ai fait moi-même** : définir le contenu du module (écrans, règles de calcul, droits de chacun), puis ses évolutions (retrait d'un versement, indication que l'achat est effectué, historique des cagnottes terminées, cagnotte secrète cachée à certains colocataires), intégrer le code au projet, lancer l'application, tester chaque parcours à la main, corriger les problèmes rencontrés et faire relire le tout par l'équipe via pull request.
+- **Mon travail** : définir le contenu du module (écrans, règles de calcul, droits de chacun), puis ses évolutions (retrait d'un versement, indication que l'achat est effectué, historique des cagnottes terminées, cagnotte secrète cachée à certains colocataires), intégrer le code au projet, lancer l'application, tester chaque parcours à la main, corriger les problèmes rencontrés et faire relire le tout par l'équipe via pull request.
+- **Usage de l'IA** : l'IA a généré l'essentiel du code du module à partir de ma description du besoin et de la structure du projet. Côté back : entités, repositories, services, contrôleurs, DTO, algorithmes de répartition en centimes et de simplification des dettes, tests unitaires. Côté front : la page à trois onglets (Dépenses, Soldes, Cagnottes), les formulaires et les services HTTP. Je l'ai aussi utilisée pour comprendre des erreurs de lancement (conflit de port avec PostgreSQL), découper mon travail en commits cohérents et rédiger des textes de pull request.
 - **Vérification** : tests unitaires sur les calculs, tests manuels des trois onglets, relecture par l'équipe.
 
 #### Emma Lehec
 
 *À compléter par Emma : outil utilisé (ou aucun), pour quelles parties, et comment le code a été vérifié.*
 
-#### Serena Seif
+#### Serena Seif - modules Tâches, Courses et Points
 
-*À compléter par Serena : outil utilisé (ou aucun), pour quelles parties, et comment le code a été vérifié.*
+- **Outil** : un assistant d'IA générative conversationnel
+- **Mon travail** : j'ai conçu pour les trois modules : maquettes visuelle sur figma, fonctionnement et règles métier (tâches récurrentes personnalisables, listes de courses personnelle et commune, attribution des points, titres, podium mensuel et remise à zéro chaque mois, nettoyage des données de tâche et courses et points quand un colocataire quitte la coloc). J'ai découpé chaque module en étapes, back puis front, et validé chaque étape dans l'application avant de passer à la suivante. J'ai intégré mon travail à celui de l'équipe et ajusté l'interface jusqu'à obtenir le rendu voulu.
+- **Usage de l'IA** :L'IA m'a servi d'appui pour produire une première version du code à partir de mes spécifications. Je l'ai aussi sollicité pour analyser des erreurs, corriger des bugs que j'avais repérés en testant.
+- **Vérification** : chaque parcours testé à la main avec le back et le front lancés - tests unitaires (JUnit, Mockito) sur les services des trois modules - relecture par l'équipe.
 
 #### Mila Ambrosi
 
