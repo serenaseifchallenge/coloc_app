@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BackdropClick } from '../shared/directives/backdrop-click';
+import { BackdropClick } from '../../shared/directives/backdrop-click';
 import { CalendarService } from './calendar.service';
-import { AVATAR_COLORS } from '../shared/components/roommate-avatar/roommate-avatar';
+import { AVATAR_COLORS } from '../../shared/components/roommate-avatar/roommate-avatar';
 import {
   CalendarEvent,
   CalendarEventRequest
 } from './calendar-event.model';
-import { AuthService } from '../core/auth/auth.service';
+import { AuthService } from '../../core/auth/auth.service';
 
 type CalendarView = 'month' | 'week';
 

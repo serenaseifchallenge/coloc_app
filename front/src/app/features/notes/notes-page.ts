@@ -2,9 +2,9 @@ import { Component, DestroyRef, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { RoommateAvatar } from '../shared/components/roommate-avatar/roommate-avatar';
-import { RoommateSummary } from '../shared/models/roommate-summary.model';
-import { BackdropClick } from '../shared/directives/backdrop-click';
+import { RoommateAvatar } from '../../shared/components/roommate-avatar/roommate-avatar';
+import { RoommateSummary } from '../../shared/models/roommate-summary.model';
+import { BackdropClick } from '../../shared/directives/backdrop-click';
 import {
   NotesService,
   NoteDTO,
@@ -13,7 +13,7 @@ import {
   CreateNoteDTO
 } from './notes.service';
 
-import { AuthService } from '../core/auth/auth.service';
+import { AuthService } from '../../core/auth/auth.service';
 
 interface PollOption {
   id: number;

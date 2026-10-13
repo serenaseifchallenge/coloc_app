@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard, hasHouseGuard, noHouseGuard } from './core/auth/auth.guards';
-import { CalendarComponent } from './calendar/calendar.component';
+import { CalendarComponent } from './features/calendar/calendar.component';
 
 export const routes: Routes = [
   // Pas connecté
@@ -58,12 +58,12 @@ export const routes: Routes = [
 
       {
         path: 'calendar',
-        loadComponent: () => import('./calendar/calendar.component').then((m) => m.CalendarComponent),
+        loadComponent: () => import('./features/calendar/calendar.component').then((m) => m.CalendarComponent),
       },
 
       {
         path: 'notes',
-        loadComponent: () => import('./notes/notes-page').then((m) => m.NotesPage),
+        loadComponent: () => import('./features/notes/notes-page').then((m) => m.NotesPage),
       },
 
       {
