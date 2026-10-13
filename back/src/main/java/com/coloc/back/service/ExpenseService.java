@@ -6,6 +6,7 @@ import com.coloc.back.dto.ExpenseSummaryResponse;
 import com.coloc.back.dto.RoommateSummaryResponse;
 import com.coloc.back.entity.Expense;
 import com.coloc.back.entity.Roommate;
+import com.coloc.back.entity.ExpenseShare;
 import com.coloc.back.repository.ExpenseRepository;
 import com.coloc.back.repository.RoommateRepository;
 import com.coloc.back.util.ExpenseSplitter;
@@ -17,7 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +105,7 @@ public class ExpenseService {
 
     private Expense findEditableExpense(Long id) {
         Expense expense = findExpense(id);
-        if (!expense.getPayer().getId().equals(currentUserService.getCurrentRoommateId())) {
+            if (!isPayer(expense, currentUserService.getCurrentRoommateId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Seul le payeur peut modifier ou supprimer cette dépense");
         }
@@ -141,16 +141,18 @@ public class ExpenseService {
         expense.setExpenseDate(request.expenseDate());
         expense.setCategory(request.category());
         expense.setPayer(payer);
-        expense.getParticipantIds().clear();
-        expense.getParticipantIds().addAll(request.participantIds());
+        // On enregistre la part de chacun : elle ne changera plus, même si un participant supprime son compte.
+        expense.getShares().clear();
+        ExpenseSplitter.splitEqually(expense.getAmount(), request.participantIds())
+                .forEach((roommateId, share) -> expense.getShares().add(new ExpenseShare(roommateId, share)));
+    }
+
+    private boolean isPayer(Expense expense, Long roommateId) {
+        return expense.getPayer() != null && expense.getPayer().getId().equals(roommateId);
     }
 
     private BigDecimal shareOf(Expense expense, Long roommateId) {
-        if (!expense.getParticipantIds().contains(roommateId)) {
-            return BigDecimal.ZERO;
-        }
-        return ExpenseSplitter.splitEqually(expense.getAmount(), new ArrayList<>(expense.getParticipantIds()))
-                .get(roommateId);
+        return expense.shareOf(roommateId);
     }
 
     private ExpenseResponse toResponse(Expense expense, Long meId) {
@@ -160,10 +162,10 @@ public class ExpenseService {
                 expense.getAmount(),
                 expense.getExpenseDate(),
                 expense.getCategory(),
-                RoommateSummaryResponse.from(expense.getPayer()),
+                RoommateSummaryResponse.fromNullable(expense.getPayer()),
                 expense.getParticipantIds().stream().sorted().toList(),
                 shareOf(expense, meId),
-                expense.getPayer().getId().equals(meId)
+                isPayer(expense, meId)
         );
     }
 

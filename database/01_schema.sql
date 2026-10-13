@@ -37,7 +37,7 @@ CREATE TABLE task (
 CREATE TABLE expense (
                          id              BIGSERIAL PRIMARY KEY,
                          shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
-                         payer_id        BIGINT NOT NULL REFERENCES roommate(id),
+                         payer_id        BIGINT REFERENCES roommate(id) ON DELETE SET NULL,
                          name            VARCHAR(150) NOT NULL,
                          amount          NUMERIC(10,2) NOT NULL CHECK (amount > 0),
                          expense_date    DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -46,17 +46,20 @@ CREATE TABLE expense (
 );
 
 CREATE TABLE contribution (
+                              id              BIGSERIAL,
                               expense_id      BIGINT NOT NULL REFERENCES expense(id) ON DELETE CASCADE,
-                              roommate_id     BIGINT NOT NULL REFERENCES roommate(id),
+                              roommate_id     BIGINT REFERENCES roommate(id) ON DELETE SET NULL,
+                              share           NUMERIC(10,2) NOT NULL CHECK (share >= 0),
                               status          BOOLEAN NOT NULL DEFAULT FALSE,
-                              PRIMARY KEY (expense_id, roommate_id)
+                              CONSTRAINT contribution_id_pkey PRIMARY KEY (id),
+                              CONSTRAINT contribution_expense_roommate_key UNIQUE (expense_id, roommate_id)
 );
 
 CREATE TABLE reimbursement (
                                id                 BIGSERIAL PRIMARY KEY,
                                shared_house_id    BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
-                               payer_id           BIGINT NOT NULL REFERENCES roommate(id),
-                               receiver_id        BIGINT NOT NULL REFERENCES roommate(id),
+                               payer_id           BIGINT REFERENCES roommate(id) ON DELETE SET NULL,
+                               receiver_id        BIGINT REFERENCES roommate(id) ON DELETE SET NULL,
                                amount             NUMERIC(10,2) NOT NULL CHECK (amount > 0),
                                method             VARCHAR(20) NOT NULL DEFAULT 'VIREMENT'
                                    CHECK (method IN ('VIREMENT', 'ESPECES', 'PAYPAL_WERO', 'AUTRE')),
@@ -92,7 +95,7 @@ CREATE TABLE pot_hidden_member (
 CREATE TABLE pot_payment (
                              id           BIGSERIAL PRIMARY KEY,
                              pot_id       BIGINT NOT NULL REFERENCES pot(id) ON DELETE CASCADE,
-                             roommate_id  BIGINT NOT NULL REFERENCES roommate(id),
+                             roommate_id  BIGINT REFERENCES roommate(id) ON DELETE SET NULL,
                              amount       NUMERIC(10,2) NOT NULL CHECK (amount > 0),
                              method       VARCHAR(20) NOT NULL DEFAULT 'VIREMENT'
                                  CHECK (method IN ('VIREMENT', 'ESPECES', 'PAYPAL_WERO', 'AUTRE')),
@@ -111,7 +114,7 @@ CREATE TABLE article (
 CREATE TABLE event (
     id              BIGSERIAL PRIMARY KEY,
     shared_house_id BIGINT NOT NULL REFERENCES shared_house(id) ON DELETE CASCADE,
-    creator_id      BIGINT NOT NULL REFERENCES roommate(id),
+    creator_id      BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,
     title           VARCHAR(150) NOT NULL,
     description     TEXT,
     start_date      DATE NOT NULL,
@@ -151,7 +154,7 @@ CREATE TABLE note (
     id BIGSERIAL PRIMARY KEY,
     shared_house_id BIGINT NOT NULL
         REFERENCES shared_house(id) ON DELETE CASCADE,
-    creator_id BIGINT NOT NULL REFERENCES roommate(id),
+    creator_id BIGINT NOT NULL REFERENCES roommate(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
     type VARCHAR(20) NOT NULL
         CHECK (type IN ('ANNONCE', 'SONDAGE')),

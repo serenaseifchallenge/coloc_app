@@ -22,13 +22,13 @@ INSERT INTO expense (shared_house_id, payer_id, name, amount, expense_date, cate
                                                                                           (1, 1, 'Courses Carrefour', 60.00, CURRENT_DATE - 2, 'COURANTE'),
                                                                                           (1, 3, 'Facture internet',  30.00, CURRENT_DATE - 5, 'INTERNET');
 
-INSERT INTO contribution (expense_id, roommate_id, status) VALUES
-                                                               (1, 1, TRUE),
-                                                               (1, 2, TRUE),
-                                                               (1, 3, FALSE),
-                                                               (2, 1, FALSE),
-                                                               (2, 2, FALSE),
-                                                               (2, 3, TRUE);
+INSERT INTO contribution (expense_id, roommate_id, share, status) VALUES
+                                                                      (1, 1, 20.00, TRUE),
+                                                                      (1, 2, 20.00, TRUE),
+                                                                      (1, 3, 20.00, FALSE),
+                                                                      (2, 1, 10.00, FALSE),
+                                                                      (2, 2, 10.00, FALSE),
+                                                                      (2, 3, 10.00, TRUE);
 
 INSERT INTO reimbursement (shared_house_id, payer_id, receiver_id, amount, method, reimbursement_date) VALUES
     (1, 2, 1, 20.00, 'VIREMENT', CURRENT_DATE - 1);

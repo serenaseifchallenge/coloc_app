@@ -184,7 +184,10 @@ public class SharedHouseService {
                         .filter(others::contains)
                         .sorted()
                         .findFirst()
-                        .orElse(others.get(0));
+                        .orElseGet(() -> others.stream()
+                                .filter(id -> !pot.getHiddenFromIds().contains(id))
+                                .findFirst()
+                                .orElse(others.get(0)));
                 pot.setCreatedById(newOwner);
             }
         }

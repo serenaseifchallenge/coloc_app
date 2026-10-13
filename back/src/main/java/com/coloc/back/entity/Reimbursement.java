@@ -22,12 +22,12 @@ public class Reimbursement {
     @Column(name = "shared_house_id", nullable = false, updatable = false)
     private Long sharedHouseId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "payer_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payer_id")
     private Roommate payer;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "receiver_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id")
     private Roommate receiver;
 
     @Column(nullable = false, precision = 10, scale = 2)
