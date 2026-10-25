@@ -191,9 +191,12 @@ Au-delà des règles communes, chaque membre décrit ci-dessous son usage person
 - **Usage de l'IA** : l'IA a généré l'essentiel du code du module à partir de ma description du besoin et de la structure du projet. Côté back : entités, repositories, services, contrôleurs, DTO, algorithmes de répartition en centimes et de simplification des dettes, tests unitaires. Côté front : la page à trois onglets (Dépenses, Soldes, Cagnottes), les formulaires et les services HTTP. Je l'ai aussi utilisée pour comprendre des erreurs de lancement (conflit de port avec PostgreSQL), découper mon travail en commits cohérents et rédiger des textes de pull request.
 - **Vérification** : tests unitaires sur les calculs, tests manuels des trois onglets, relecture par l'équipe.
 
-#### Emma Lehec
+#### Emma Lehec - modules Colocation, Colocataire, Authentification, Accueil et Paramètres
 
-*À compléter par Emma : outil utilisé (ou aucun), pour quelles parties, et comment le code a été vérifié.*
+- **Outil** : un assistant d'IA générative conversationnel.
+- **Mon travail** : j'ai participé à la réalisation du modèle des données, aux maquettes de l'app web sur figma. Je me suis occupée de l'inscription et de la connexion, de la création d'une colocation ou de l'adhésion avec un code d'invitation, de la page d'accueil, des paramètres (profil, colocation, photo de profil) et du header. Puis je me suis occupée des règles métiers des colocations et des colocataires, : si on supprime son compte ou qu'on quitte la coloc : le solde doit être à 0 et on ne doit pas avoir d'argent dans une cagnotte en cours, les cagnottes crées sont transmises à un autre colocataire, l'hitorique des dépenses est conservé mais sans le nom de la personne partie (uniquement pour suppression compte). J'ai découpé le travail en étapes, back puis front, testé chaque étape dans l'application et intégré mon travail à celui de l'équipe. 
+- **Usage de l'IA** : j'ai utilisé l'IA en lui donnant mes spécifiactions ainsi que mes maquettes du site afin d'obtenir une première version du code, ainsi que des tests adaptés. Je l'ai aussi utilisé pour comprendre les erreurs et ajusté le code, ainsi que m'aider lors de conflits sur Git. 
+- **Vérification** : j'ai d'abord lancé le back et le front pour les tester à la main (inscription, coloc, départ, suppression de compte), puis j'ai créé des tests unitaires (JUnit, Mockito) sur AuthService, JwtService, CurrentUserService, SharedHouseService et RoommateService, enfin tout à été relu et retesté par l'équipe.
 
 #### Serena Seif - modules Tâches, Courses et Points
 
