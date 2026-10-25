@@ -205,9 +205,13 @@ Au-delà des règles communes, chaque membre décrit ci-dessous son usage person
 - **Usage de l'IA** :L'IA m'a servi d'appui pour produire une première version du code à partir de mes spécifications. Je l'ai aussi sollicité pour analyser des erreurs, corriger des bugs que j'avais repérés en testant.
 - **Vérification** : chaque parcours testé à la main avec le back et le front lancés - tests unitaires (JUnit, Mockito) sur les services des trois modules - relecture par l'équipe.
 
-#### Mila Ambrosi
+#### Mila Ambrosi - modules Notes et Calendrier
 
-*À compléter par Mila : outil utilisé (ou aucun), pour quelles parties, et comment le code a été vérifié.*
+-	**Outil** : un assistant d'IA générative conversationnel
+-	**Mon travail** : j'ai participé à la conception du modèle de données et des maquettes de l'application sur Figma. J'ai développé les modules Notes et Calendrier, du backend jusqu'au frontend. Le module Notes permet de publier des annonces et de créer des sondages avec plusieurs options de réponse, une date de fin et des droits de suppression. Le module Calendrier permet de consulter les événements, de naviguer entre les vues mensuelle et hebdomadaire, ainsi que de créer, modifier et supprimer des événements. 
+-	**Usage de l'IA** : j'ai utilisé l'IA pour m'accompagner dans le développement des fonctionnalités à partir des besoins du projet et du code existant. Elle m'a aidée à structurer et adapter le code, à comprendre et corriger des erreurs, ainsi qu'à préparer des tests unitaires.
+-	**Vérification** : parcours testés à la main avec le back et le front lancés - tests unitaires (JUnit, Mockito) - relecture par l'équipe
+
 
 ### Limites et enseignements
 
